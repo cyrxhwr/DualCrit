@@ -162,10 +162,7 @@ export default function ActivityRoom() {
         )}
 
         {activity && step === 'my-feedback' && id && (
-          <InterviewFeedback
-            activityId={id}
-            scenarioTag={activity.selectedScenarioTag}
-          />
+          <InterviewFeedback activityId={id} />
         )}
 
         {activity && step === 'lobby' && (

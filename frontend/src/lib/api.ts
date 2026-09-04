@@ -113,15 +113,6 @@ export interface Criterion {
   response: string;
 }
 
-/** A moment in the transcript the evaluation points at. */
-export interface Annotation {
-  messageIndex: number;
-  quote: string;
-  kind: 'issue' | 'good';
-  label: string;
-  explanation: string;
-}
-
 export interface StoredEvaluation {
   id: string;
   scope: 'team' | 'user';
@@ -133,7 +124,6 @@ export interface StoredEvaluation {
     feedback?: { mistake: string; explanation: string }[];
     /** Interview feedback: the five rubric scores. */
     criteria?: Criterion[];
-    annotations?: Annotation[];
   };
 }
 

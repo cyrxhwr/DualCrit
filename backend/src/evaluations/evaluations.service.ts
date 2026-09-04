@@ -19,18 +19,8 @@ export interface Criterion {
   response: string;
 }
 
-/** A moment in the transcript worth pointing at. */
-export interface Annotation {
-  messageIndex: number;
-  quote: string;
-  kind: 'issue' | 'good';
-  label: string;
-  explanation: string;
-}
-
 export interface InterviewFeedback {
   criteria: Criterion[];
-  annotations: Annotation[];
 }
 
 export interface StoredEvaluation {

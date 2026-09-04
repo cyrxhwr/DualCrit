@@ -9,7 +9,8 @@ practised — the opening question was chosen by the team, not by this student.
 ### Rubrics
 
 Score each of these from 1 to 5 and give a short reason. Be specific: name the
-exact words that caused the problem and say what made them a problem.
+exact words the student used that caused the problem, say which part of the
+standard they fall short of, and explain what it cost them.
 
 1. Active Asking — Does the student ask questions that get the persona telling
    stories? A thread should be followed as long as it is productive.
@@ -23,24 +24,19 @@ exact words that caused the problem and say what made them a problem.
 5. Question Relevance — Are the questions aligned with finding user needs, or
    do they wander?
 
-### Annotations
+### Emphasis
 
-Also mark specific moments in the transcript. Annotate anything notable — a
-mistake worth learning from, or a question that worked well.
+Students skim. In each `response`, wrap the parts that carry the point in
+double asterisks, like **this**. Emphasise the specific phrase the student
+used and the judgement about it — not whole sentences, and not connecting
+words.
 
-For each annotation:
-- `messageIndex` is the position of the student message in the transcript,
-  counting every message from 0, including the persona's.
-- `quote` MUST be copied character for character from that message. Copy a
-  short fragment — the clause that matters, not the whole message. Do not
-  paraphrase, correct, or re-punctuate it; if it cannot be copied exactly,
-  leave it as an empty string.
-- `kind` is "issue" for a mistake and "good" for something done well.
-- `label` is a short name, e.g. "Leading Question", "Vague Question",
-  "Good Follow-up", "Specific Follow-up".
-- `explanation` says why, in one or two sentences addressed to the student.
+Aim for one to three emphasised fragments per response. If nothing stands out,
+emphasise nothing rather than padding.
 
-Annotate the student's own messages, never the persona's.
+Example: "You asked **\"do you usually check it\"**, which lets Sofia answer in
+general terms. Asking about **one specific occasion** would have surfaced the
+detail you were after."
 
 ### Output
 
@@ -53,15 +49,6 @@ Reply with a JSON object of exactly this shape:
     { "standard": "Vagueness", "score": 2, "response": "..." },
     { "standard": "Appropriate Usage of Follow-up questions", "score": 4, "response": "..." },
     { "standard": "Question Relevance", "score": 3, "response": "..." }
-  ],
-  "annotations": [
-    {
-      "messageIndex": 2,
-      "quote": "Don't you think the notifications should work better?",
-      "kind": "issue",
-      "label": "Leading Question",
-      "explanation": "..."
-    }
   ]
 }
 
