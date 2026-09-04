@@ -39,6 +39,15 @@ export class EvaluationsController {
     return result;
   }
 
+  /** Feedback on this student's own interview, with transcript annotations. */
+  @Post('interview')
+  interviewFeedback(
+    @CurrentStudent() student: AuthedStudent,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return this.evaluations.getOrCreateInterviewFeedback(id, student.id);
+  }
+
   @Get('question')
   read(
     @CurrentStudent() student: AuthedStudent,

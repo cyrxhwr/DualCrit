@@ -8,6 +8,7 @@ import { scenarioByTag } from '../lib/scenarios';
 interface Props {
   activityId: string;
   scenarioTag: string | null;
+  onContinue: () => void;
 }
 
 /**
@@ -16,7 +17,11 @@ interface Props {
  * Comparison is the point: everyone opened with the same question, so the
  * differences are entirely in how each person followed up.
  */
-export default function PeerReview({ activityId, scenarioTag }: Props) {
+export default function PeerReview({
+  activityId,
+  scenarioTag,
+  onContinue,
+}: Props) {
   const [data, setData] = useState<TeamTranscripts | null>(null);
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
@@ -165,9 +170,18 @@ export default function PeerReview({ activityId, scenarioTag }: Props) {
         })}
       </div>
 
-      <p className="text-sm text-gray-400 mt-8">
-        Feedback on your own interview is the next step, and is not built yet.
-      </p>
+      <div className="flex items-center justify-between gap-4 mt-8">
+        <p className="text-sm text-gray-500">
+          Next you get feedback on how you interviewed.
+        </p>
+        <button
+          type="button"
+          onClick={onContinue}
+          className="shrink-0 bg-green-600 text-white rounded px-6 py-1.5 text-sm font-medium hover:bg-green-700"
+        >
+          See my feedback
+        </button>
+      </div>
     </div>
   );
 }

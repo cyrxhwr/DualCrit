@@ -13,11 +13,31 @@ export interface QuestionFeedback {
   feedback: FeedbackItem[];
 }
 
+export interface Criterion {
+  standard: string;
+  score: number;
+  response: string;
+}
+
+/** A moment in the transcript worth pointing at. */
+export interface Annotation {
+  messageIndex: number;
+  quote: string;
+  kind: 'issue' | 'good';
+  label: string;
+  explanation: string;
+}
+
+export interface InterviewFeedback {
+  criteria: Criterion[];
+  annotations: Annotation[];
+}
+
 export interface StoredEvaluation {
   id: string;
   scope: 'team' | 'user';
   evaluationType: string;
-  feedback: QuestionFeedback;
+  feedback: QuestionFeedback & InterviewFeedback;
   model: string | null;
   createdAt: string;
 }
@@ -26,7 +46,7 @@ interface EvaluationRow {
   id: string;
   scope: 'team' | 'user';
   evaluation_type: string;
-  processed_scores: QuestionFeedback;
+  processed_scores: QuestionFeedback & InterviewFeedback;
   model: string | null;
   created_at: string;
 }
@@ -41,6 +61,12 @@ export class EvaluationsService {
   private readonly inFlight = new Map<
     string,
     Promise<{ evaluation: StoredEvaluation | null; generating: boolean }>
+  >();
+
+  /** activity+student+type -> the per-student call already in progress here. */
+  private readonly inFlightUser = new Map<
+    string,
+    Promise<{ evaluation: StoredEvaluation | null }>
   >();
 
   constructor(
@@ -145,6 +171,146 @@ export class EvaluationsService {
       'pre_question_eval',
     );
     return { evaluation: stored, generating: false };
+  }
+
+  /**
+   * Feedback on this student's own interview.
+   *
+   * scope 'user', so it is theirs. The previous system resolved this as
+   * `find(e => e.user_id === userId) || postEvaluations[0]`, which served a
+   * student whichever evaluation happened to be first in the session when
+   * they had none of their own — someone else's assessment of someone else's
+   * interview, presented as theirs. There is no fallback here: a student
+   * either has their own row or sees nothing.
+   */
+  async getOrCreateInterviewFeedback(
+    activityId: string,
+    studentUuid: string,
+  ): Promise<{ evaluation: StoredEvaluation | null }> {
+    await this.activities.assertMember(activityId, studentUuid);
+
+    const existing = await this.findUserEvaluation(
+      activityId,
+      studentUuid,
+      'post_interview_eval',
+    );
+    if (existing) return { evaluation: existing };
+
+    const key = `${activityId}:${studentUuid}:post_interview_eval`;
+    const running = this.inFlightUser.get(key);
+    if (running) return running;
+
+    const work = this.generateInterviewFeedback(activityId, studentUuid).finally(
+      () => this.inFlightUser.delete(key),
+    );
+    this.inFlightUser.set(key, work);
+    return work;
+  }
+
+  private async generateInterviewFeedback(
+    activityId: string,
+    studentUuid: string,
+  ): Promise<{ evaluation: StoredEvaluation | null }> {
+    const { data: transcripts, error: transcriptError } =
+      await this.supabase.client
+        .from('interview_transcripts')
+        .select('messages, scenario_tag')
+        .eq('activity_id', activityId)
+        .eq('student_id', studentUuid)
+        .order('attempt', { ascending: false })
+        .limit(1);
+
+    if (transcriptError) {
+      throw new BadRequestException(transcriptError.message);
+    }
+
+    const transcript = transcripts?.[0] as
+      | { messages: { role: string; text: string }[]; scenario_tag: string }
+      | undefined;
+
+    if (!transcript || transcript.messages.length === 0) {
+      throw new BadRequestException('You have no interview to evaluate yet');
+    }
+
+    if (!this.llm.available) return { evaluation: null };
+
+    // Indices are numbered here exactly as the frontend renders them, so an
+    // annotation's messageIndex lines up with the message it refers to.
+    const rendered = transcript.messages
+      .map(
+        (m, i) =>
+          `[${i}] ${m.role === 'student' ? 'STUDENT' : 'PERSONA'}: ${m.text}`,
+      )
+      .join('\n');
+
+    const { parsed, raw, model } = await this.llm.askForJson<InterviewFeedback>(
+      'interview-feedback.txt',
+      rendered,
+    );
+
+    const { error } = await this.supabase.client.from('ai_evaluations').insert({
+      activity_id: activityId,
+      student_id: studentUuid,
+      scope: 'user',
+      evaluation_type: 'post_interview_eval',
+      model,
+      input_data: {
+        messages: transcript.messages,
+        scenarioTag: transcript.scenario_tag,
+      },
+      ai_response: raw,
+      processed_scores: parsed,
+      feedback_summary: parsed.criteria?.[0]?.response ?? null,
+    });
+
+    if (error) {
+      if (error.code === UNIQUE_VIOLATION) {
+        const winner = await this.findUserEvaluation(
+          activityId,
+          studentUuid,
+          'post_interview_eval',
+        );
+        if (winner) return { evaluation: winner };
+      }
+      throw new BadRequestException(error.message);
+    }
+
+    this.logger.log(`Generated interview feedback for ${studentUuid}`);
+
+    return {
+      evaluation: await this.findUserEvaluation(
+        activityId,
+        studentUuid,
+        'post_interview_eval',
+      ),
+    };
+  }
+
+  private async findUserEvaluation(
+    activityId: string,
+    studentUuid: string,
+    evaluationType: string,
+  ): Promise<StoredEvaluation | null> {
+    const { data, error } = await this.supabase.client
+      .from('ai_evaluations')
+      .select('id, scope, evaluation_type, processed_scores, model, created_at')
+      .eq('activity_id', activityId)
+      .eq('student_id', studentUuid)
+      .eq('evaluation_type', evaluationType)
+      .eq('scope', 'user')
+      .maybeSingle<EvaluationRow>();
+
+    if (error) throw new BadRequestException(error.message);
+    if (!data) return null;
+
+    return {
+      id: data.id,
+      scope: data.scope,
+      evaluationType: data.evaluation_type,
+      feedback: data.processed_scores,
+      model: data.model,
+      createdAt: data.created_at,
+    };
   }
 
   /** Read without generating — used when a member arrives after the fact. */

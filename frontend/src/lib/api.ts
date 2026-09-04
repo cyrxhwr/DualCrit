@@ -107,6 +107,21 @@ export interface VotingState {
   winners: string[];
 }
 
+export interface Criterion {
+  standard: string;
+  score: number;
+  response: string;
+}
+
+/** A moment in the transcript the evaluation points at. */
+export interface Annotation {
+  messageIndex: number;
+  quote: string;
+  kind: 'issue' | 'good';
+  label: string;
+  explanation: string;
+}
+
 export interface StoredEvaluation {
   id: string;
   scope: 'team' | 'user';
@@ -114,8 +129,11 @@ export interface StoredEvaluation {
   model: string | null;
   createdAt: string;
   feedback: {
-    /** One entry per rubric violation, or a single "None" entry when sound. */
-    feedback: { mistake: string; explanation: string }[];
+    /** Question feedback: one entry per rubric violation, or a single "None". */
+    feedback?: { mistake: string; explanation: string }[];
+    /** Interview feedback: the five rubric scores. */
+    criteria?: Criterion[];
+    annotations?: Annotation[];
   };
 }
 
@@ -221,6 +239,12 @@ export const api = {
   teamTranscripts: (activityId: string) =>
     request<TeamTranscripts>(
       `/activities/${activityId}/interview/transcripts`,
+    ),
+
+  interviewFeedback: (activityId: string) =>
+    request<{ evaluation: StoredEvaluation | null }>(
+      '/activities/' + activityId + '/evaluations/interview',
+      { method: 'POST' },
     ),
 
   votingState: (activityId: string, type: string) =>
