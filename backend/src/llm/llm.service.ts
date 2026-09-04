@@ -3,7 +3,12 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import OpenAI from 'openai';
 
-export const DEFAULT_MODEL = 'gpt-4o-mini';
+/**
+ * Matches the model the previous system used for evaluations, so feedback is
+ * comparable with anything collected before. Override with OPENAI_MODEL —
+ * gpt-4o-mini is far cheaper if exact comparability stops mattering.
+ */
+export const DEFAULT_MODEL = process.env.OPENAI_MODEL ?? 'gpt-4o';
 
 @Injectable()
 export class LlmService {
@@ -66,6 +71,7 @@ export class LlmService {
     const completion = await this.client.chat.completions.create({
       model,
       temperature: 0,
+      max_tokens: 2000,
       response_format: { type: 'json_object' },
       messages: [
         { role: 'system', content: this.prompt(promptName) },

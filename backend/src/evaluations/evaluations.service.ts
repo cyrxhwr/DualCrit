@@ -3,11 +3,14 @@ import { SupabaseService } from '../supabase/supabase.service';
 import { ActivitiesService } from '../activities/activities.service';
 import { LlmService } from '../llm/llm.service';
 
+/** One entry per rubric violation, or a single "None" entry when sound. */
+export interface FeedbackItem {
+  mistake: string;
+  explanation: string;
+}
+
 export interface QuestionFeedback {
-  verdict: 'strong' | 'workable' | 'needs_work';
-  summary: string;
-  mistakes: { type: string; quote: string; explanation: string }[];
-  strengths: string[];
+  feedback: FeedbackItem[];
 }
 
 export interface StoredEvaluation {
@@ -120,7 +123,7 @@ export class EvaluationsService {
       },
       ai_response: raw,
       processed_scores: parsed,
-      feedback_summary: parsed.summary,
+      feedback_summary: parsed.feedback?.[0]?.explanation ?? null,
     });
 
     if (error) {

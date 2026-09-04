@@ -114,10 +114,8 @@ export interface StoredEvaluation {
   model: string | null;
   createdAt: string;
   feedback: {
-    verdict: 'strong' | 'workable' | 'needs_work';
-    summary: string;
-    mistakes: { type: string; quote: string; explanation: string }[];
-    strengths: string[];
+    /** One entry per rubric violation, or a single "None" entry when sound. */
+    feedback: { mistake: string; explanation: string }[];
   };
 }
 

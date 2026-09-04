@@ -1,36 +1,20 @@
 import { useCallback, useEffect, useState } from 'react';
-import { AlertCircle, CheckCircle2, Sparkles } from 'lucide-react';
+import { CheckCircle, Sparkles } from 'lucide-react';
 import { api, type StoredEvaluation } from '../lib/api';
 import { getSocket } from '../lib/socket';
 import { useActivityRoom } from '../lib/useActivityRoom';
+import { describeMistake, isNoIssue } from '../lib/rubric';
 
 interface Props {
   activityId: string;
   question: string;
 }
 
-const MISTAKE_LABELS: Record<string, string> = {
-  closed_question: 'Closed question',
-  too_broad: 'Too broad',
-  premature_solution: 'Premature solution',
-  double_barrelled: 'Double-barrelled',
-  leading: 'Leading or biased',
-  lacks_relevance: 'Lacks user relevance',
-  overly_narrow: 'Overly narrow',
-  unclear_purpose: 'Unclear purpose',
-};
-
-const VERDICTS: Record<string, { label: string; className: string }> = {
-  strong: { label: 'Strong question', className: 'bg-green-50 text-green-800' },
-  workable: { label: 'Workable', className: 'bg-blue-50 text-blue-800' },
-  needs_work: { label: 'Needs work', className: 'bg-amber-50 text-amber-800' },
-};
-
 /**
  * AI feedback on the question the team voted for.
  *
  * One evaluation per team, not per student — everyone is looking at the same
- * question, so everyone sees the same feedback.
+ * question, so everyone sees the same notes.
  */
 export default function QuestionFeedback({ activityId, question }: Props) {
   const [evaluation, setEvaluation] = useState<StoredEvaluation | null>(null);
@@ -71,19 +55,26 @@ export default function QuestionFeedback({ activityId, question }: Props) {
     };
   }, [activityId]);
 
+  const items = evaluation?.feedback.feedback ?? [];
+  const issues = items.filter((item) => !isNoIssue(item.mistake));
+  const isSound = evaluation !== null && issues.length === 0;
+
   return (
     <div>
       <h2 className="text-lg font-semibold text-gray-800 mb-1">
-        Feedback on your team's question
+        AI feedback on your team's question
       </h2>
       <p className="text-sm text-gray-500 mb-5">
         This looks at the question you all chose, so everyone sees the same
         notes.
       </p>
 
-      <blockquote className="border-l-4 border-violet-500 bg-violet-50 rounded-r-lg p-5 mb-6">
-        <p className="text-gray-800">{question}</p>
-      </blockquote>
+      <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 mb-6">
+        <h3 className="font-semibold text-indigo-800 mb-2 text-sm">
+          Selected question
+        </h3>
+        <p className="text-indigo-700 text-lg break-words">“{question}”</p>
+      </div>
 
       {loading && (
         <p className="flex items-center gap-2 text-sm text-gray-500 py-4">
@@ -105,73 +96,98 @@ export default function QuestionFeedback({ activityId, question }: Props) {
         </p>
       )}
 
-      {evaluation && (
-        <div className="space-y-5">
-          <div className="flex items-center gap-3">
-            <span
-              className={`text-sm font-medium px-3 py-1 rounded-full ${
-                VERDICTS[evaluation.feedback.verdict]?.className ??
-                'bg-gray-100 text-gray-700'
-              }`}
-            >
-              {VERDICTS[evaluation.feedback.verdict]?.label ??
-                evaluation.feedback.verdict}
-            </span>
+      {issues.length > 0 && (
+        <div className="space-y-4">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <h3 className="font-semibold text-yellow-800 mb-2 text-sm">
+              Identified issues
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {issues.map((item, i) => (
+                <span
+                  key={`${item.mistake}-${i}`}
+                  className="bg-yellow-200 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium"
+                >
+                  {item.mistake}
+                </span>
+              ))}
+            </div>
           </div>
 
-          <p className="text-gray-800">{evaluation.feedback.summary}</p>
-
-          {evaluation.feedback.strengths.length > 0 && (
-            <section>
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">
-                What works
+          {issues.map((item, i) => (
+            <article
+              key={`${item.mistake}-detail-${i}`}
+              className="border border-gray-200 rounded-lg p-6"
+            >
+              <h3 className="text-lg font-bold text-gray-800 mb-1">
+                {item.mistake}
               </h3>
-              <ul className="space-y-2">
-                {evaluation.feedback.strengths.map((strength, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                    <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
-                    {strength}
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          {evaluation.feedback.mistakes.length > 0 && (
-            <section>
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">
-                Worth reconsidering
-              </h3>
-              <ul className="space-y-3">
-                {evaluation.feedback.mistakes.map((mistake, i) => (
-                  <li
-                    key={i}
-                    className="border border-amber-200 bg-amber-50 rounded-lg p-4"
-                  >
-                    <div className="flex items-center gap-2 mb-1">
-                      <AlertCircle className="h-4 w-4 text-amber-700" />
-                      <span className="text-sm font-medium text-amber-900">
-                        {MISTAKE_LABELS[mistake.type] ?? mistake.type}
-                      </span>
-                    </div>
-                    {mistake.quote && (
-                      <p className="text-sm text-amber-900 italic mb-1">
-                        “{mistake.quote}”
-                      </p>
-                    )}
-                    <p className="text-sm text-amber-900">
-                      {mistake.explanation}
+              {describeMistake(item.mistake) && (
+                <p className="text-gray-600 mb-4 text-sm">
+                  {describeMistake(item.mistake)}
+                </p>
+              )}
+              <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <span className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center shrink-0 text-indigo-600 font-bold text-xs">
+                    AI
+                  </span>
+                  <div>
+                    <h4 className="font-semibold text-indigo-800 mb-1 text-sm">
+                      AI feedback
+                    </h4>
+                    <p className="text-indigo-700 text-sm leading-relaxed break-words">
+                      {item.explanation}
                     </p>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          <p className="text-xs text-gray-400 pt-2">
-            Generated once for the team{evaluation.model ? ` · ${evaluation.model}` : ''}
-          </p>
+                  </div>
+                </div>
+              </div>
+            </article>
+          ))}
         </div>
+      )}
+
+      {isSound && (
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-8">
+          <div className="flex items-center gap-4 mb-6">
+            <span className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center shrink-0">
+              <CheckCircle className="w-7 h-7 text-green-600" />
+            </span>
+            <div>
+              <h3 className="text-xl font-bold text-green-800">
+                Excellent question
+              </h3>
+              <p className="text-green-600 text-sm">
+                No rubric issues were found
+              </p>
+            </div>
+          </div>
+
+          {items[0]?.explanation && (
+            <div className="bg-white border border-green-100 rounded-lg p-6">
+              <div className="flex items-start gap-3">
+                <span className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center shrink-0 text-green-600 font-bold text-xs">
+                  AI
+                </span>
+                <div>
+                  <h4 className="font-semibold text-green-800 mb-1 text-sm">
+                    AI feedback
+                  </h4>
+                  <p className="text-green-700 text-sm leading-relaxed break-words">
+                    {items[0].explanation}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {evaluation && (
+        <p className="text-xs text-gray-400 pt-6">
+          Generated once for the team
+          {evaluation.model ? ` · ${evaluation.model}` : ''}
+        </p>
       )}
 
       <p className="text-sm text-gray-400 mt-8">
