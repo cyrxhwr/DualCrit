@@ -56,7 +56,7 @@ export default function SignIn() {
             onChange={(e) => setStudentId(e.target.value)}
             required
             autoComplete="username"
-            placeholder="2021-00123"
+            placeholder="20260001"
             className="w-full mb-4 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500"
           />
 

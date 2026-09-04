@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from 'react';
 import { api, tokenStore, type Student } from './api';
+import { resetSocket } from './socket';
 
 interface AuthValue {
   student: Student | null;
@@ -48,6 +49,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(() => {
     tokenStore.clear();
+    // Drop the live connection too. On a shared machine the next student
+    // would otherwise inherit a socket authenticated as the previous one.
+    resetSocket();
     setStudent(null);
   }, []);
 

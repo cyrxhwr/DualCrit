@@ -37,6 +37,13 @@ interface MemberRow {
   students: { full_name: string } | null;
 }
 
+export interface ActivityMember {
+  studentUuid: string;
+  fullName: string;
+  isHost: boolean;
+  currentStep: string | null;
+}
+
 @Injectable()
 export class ActivitiesService {
   constructor(private readonly supabase: SupabaseService) {}
@@ -187,6 +194,31 @@ export class ActivitiesService {
       .eq('student_id', studentUuid);
 
     if (error) throw new BadRequestException(error.message);
+  }
+
+  /**
+   * The member list, read from the database every time.
+   *
+   * Membership is durable and lives here; who currently has a socket open is
+   * separate and ephemeral. Keeping the two apart is why a disconnect cannot
+   * lose anyone from a team.
+   */
+  async listMembers(activityId: string): Promise<ActivityMember[]> {
+    const { data, error } = await this.supabase.client
+      .from('activity_members')
+      .select('student_id, is_host, current_step, students(full_name)')
+      .eq('activity_id', activityId)
+      .eq('is_active', true)
+      .order('joined_at', { ascending: true });
+
+    if (error) throw new BadRequestException(error.message);
+
+    return ((data ?? []) as unknown as MemberRow[]).map((row) => ({
+      studentUuid: row.student_id,
+      fullName: row.students?.full_name ?? 'Student',
+      isHost: row.is_host,
+      currentStep: row.current_step,
+    }));
   }
 
   /**
