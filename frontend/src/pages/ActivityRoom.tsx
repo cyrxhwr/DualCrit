@@ -9,8 +9,15 @@ import ScenarioSelection from './ScenarioSelection';
 import QuestionCreation from './QuestionCreation';
 import QuestionFeedback from './QuestionFeedback';
 import Interview from './Interview';
+import PeerReview from './PeerReview';
 
-type Step = 'lobby' | 'scenario' | 'question' | 'feedback' | 'interview';
+type Step =
+  | 'lobby'
+  | 'scenario'
+  | 'question'
+  | 'feedback'
+  | 'interview'
+  | 'peer-review';
 
 /**
  * Which step to show.
@@ -30,6 +37,7 @@ function deriveStep(activity: Activity | null): Step {
   if (!activity.selectedQuestionContent) return 'question';
   // From here the workflow is per student, so it follows their own recorded
   // step rather than anything the team has finished.
+  if (activity.currentStep === 'peer-review') return 'peer-review';
   if (activity.currentStep === 'interview') return 'interview';
   return 'feedback';
 }
@@ -79,9 +87,9 @@ export default function ActivityRoom() {
 
   const [starting, setStarting] = useState(false);
 
-  const goToInterview = async () => {
+  const goToStep = async (step: string) => {
     if (!id) return;
-    await api.setStep(id, 'interview').catch(() => undefined);
+    await api.setStep(id, step).catch(() => undefined);
     await loadActivity();
   };
 
@@ -131,11 +139,23 @@ export default function ActivityRoom() {
           <QuestionFeedback
             activityId={id}
             question={activity.selectedQuestionContent}
-            onContinue={() => void goToInterview()}
+            onContinue={() => void goToStep('interview')}
           />
         )}
 
-        {activity && step === 'interview' && id && <Interview activityId={id} />}
+        {activity && step === 'interview' && id && (
+          <Interview
+            activityId={id}
+            onContinue={() => void goToStep('peer-review')}
+          />
+        )}
+
+        {activity && step === 'peer-review' && id && (
+          <PeerReview
+            activityId={id}
+            scenarioTag={activity.selectedScenarioTag}
+          />
+        )}
 
         {activity && step === 'lobby' && (
           <>

@@ -7,6 +7,7 @@ import { scenarioByTag } from '../lib/scenarios';
 
 interface Props {
   activityId: string;
+  onContinue: () => void;
 }
 
 /**
@@ -16,7 +17,7 @@ interface Props {
  * This is the first per-student step — the conversation belongs to one person,
  * unlike everything before it.
  */
-export default function Interview({ activityId }: Props) {
+export default function Interview({ activityId, onContinue }: Props) {
   const [state, setState] = useState<InterviewState | null>(null);
   const [progress, setProgress] = useState({ completed: 0, total: 0 });
   const [draft, setDraft] = useState('');
@@ -229,14 +230,24 @@ export default function Interview({ activityId }: Props) {
       {state.completed && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-5 flex items-start gap-3">
           <CheckCircle className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
-          <div>
+          <div className="flex-1">
             <p className="font-medium text-green-800">Interview finished</p>
             <p className="text-sm text-green-700 mt-0.5">
               {progress.completed === progress.total
-                ? 'Everyone is done. Feedback on your transcript is the next step, and is not built yet.'
+                ? 'Everyone is done — you can read how the rest of your team interviewed.'
                 : `Waiting for the rest of your team — ${progress.completed} of ${progress.total} finished.`}
             </p>
           </div>
+
+          {progress.completed === progress.total && (
+            <button
+              type="button"
+              onClick={onContinue}
+              className="shrink-0 bg-green-600 text-white rounded px-6 py-1.5 text-sm font-medium hover:bg-green-700"
+            >
+              Read the team's interviews
+            </button>
+          )}
         </div>
       )}
     </div>

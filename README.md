@@ -99,5 +99,5 @@ Sign-in, the dashboard, create/join, the live member list, the team scenario
 vote, question creation with voting, and AI feedback on the team question all
 work end to end. The host
 picks the workflow when creating the activity, and each student resumes where
-their team actually is. Each student then interviews the persona themselves.
-Feedback on the transcript is next.
+their team actually is. Each student interviews the persona themselves, then
+reads how the rest of the team did. Feedback on your own transcript is next.

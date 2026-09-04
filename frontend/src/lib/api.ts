@@ -135,6 +135,18 @@ export interface InterviewState {
   followUpsLeft: number;
 }
 
+export interface TeamTranscripts {
+  ready: boolean;
+  completed: number;
+  total: number;
+  transcripts: {
+    studentUuid: string;
+    authorName: string;
+    isMine: boolean;
+    messages: InterviewMessage[];
+  }[];
+}
+
 export const api = {
   signIn: (studentId: string, fullName: string) =>
     request<{ token: string; student: Student }>('/auth/sign-in', {
@@ -204,6 +216,11 @@ export const api = {
     request<{ completed: number; total: number }>(
       `/activities/${activityId}/interview/complete`,
       { method: 'POST' },
+    ),
+
+  teamTranscripts: (activityId: string) =>
+    request<TeamTranscripts>(
+      `/activities/${activityId}/interview/transcripts`,
     ),
 
   votingState: (activityId: string, type: string) =>

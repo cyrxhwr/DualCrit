@@ -167,6 +167,79 @@ export class InterviewService {
     if (error) throw new BadRequestException(error.message);
   }
 
+  /**
+   * Every member's interview, for the peer review step.
+   *
+   * Withheld until the whole team has finished: reading a team-mate's
+   * transcript before writing your own would change what you ask.
+   *
+   * Each student appears once, with their most recent attempt. The previous
+   * system deduplicated by keeping the *first* row it saw while the summary
+   * used the newest, so the two screens could show different conversations
+   * for the same person.
+   */
+  async listTeamTranscripts(
+    activityId: string,
+    studentUuid: string,
+  ): Promise<{
+    ready: boolean;
+    completed: number;
+    total: number;
+    transcripts: {
+      studentUuid: string;
+      authorName: string;
+      isMine: boolean;
+      messages: Message[];
+    }[];
+  }> {
+    const progress = await this.progress(activityId, studentUuid);
+    if (progress.completed < progress.total || progress.total === 0) {
+      return { ready: false, ...progress, transcripts: [] };
+    }
+
+    const [{ data, error }, members] = await Promise.all([
+      this.supabase.client
+        .from('interview_transcripts')
+        .select('student_id, attempt, messages, students(full_name)')
+        .eq('activity_id', activityId)
+        .order('attempt', { ascending: true }),
+      this.activities.listMembers(activityId),
+    ]);
+
+    if (error) throw new BadRequestException(error.message);
+
+    // Ordered by attempt ascending, so the last write per student wins.
+    const latest = new Map<
+      string,
+      { studentUuid: string; authorName: string; messages: Message[] }
+    >();
+
+    for (const row of (data ?? []) as unknown as {
+      student_id: string;
+      messages: Message[];
+      students: { full_name: string } | null;
+    }[]) {
+      latest.set(row.student_id, {
+        studentUuid: row.student_id,
+        authorName: row.students?.full_name ?? 'Student',
+        messages: row.messages,
+      });
+    }
+
+    const order = new Map(members.map((m, i) => [m.studentUuid, i]));
+
+    return {
+      ready: true,
+      ...progress,
+      transcripts: [...latest.values()]
+        .sort(
+          (a, b) =>
+            (order.get(a.studentUuid) ?? 0) - (order.get(b.studentUuid) ?? 0),
+        )
+        .map((t) => ({ ...t, isMine: t.studentUuid === studentUuid })),
+    };
+  }
+
   /** How many members have finished — used to gate the steps that follow. */
   async progress(
     activityId: string,

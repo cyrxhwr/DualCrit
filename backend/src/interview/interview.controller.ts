@@ -30,6 +30,15 @@ export class InterviewController {
     return this.interview.progress(id, student.id);
   }
 
+  /** Everyone's interview, once the whole team has finished. */
+  @Get('transcripts')
+  transcripts(
+    @CurrentStudent() student: AuthedStudent,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return this.interview.listTeamTranscripts(id, student.id);
+  }
+
   @Post('ask')
   ask(
     @CurrentStudent() student: AuthedStudent,
