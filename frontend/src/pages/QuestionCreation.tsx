@@ -76,8 +76,7 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
   // it from the voting state meant it was 0 until a round began, so "everyone
   // has submitted" could never become true and voting never opened.
   const memberCount = members.length;
-  const everyoneSubmitted =
-    memberCount > 0 && questions.length >= memberCount;
+  const everyoneSubmitted = memberCount > 0 && questions.length >= memberCount;
   const inVoting = voting.state?.status === 'active';
   const decided = voting.state?.status === 'completed';
 
@@ -85,7 +84,9 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
     setBusy(true);
     setError(null);
     try {
-      setQuestions(await api.submitContribution(activityId, TYPE, draft.trim()));
+      setQuestions(
+        await api.submitContribution(activityId, TYPE, draft.trim()),
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not save');
     } finally {
@@ -96,12 +97,12 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
   if (decided) {
     const winner = questions.find((q) => q.isSelected);
     return (
-      <div className="py-6">
+      <div className="py-6 fade-in">
         <h2 className="text-lg font-semibold text-gray-800 mb-1">
           Your team's question
         </h2>
         <p className="text-sm text-gray-500 mb-4">
-          This is the question everyone will use for their interview.
+          Everyone interviews with this.
         </p>
         <blockquote className="border-l-4 border-violet-500 bg-violet-50 rounded-r-lg p-5">
           <p className="text-gray-800">{winner?.content.question}</p>
@@ -111,9 +112,6 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
             </footer>
           )}
         </blockquote>
-        <p className="text-sm text-gray-400 mt-6">
-          AI feedback on this question is the next step, and is not built yet.
-        </p>
       </div>
     );
   }
@@ -170,7 +168,7 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
               type="button"
               onClick={submit}
               disabled={busy || draft.trim().length === 0}
-              className="bg-green-600 text-white rounded px-6 py-1.5 text-sm font-medium hover:bg-green-700 disabled:opacity-50"
+              className="bg-green-600 text-white rounded-lg px-6 py-2 text-sm font-semibold hover:bg-green-700 disabled:opacity-50 btn-lift shadow-sm"
             >
               {mine ? 'Update question' : 'Submit question'}
             </button>
@@ -178,7 +176,7 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
         </div>
       )}
 
-      <ul className="space-y-3">
+      <ul className="space-y-3 stagger">
         {questions.map((question) => {
           const votes = voting.state?.tally[question.id] ?? 0;
           const isPicked = picked === question.id;
@@ -230,7 +228,7 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
           <button
             type="button"
             onClick={() => void voting.start(1)}
-            className="bg-violet-600 text-white rounded px-6 py-1.5 text-sm font-medium hover:bg-violet-700"
+            className="bg-violet-600 text-white rounded-lg px-6 py-2 text-sm font-semibold hover:bg-violet-700 btn-lift shadow-sm"
           >
             Start voting
           </button>
@@ -241,7 +239,7 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
             type="button"
             disabled={!picked || picked === voting.myVote[0]}
             onClick={() => picked && void voting.castVote([picked])}
-            className="bg-green-600 text-white rounded px-6 py-1.5 text-sm font-medium hover:bg-green-700 disabled:opacity-50"
+            className="bg-green-600 text-white rounded-lg px-6 py-2 text-sm font-semibold hover:bg-green-700 disabled:opacity-50 btn-lift shadow-sm"
           >
             {voting.myVote.length > 0 ? 'Change vote' : 'Submit vote'}
           </button>

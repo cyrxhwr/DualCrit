@@ -77,14 +77,13 @@ export default function PeerReview({
 
   if (!data.ready) {
     return (
-      <div className="py-10 text-center">
+      <div className="py-10 text-center fade-in">
         <Users className="h-8 w-8 text-gray-300 mx-auto mb-3" />
         <h2 className="text-lg font-semibold text-gray-800">
           Waiting for your team
         </h2>
         <p className="text-sm text-gray-500 mt-1">
           {data.completed} of {data.total} have finished their interview.
-          Everyone's transcript opens up once the last person is done.
         </p>
       </div>
     );
@@ -93,16 +92,14 @@ export default function PeerReview({
   return (
     <div>
       <h2 className="text-lg font-semibold text-gray-800 mb-1">
-        How your team interviewed{' '}
-        {scenario?.persona.name ?? 'the persona'}
+        How your team interviewed {scenario?.persona.name ?? 'the persona'}
       </h2>
       <p className="text-sm text-gray-500 mb-5">
-        You all opened with the same question, so the differences are in how
-        each of you followed up. Read them side by side before your own
-        feedback.
+        Everyone opened with the same question — the difference is in the
+        follow-ups.
       </p>
 
-      <div className="space-y-3">
+      <div className="space-y-3 stagger">
         {data.transcripts.map((transcript) => {
           const isOpen = open[transcript.studentUuid] ?? false;
           const followUps = Math.max(
@@ -113,7 +110,7 @@ export default function PeerReview({
           return (
             <article
               key={transcript.studentUuid}
-              className="border border-gray-200 rounded-lg overflow-hidden"
+              className="border border-gray-200 rounded-xl overflow-hidden bg-white"
             >
               <button
                 type="button"
@@ -169,15 +166,11 @@ export default function PeerReview({
           );
         })}
       </div>
-
-      <div className="flex items-center justify-between gap-4 mt-8">
-        <p className="text-sm text-gray-500">
-          Next you get feedback on how you interviewed.
-        </p>
+      <div className="flex justify-end mt-8">
         <button
           type="button"
           onClick={onContinue}
-          className="shrink-0 bg-green-600 text-white rounded px-6 py-1.5 text-sm font-medium hover:bg-green-700"
+          className="shrink-0 bg-green-600 text-white rounded-lg px-6 py-2 text-sm font-semibold hover:bg-green-700 btn-lift shadow-sm"
         >
           See my feedback
         </button>

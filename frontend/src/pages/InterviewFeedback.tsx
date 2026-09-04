@@ -17,7 +17,10 @@ interface Props {
 function withEmphasis(text: string): ReactNode[] {
   return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
     part.startsWith('**') && part.endsWith('**') && part.length > 4 ? (
-      <strong key={i} className="font-semibold text-emerald-950 bg-emerald-100 rounded px-0.5">
+      <strong
+        key={i}
+        className="font-semibold text-emerald-950 bg-emerald-100 rounded px-0.5"
+      >
         {part.slice(2, -2)}
       </strong>
     ) : (
@@ -27,10 +30,7 @@ function withEmphasis(text: string): ReactNode[] {
 }
 
 /** The student's own interview, scored against the five rubric standards. */
-export default function InterviewFeedback({
-  activityId,
-  onContinue,
-}: Props) {
+export default function InterviewFeedback({ activityId, onContinue }: Props) {
   const [evaluation, setEvaluation] = useState<StoredEvaluation | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +43,9 @@ export default function InterviewFeedback({
         setError(null);
       })
       .catch((err: unknown) =>
-        setError(err instanceof Error ? err.message : 'Could not load feedback'),
+        setError(
+          err instanceof Error ? err.message : 'Could not load feedback',
+        ),
       )
       .finally(() => setLoading(false));
   }, [activityId]);
@@ -86,11 +88,11 @@ export default function InterviewFeedback({
         chose.
       </p>
 
-      <div className="space-y-5">
+      <div className="space-y-5 stagger">
         {criteria.map((criterion) => (
           <article
             key={criterion.standard}
-            className="border border-gray-200 rounded-lg p-6"
+            className="border border-gray-200 rounded-xl p-6 smooth-hover bg-white"
           >
             <div className="flex items-center justify-between gap-4 mb-4">
               <h3 className="text-lg font-bold text-gray-800">
@@ -101,7 +103,10 @@ export default function InterviewFeedback({
                   {criterion.score}
                   <span className="text-sm font-normal text-gray-500">/5</span>
                 </span>
-                <span className="flex" aria-label={`${criterion.score} out of 5`}>
+                <span
+                  className="flex"
+                  aria-label={`${criterion.score} out of 5`}
+                >
                   {[0, 1, 2, 3, 4].map((i) => (
                     <Star
                       key={i}
@@ -125,15 +130,11 @@ export default function InterviewFeedback({
           </article>
         ))}
       </div>
-
-      <div className="flex items-center justify-between gap-4 mt-8">
-        <p className="text-sm text-gray-500">
-          Last step: everything you and your team produced, in one place.
-        </p>
+      <div className="flex justify-end mt-8">
         <button
           type="button"
           onClick={onContinue}
-          className="shrink-0 bg-green-600 text-white rounded px-6 py-1.5 text-sm font-medium hover:bg-green-700"
+          className="shrink-0 bg-green-600 text-white rounded-lg px-6 py-2 text-sm font-semibold hover:bg-green-700 btn-lift shadow-sm"
         >
           See my summary
         </button>

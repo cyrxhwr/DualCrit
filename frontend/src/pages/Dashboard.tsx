@@ -35,7 +35,9 @@ export default function Dashboard() {
       setActivities(await api.listActivities());
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not load activities');
+      setError(
+        err instanceof Error ? err.message : 'Could not load activities',
+      );
     } finally {
       setLoading(false);
     }
@@ -102,13 +104,13 @@ export default function Dashboard() {
 
   return (
     <AppShell>
-      <div className="bg-white rounded-xl border border-gray-200 p-8">
+      <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 fade-in">
         <div className="grid sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
           <button
             type="button"
             onClick={() => setPanel(panel === 'create' ? 'none' : 'create')}
             aria-expanded={panel === 'create'}
-            className="border-2 border-dashed border-green-400 bg-green-50 rounded-xl py-10 flex flex-col items-center gap-3 hover:bg-green-100"
+            className="border-2 border-dashed border-green-400 bg-green-50 rounded-xl py-10 flex flex-col items-center gap-3 hover:bg-green-100 smooth-hover"
           >
             <SquarePen className="h-8 w-8 text-green-700" />
             <span className="font-medium text-green-800 text-center leading-tight">
@@ -122,7 +124,7 @@ export default function Dashboard() {
             type="button"
             onClick={() => setPanel(panel === 'join' ? 'none' : 'join')}
             aria-expanded={panel === 'join'}
-            className="border-2 border-dashed border-orange-400 bg-orange-50 rounded-xl py-10 flex flex-col items-center gap-3 hover:bg-orange-100"
+            className="border-2 border-dashed border-orange-400 bg-orange-50 rounded-xl py-10 flex flex-col items-center gap-3 hover:bg-orange-100 smooth-hover"
           >
             <LogIn className="h-8 w-8 text-orange-600" />
             <span className="font-medium text-orange-800 text-center leading-tight">
@@ -134,7 +136,7 @@ export default function Dashboard() {
         </div>
 
         {panel === 'create' && (
-          <div className="max-w-2xl mx-auto mt-6 border border-gray-200 rounded-lg p-5">
+          <div className="max-w-2xl mx-auto mt-6 border border-gray-200 rounded-xl p-5 slide-in-up">
             <label
               htmlFor="activityName"
               className="block text-sm font-medium text-gray-700 mb-1"
@@ -153,10 +155,7 @@ export default function Dashboard() {
             <p className="text-sm font-medium text-gray-700 mb-1">
               What will the team do?
             </p>
-            <p className="text-xs text-gray-500 mb-3">
-              Everyone who joins with the code does this workflow. It cannot be
-              changed afterwards.
-            </p>
+            <p className="text-xs text-gray-500 mb-3">Fixed once created.</p>
             <div className="flex flex-col sm:flex-row gap-3">
               {typeOption(
                 'interview',
@@ -175,7 +174,7 @@ export default function Dashboard() {
                 type="button"
                 onClick={createActivity}
                 disabled={busy || name.trim().length === 0}
-                className="bg-green-600 text-white rounded-lg px-6 py-2 text-sm font-medium hover:bg-green-700 disabled:opacity-50"
+                className="bg-green-600 text-white rounded-lg px-6 py-2 text-sm font-semibold hover:bg-green-700 disabled:opacity-50 btn-lift shadow-sm"
               >
                 {busy ? 'Creating…' : 'Create activity'}
               </button>
@@ -184,7 +183,7 @@ export default function Dashboard() {
         )}
 
         {panel === 'join' && (
-          <div className="max-w-2xl mx-auto mt-6 flex gap-2">
+          <div className="max-w-2xl mx-auto mt-6 flex gap-2 slide-in-up">
             <input
               value={joinCode}
               onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
@@ -197,7 +196,7 @@ export default function Dashboard() {
               type="button"
               onClick={join}
               disabled={busy || joinCode.length !== 6}
-              className="bg-orange-500 text-white rounded-lg px-5 font-medium hover:bg-orange-600 disabled:opacity-50"
+              className="bg-orange-500 text-white rounded-lg px-5 font-semibold hover:bg-orange-600 disabled:opacity-50 btn-lift"
             >
               Join
             </button>
@@ -217,16 +216,13 @@ export default function Dashboard() {
         {loading ? (
           <p className="text-center text-gray-500 py-8">Loading…</p>
         ) : activities.length === 0 ? (
-          <p className="text-center text-gray-500 py-8">
-            Nothing yet. Create an activity, or join one with a code from a
-            groupmate.
-          </p>
+          <p className="text-center text-gray-500 py-8">No activities yet.</p>
         ) : (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 stagger">
             {activities.map((activity) => (
               <article
                 key={activity.id}
-                className="border border-gray-200 rounded-lg p-4 flex flex-col"
+                className="border border-gray-200 rounded-xl p-4 flex flex-col smooth-hover bg-white"
               >
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="font-semibold text-gray-800">
@@ -251,7 +247,7 @@ export default function Dashboard() {
                 <button
                   type="button"
                   onClick={() => navigate(`/activity/${activity.id}`)}
-                  className="mt-4 self-center bg-green-600 text-white rounded px-6 py-1.5 text-sm font-medium hover:bg-green-700"
+                  className="mt-4 self-center bg-green-600 text-white rounded-lg px-6 py-1.5 text-sm font-semibold hover:bg-green-700 btn-lift"
                 >
                   Continue
                 </button>

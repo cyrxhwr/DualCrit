@@ -112,21 +112,22 @@ export default function Summary({ activityId, onFinish }: Props) {
           </button>
         </div>
       </div>
-      <p className="text-sm text-gray-500 mb-5">
-        {scenario
-          ? `You interviewed ${scenario.persona.name}, ${scenario.persona.role.toLowerCase()}.`
-          : 'A record of what you and your team produced.'}
-      </p>
+      {scenario && (
+        <p className="text-sm text-gray-500 mb-5">
+          You interviewed {scenario.persona.name},{' '}
+          {scenario.persona.role.toLowerCase()}.
+        </p>
+      )}
 
       {!summary.saved && (
         <p className="mb-5 flex items-start gap-2 text-sm text-amber-900 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
           <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
-          This summary could not be saved to your record. Copy or download it so
-          you keep a copy, and tell your instructor.
+          This could not be saved to your record. Download a copy and tell your
+          instructor.
         </p>
       )}
 
-      <div className="space-y-6">
+      <div className="space-y-6 stagger">
         {summary.myQuestion && (
           <section>
             <h3 className="text-sm font-semibold text-gray-700 mb-2">
@@ -196,7 +197,7 @@ export default function Summary({ activityId, onFinish }: Props) {
                 {summary.questionCount === 1 ? '' : 's'} asked
               </span>
             </h3>
-            <div className="border border-gray-200 rounded-lg divide-y divide-gray-100">
+            <div className="border border-gray-200 rounded-xl divide-y divide-gray-100 bg-white">
               {summary.transcript.map((message, i) => (
                 <div
                   key={i}
@@ -272,7 +273,7 @@ export default function Summary({ activityId, onFinish }: Props) {
         <button
           type="button"
           onClick={onFinish}
-          className="bg-teal-600 text-white rounded px-8 py-2 text-sm font-semibold hover:bg-teal-700"
+          className="bg-teal-600 text-white rounded-lg px-8 py-2.5 text-sm font-semibold hover:bg-teal-700 btn-lift shadow-sm"
         >
           Back to my activities
         </button>

@@ -40,13 +40,12 @@ export default function ScenarioSelection({ activityId, onDecided }: Props) {
   }
 
   const hasVoted = myVote.length > 0;
-  const tied =
-    state?.isComplete === true && (state?.winners.length ?? 0) > 1;
+  const tied = state?.isComplete === true && (state?.winners.length ?? 0) > 1;
 
   if (decided && state) {
     const winner = scenarioByTag(state.winners[0]);
     return (
-      <div className="text-center py-8">
+      <div className="text-center py-8 fade-in">
         <p className="text-5xl mb-3">{winner?.persona.image}</p>
         <h2 className="text-lg font-semibold text-gray-800">
           The team chose {winner?.persona.name}
@@ -70,14 +69,12 @@ export default function ScenarioSelection({ activityId, onDecided }: Props) {
         )}
       </div>
       <p className="text-sm text-gray-500 mb-5">
-        Everyone votes. The scenario with the most votes becomes the one your
-        team interviews.
+        The scenario with the most votes is the one you will all interview.
       </p>
 
       {tied && (
         <p className="mb-4 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-          It's a tie. Change a vote to break it — nothing is decided until one
-          scenario is ahead.
+          It's a tie — change a vote to break it.
         </p>
       )}
 
@@ -87,7 +84,7 @@ export default function ScenarioSelection({ activityId, onDecided }: Props) {
         </p>
       )}
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 stagger">
         {SCENARIOS.map((scenario) => {
           const votes = state?.tally[scenario.tag] ?? 0;
           const isPicked = picked === scenario.tag;
@@ -98,7 +95,7 @@ export default function ScenarioSelection({ activityId, onDecided }: Props) {
               type="button"
               onClick={() => setPicked(scenario.tag)}
               aria-pressed={isPicked}
-              className={`text-left rounded-xl border-2 p-5 transition-colors ${
+              className={`text-left rounded-xl border-2 p-5 smooth-hover ${
                 isPicked
                   ? 'border-violet-500 bg-violet-50'
                   : 'border-gray-200 hover:border-gray-300'
@@ -146,7 +143,7 @@ export default function ScenarioSelection({ activityId, onDecided }: Props) {
           type="button"
           disabled={!picked || picked === myVote[0]}
           onClick={() => picked && void castVote([picked])}
-          className="bg-green-600 text-white rounded px-6 py-1.5 text-sm font-medium hover:bg-green-700 disabled:opacity-50"
+          className="bg-green-600 text-white rounded-lg px-6 py-2 text-sm font-semibold hover:bg-green-700 disabled:opacity-50 btn-lift shadow-sm"
         >
           {hasVoted ? 'Change vote' : 'Submit vote'}
         </button>

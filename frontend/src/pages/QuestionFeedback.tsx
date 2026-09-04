@@ -70,8 +70,7 @@ export default function QuestionFeedback({
         AI feedback on your team's question
       </h2>
       <p className="text-sm text-gray-500 mb-5">
-        This looks at the question you all chose, so everyone sees the same
-        notes.
+        The same notes for everyone — it is the team’s question.
       </p>
 
       <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 mb-6">
@@ -102,7 +101,7 @@ export default function QuestionFeedback({
       )}
 
       {issues.length > 0 && (
-        <div className="space-y-4">
+        <div className="space-y-4 stagger">
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <h3 className="font-semibold text-yellow-800 mb-2 text-sm">
               Identified issues
@@ -122,7 +121,7 @@ export default function QuestionFeedback({
           {issues.map((item, i) => (
             <article
               key={`${item.mistake}-detail-${i}`}
-              className="border border-gray-200 rounded-lg p-6"
+              className="border border-gray-200 rounded-xl p-6 smooth-hover bg-white"
             >
               <h3 className="text-lg font-bold text-gray-800 mb-1">
                 {item.mistake}
@@ -187,16 +186,12 @@ export default function QuestionFeedback({
           )}
         </div>
       )}
-
-            <div className="flex items-center justify-between gap-4 mt-8">
-        <p className="text-sm text-gray-500">
-          Next you each interview the persona yourself, using this question.
-        </p>
+      <div className="flex justify-end mt-8">
         <button
           type="button"
           onClick={onContinue}
           disabled={loading}
-          className="shrink-0 bg-green-600 text-white rounded px-6 py-1.5 text-sm font-medium hover:bg-green-700 disabled:opacity-50"
+          className="shrink-0 bg-green-600 text-white rounded-lg px-6 py-2 text-sm font-semibold hover:bg-green-700 disabled:opacity-50 btn-lift shadow-sm"
         >
           Start my interview
         </button>
