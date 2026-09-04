@@ -104,8 +104,8 @@ export default function Interview({ activityId }: Props) {
         </span>
       </div>
       <p className="text-sm text-gray-500 mb-5">
-        This conversation is yours alone. Start with your team's question, then
-        follow up on whatever they say.
+        This conversation is yours alone. Ask your team's question, then probe
+        their answer with three follow-ups.
       </p>
 
       {error && (
@@ -185,17 +185,17 @@ export default function Interview({ activityId }: Props) {
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               maxLength={500}
-              disabled={busy || state.turnsLeft <= 0}
+              disabled={busy || state.followUpsLeft <= 0}
               placeholder={
-                state.turnsLeft > 0
+                state.followUpsLeft > 0
                   ? 'Ask a follow-up…'
-                  : 'You have reached the question limit'
+                  : 'You have used all three follow-ups'
               }
               className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 disabled:bg-gray-50"
             />
             <button
               type="submit"
-              disabled={busy || !draft.trim() || state.turnsLeft <= 0}
+              disabled={busy || !draft.trim() || state.followUpsLeft <= 0}
               className="bg-violet-600 text-white rounded-lg px-4 flex items-center gap-1.5 text-sm font-medium hover:bg-violet-700 disabled:opacity-50"
             >
               <Send className="h-4 w-4" />
@@ -205,7 +205,7 @@ export default function Interview({ activityId }: Props) {
 
           <div className="flex items-center justify-between mt-3">
             <span className="text-xs text-gray-400">
-              {state.turnsLeft} question{state.turnsLeft === 1 ? '' : 's'} left
+              {state.followUpsLeft} follow-up{state.followUpsLeft === 1 ? '' : 's'} left
             </span>
             <button
               type="button"

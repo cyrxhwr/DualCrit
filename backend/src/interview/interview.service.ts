@@ -15,14 +15,19 @@ export interface InterviewState {
   openingQuestion: string | null;
   scenarioTag: string | null;
   completed: boolean;
-  turnsLeft: number;
+  /** Follow-ups still available after the opening question. */
+  followUpsLeft: number;
 }
 
 /**
- * A soft cap on questions per interview. Enough for a real conversation, and
- * it bounds what a single student can spend if they keep going.
+ * Three follow-ups after the team's opening question, matching the previous
+ * system and the on-screen instructions students are given. The exercise is
+ * about probing deliberately, not conversing at length.
  */
-export const MAX_STUDENT_TURNS = 20;
+export const FOLLOW_UP_LIMIT = 3;
+
+/** The opening question plus its follow-ups. */
+export const MAX_STUDENT_MESSAGES = FOLLOW_UP_LIMIT + 1;
 
 interface TranscriptRow {
   id: string;
@@ -60,7 +65,7 @@ export class InterviewService {
       openingQuestion: activity.selected_question_content,
       scenarioTag: activity.selected_scenario_tag,
       completed,
-      turnsLeft: MAX_STUDENT_TURNS - this.studentTurns(messages),
+      followUpsLeft: this.followUpsLeft(messages),
     };
   }
 
@@ -90,9 +95,9 @@ export class InterviewService {
     const transcript = await this.latestTranscript(activityId, studentUuid);
     const messages = transcript?.messages ?? [];
 
-    if (this.studentTurns(messages) >= MAX_STUDENT_TURNS) {
+    if (this.studentTurns(messages) >= MAX_STUDENT_MESSAGES) {
       throw new BadRequestException(
-        `An interview is limited to ${MAX_STUDENT_TURNS} questions`,
+        `You have asked your opening question and all ${FOLLOW_UP_LIMIT} follow-ups`,
       );
     }
 
@@ -129,7 +134,7 @@ export class InterviewService {
       openingQuestion: activity.selected_question_content,
       scenarioTag: activity.selected_scenario_tag,
       completed: false,
-      turnsLeft: MAX_STUDENT_TURNS - this.studentTurns(withAnswer),
+      followUpsLeft: this.followUpsLeft(withAnswer),
     };
   }
 
@@ -169,6 +174,11 @@ export class InterviewService {
 
     if (error) throw new BadRequestException(error.message);
     return { completed: count ?? 0, total: members.length };
+  }
+
+  /** Never negative: the opening question does not count as a follow-up. */
+  private followUpsLeft(messages: Message[]): number {
+    return Math.max(0, MAX_STUDENT_MESSAGES - this.studentTurns(messages));
   }
 
   private studentTurns(messages: Message[]): number {

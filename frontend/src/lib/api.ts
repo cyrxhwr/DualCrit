@@ -131,7 +131,8 @@ export interface InterviewState {
   openingQuestion: string | null;
   scenarioTag: string | null;
   completed: boolean;
-  turnsLeft: number;
+  /** Follow-ups still available after the opening question. */
+  followUpsLeft: number;
 }
 
 export const api = {
