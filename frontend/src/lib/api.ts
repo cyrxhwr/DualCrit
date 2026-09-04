@@ -107,6 +107,20 @@ export interface VotingState {
   winners: string[];
 }
 
+export interface StoredEvaluation {
+  id: string;
+  scope: 'team' | 'user';
+  evaluationType: string;
+  model: string | null;
+  createdAt: string;
+  feedback: {
+    verdict: 'strong' | 'workable' | 'needs_work';
+    summary: string;
+    mistakes: { type: string; quote: string; explanation: string }[];
+    strengths: string[];
+  };
+}
+
 export const api = {
   signIn: (studentId: string, fullName: string) =>
     request<{ token: string; student: Student }>('/auth/sign-in', {
@@ -146,6 +160,17 @@ export const api = {
       method: 'POST',
       body: { text, orderIndex },
     }),
+
+  questionFeedback: (activityId: string) =>
+    request<{ evaluation: StoredEvaluation | null; generating: boolean }>(
+      '/activities/' + activityId + '/evaluations/question',
+      { method: 'POST' },
+    ),
+
+  readQuestionFeedback: (activityId: string) =>
+    request<{ evaluation: StoredEvaluation | null }>(
+      '/activities/' + activityId + '/evaluations/question',
+    ),
 
   votingState: (activityId: string, type: string) =>
     request<{ state: VotingState | null; myVote: string[] }>(

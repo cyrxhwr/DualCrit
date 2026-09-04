@@ -7,8 +7,9 @@ import { getSocket } from '../lib/socket';
 import { useActivityMembers } from '../lib/useActivityMembers';
 import ScenarioSelection from './ScenarioSelection';
 import QuestionCreation from './QuestionCreation';
+import QuestionFeedback from './QuestionFeedback';
 
-type Step = 'lobby' | 'scenario' | 'question' | 'next';
+type Step = 'lobby' | 'scenario' | 'question' | 'feedback';
 
 /**
  * Which step to show.
@@ -26,7 +27,7 @@ function deriveStep(activity: Activity | null): Step {
   if (!activity.startedAt) return 'lobby';
   if (!activity.selectedScenarioTag) return 'scenario';
   if (!activity.selectedQuestionContent) return 'question';
-  return 'next';
+  return 'feedback';
 }
 
 export default function ActivityRoom() {
@@ -116,15 +117,11 @@ export default function ActivityRoom() {
           />
         )}
 
-        {activity && step === 'next' && (
-          <div className="py-10 text-center">
-            <h2 className="text-lg font-semibold text-gray-800">
-              Your team is ready to interview
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">
-              The interview step is not built yet.
-            </p>
-          </div>
+        {activity && step === 'feedback' && id && activity.selectedQuestionContent && (
+          <QuestionFeedback
+            activityId={id}
+            question={activity.selectedQuestionContent}
+          />
         )}
 
         {activity && step === 'lobby' && (

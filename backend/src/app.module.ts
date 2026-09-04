@@ -8,6 +8,8 @@ import { ActivitiesModule } from './activities/activities.module';
 import { RealtimeModule } from './realtime/realtime.module';
 import { VotingModule } from './voting/voting.module';
 import { ContributionsModule } from './contributions/contributions.module';
+import { LlmModule } from './llm/llm.module';
+import { EvaluationsModule } from './evaluations/evaluations.module';
 import { HealthController } from './common/health.controller';
 
 @Module({
@@ -19,6 +21,8 @@ import { HealthController } from './common/health.controller';
     RealtimeModule,
     VotingModule,
     ContributionsModule,
+    LlmModule,
+    EvaluationsModule,
   ],
   controllers: [HealthController],
   providers: [
