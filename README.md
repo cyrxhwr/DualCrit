@@ -95,6 +95,7 @@ supabase/migrations/
 
 ## Status
 
-Scaffold. Sign-in, the dashboard, and create/join work end to end. The host
-picks the workflow when creating the activity. The workflow steps themselves
-are not built yet.
+Sign-in, the dashboard, create/join, the live member list and the team
+scenario vote all work end to end. The host
+picks the workflow when creating the activity. The remaining interview steps
+(question creation, AI feedback, the interview itself) are not built yet.

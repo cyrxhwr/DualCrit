@@ -5,10 +5,17 @@ import { AuthModule } from './auth/auth.module';
 import { AuthGuard } from './auth/auth.guard';
 import { ActivitiesModule } from './activities/activities.module';
 import { RealtimeModule } from './realtime/realtime.module';
+import { VotingModule } from './voting/voting.module';
 import { HealthController } from './common/health.controller';
 
 @Module({
-  imports: [SupabaseModule, AuthModule, ActivitiesModule, RealtimeModule],
+  imports: [
+    SupabaseModule,
+    AuthModule,
+    ActivitiesModule,
+    RealtimeModule,
+    VotingModule,
+  ],
   controllers: [HealthController],
   providers: [
     // Protected by default. Routes opt out with @Public().

@@ -80,6 +80,19 @@ export interface Activity {
   members: string[];
 }
 
+export interface VotingState {
+  activityId: string;
+  type: string;
+  roundId: string;
+  status: 'active' | 'completed' | 'cancelled';
+  maxSelections: number;
+  tally: Record<string, number>;
+  votedCount: number;
+  memberCount: number;
+  isComplete: boolean;
+  winners: string[];
+}
+
 export const api = {
   signIn: (studentId: string, fullName: string) =>
     request<{ token: string; student: Student }>('/auth/sign-in', {
@@ -101,5 +114,22 @@ export const api = {
     request<{ ok: true }>(`/activities/${activityId}/step`, {
       method: 'POST',
       body: { step },
+    }),
+
+  votingState: (activityId: string, type: string) =>
+    request<{ state: VotingState | null; myVote: string[] }>(
+      `/activities/${activityId}/voting/${type}`,
+    ),
+
+  startVoting: (activityId: string, type: string, maxSelections = 1) =>
+    request<VotingState>(`/activities/${activityId}/voting/${type}/start`, {
+      method: 'POST',
+      body: { maxSelections },
+    }),
+
+  castVote: (activityId: string, type: string, optionIds: string[]) =>
+    request<VotingState>(`/activities/${activityId}/voting/${type}/vote`, {
+      method: 'POST',
+      body: { optionIds },
     }),
 };

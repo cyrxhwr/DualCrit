@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import AppShell from '../components/AppShell';
 import { api, ACTIVITY_TYPE_LABELS, type Activity } from '../lib/api';
 import { useActivityMembers } from '../lib/useActivityMembers';
+import ScenarioSelection from './ScenarioSelection';
 
 /**
  * The lobby: join code on the left, live member list on the right.
@@ -15,8 +16,18 @@ export default function ActivityRoom() {
   const navigate = useNavigate();
   const [activity, setActivity] = useState<Activity | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [started, setStarted] = useState(false);
 
   const { members, connected } = useActivityMembers(id);
+
+  // Record where this student is, so the dashboard's Continue can send them
+  // back here rather than to the beginning.
+  useEffect(() => {
+    if (!id) return;
+    void api
+      .setStep(id, started ? 'scenario-selection' : 'lobby')
+      .catch(() => undefined);
+  }, [id, started]);
 
   useEffect(() => {
     if (!id) return;
@@ -53,7 +64,11 @@ export default function ActivityRoom() {
           </p>
         )}
 
-        {activity && (
+        {activity && started && id && (
+          <ScenarioSelection activityId={id} onDecided={() => undefined} />
+        )}
+
+        {activity && !started && (
           <>
             <div className="flex items-center gap-3 mb-6">
               <h1 className="text-xl font-semibold text-gray-800">
@@ -138,7 +153,14 @@ export default function ActivityRoom() {
             <div className="max-w-3xl flex justify-end mt-6">
               <button
                 type="button"
-                className="bg-green-600 text-white rounded px-6 py-1.5 text-sm font-medium hover:bg-green-700"
+                onClick={() => setStarted(true)}
+                disabled={activity.type !== 'interview'}
+                title={
+                  activity.type === 'interview'
+                    ? undefined
+                    : 'The POV & HMW workflow is not built yet'
+                }
+                className="bg-green-600 text-white rounded px-6 py-1.5 text-sm font-medium hover:bg-green-700 disabled:opacity-50"
               >
                 Continue
               </button>

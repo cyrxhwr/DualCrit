@@ -133,6 +133,16 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     }
   }
 
+  /**
+   * Tell everyone watching an activity that something changed.
+   *
+   * Callers pass state they have just read from the database, so this stays a
+   * notification channel rather than a second copy of the truth.
+   */
+  emitToActivity(activityId: string, event: string, payload: unknown): void {
+    this.server.to(activityId).emit(event, payload);
+  }
+
   private onlineIn(activityId: string): Set<string> {
     const online = new Set<string>();
     for (const state of this.sockets.values()) {
