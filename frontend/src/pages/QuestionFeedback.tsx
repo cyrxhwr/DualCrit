@@ -8,6 +8,7 @@ import { describeMistake, isNoIssue } from '../lib/rubric';
 interface Props {
   activityId: string;
   question: string;
+  onContinue: () => void;
 }
 
 /**
@@ -16,7 +17,11 @@ interface Props {
  * One evaluation per team, not per student — everyone is looking at the same
  * question, so everyone sees the same notes.
  */
-export default function QuestionFeedback({ activityId, question }: Props) {
+export default function QuestionFeedback({
+  activityId,
+  question,
+  onContinue,
+}: Props) {
   const [evaluation, setEvaluation] = useState<StoredEvaluation | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -183,17 +188,19 @@ export default function QuestionFeedback({ activityId, question }: Props) {
         </div>
       )}
 
-      {evaluation && (
-        <p className="text-xs text-gray-400 pt-6">
-          Generated once for the team
-          {evaluation.model ? ` · ${evaluation.model}` : ''}
+            <div className="flex items-center justify-between gap-4 mt-8">
+        <p className="text-sm text-gray-500">
+          Next you each interview the persona yourself, using this question.
         </p>
-      )}
-
-      <p className="text-sm text-gray-400 mt-8">
-        Next each of you runs your own interview with this question. That step
-        is not built yet.
-      </p>
+        <button
+          type="button"
+          onClick={onContinue}
+          disabled={loading}
+          className="shrink-0 bg-green-600 text-white rounded px-6 py-1.5 text-sm font-medium hover:bg-green-700 disabled:opacity-50"
+        >
+          Start my interview
+        </button>
+      </div>
     </div>
   );
 }

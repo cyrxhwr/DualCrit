@@ -8,8 +8,9 @@ import { useActivityMembers } from '../lib/useActivityMembers';
 import ScenarioSelection from './ScenarioSelection';
 import QuestionCreation from './QuestionCreation';
 import QuestionFeedback from './QuestionFeedback';
+import Interview from './Interview';
 
-type Step = 'lobby' | 'scenario' | 'question' | 'feedback';
+type Step = 'lobby' | 'scenario' | 'question' | 'feedback' | 'interview';
 
 /**
  * Which step to show.
@@ -27,6 +28,9 @@ function deriveStep(activity: Activity | null): Step {
   if (!activity.startedAt) return 'lobby';
   if (!activity.selectedScenarioTag) return 'scenario';
   if (!activity.selectedQuestionContent) return 'question';
+  // From here the workflow is per student, so it follows their own recorded
+  // step rather than anything the team has finished.
+  if (activity.currentStep === 'interview') return 'interview';
   return 'feedback';
 }
 
@@ -75,6 +79,12 @@ export default function ActivityRoom() {
 
   const [starting, setStarting] = useState(false);
 
+  const goToInterview = async () => {
+    if (!id) return;
+    await api.setStep(id, 'interview').catch(() => undefined);
+    await loadActivity();
+  };
+
   const begin = async () => {
     if (!id) return;
     setStarting(true);
@@ -121,8 +131,11 @@ export default function ActivityRoom() {
           <QuestionFeedback
             activityId={id}
             question={activity.selectedQuestionContent}
+            onContinue={() => void goToInterview()}
           />
         )}
+
+        {activity && step === 'interview' && id && <Interview activityId={id} />}
 
         {activity && step === 'lobby' && (
           <>

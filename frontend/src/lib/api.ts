@@ -119,6 +119,21 @@ export interface StoredEvaluation {
   };
 }
 
+export interface InterviewMessage {
+  role: 'student' | 'persona';
+  text: string;
+  at: string;
+}
+
+export interface InterviewState {
+  attempt: number;
+  messages: InterviewMessage[];
+  openingQuestion: string | null;
+  scenarioTag: string | null;
+  completed: boolean;
+  turnsLeft: number;
+}
+
 export const api = {
   signIn: (studentId: string, fullName: string) =>
     request<{ token: string; student: Student }>('/auth/sign-in', {
@@ -168,6 +183,26 @@ export const api = {
   readQuestionFeedback: (activityId: string) =>
     request<{ evaluation: StoredEvaluation | null }>(
       '/activities/' + activityId + '/evaluations/question',
+    ),
+
+  interviewState: (activityId: string) =>
+    request<InterviewState>(`/activities/${activityId}/interview`),
+
+  interviewProgress: (activityId: string) =>
+    request<{ completed: number; total: number }>(
+      `/activities/${activityId}/interview/progress`,
+    ),
+
+  interviewAsk: (activityId: string, text: string) =>
+    request<InterviewState>(`/activities/${activityId}/interview/ask`, {
+      method: 'POST',
+      body: { text },
+    }),
+
+  interviewComplete: (activityId: string) =>
+    request<{ completed: number; total: number }>(
+      `/activities/${activityId}/interview/complete`,
+      { method: 'POST' },
     ),
 
   votingState: (activityId: string, type: string) =>

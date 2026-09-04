@@ -50,6 +50,43 @@ export class LlmService {
   }
 
   /**
+   * Reply in character as one of the four personas.
+   *
+   * The full conversation is passed in by the caller, who reads it from that
+   * student's own transcript. This service keeps no conversation state, so
+   * there is nothing for one student's interview to leak into another's.
+   */
+  async askPersona(
+    scenarioTag: string,
+    history: { role: 'user' | 'assistant'; content: string }[],
+    model = DEFAULT_MODEL,
+  ): Promise<string> {
+    if (!this.client) {
+      throw new ServiceUnavailableException(
+        'The AI interviewee is not configured on this server',
+      );
+    }
+
+    const completion = await this.client.chat.completions.create({
+      model,
+      // Matches the previous system's persona settings: a little warmth for
+      // character, and short answers so students have to probe.
+      temperature: 0.3,
+      max_tokens: 300,
+      messages: [
+        { role: 'system', content: this.prompt(`persona${scenarioTag}.txt`) },
+        ...history,
+      ],
+    });
+
+    const content = completion.choices[0]?.message?.content?.trim();
+    if (!content) {
+      throw new ServiceUnavailableException('The persona returned nothing');
+    }
+    return content;
+  }
+
+  /**
    * Ask for JSON and parse it.
    *
    * Uses the model's JSON mode, so the reply is valid JSON by construction.

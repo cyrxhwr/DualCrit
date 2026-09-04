@@ -10,6 +10,7 @@ import { VotingModule } from './voting/voting.module';
 import { ContributionsModule } from './contributions/contributions.module';
 import { LlmModule } from './llm/llm.module';
 import { EvaluationsModule } from './evaluations/evaluations.module';
+import { InterviewModule } from './interview/interview.module';
 import { HealthController } from './common/health.controller';
 
 @Module({
@@ -23,6 +24,7 @@ import { HealthController } from './common/health.controller';
     ContributionsModule,
     LlmModule,
     EvaluationsModule,
+    InterviewModule,
   ],
   controllers: [HealthController],
   providers: [
