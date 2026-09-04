@@ -15,6 +15,7 @@ export interface ActivitySummary {
   status: string;
   updatedAt: string;
   currentStep: string | null;
+  startedAt: string | null;
   selectedScenarioTag: string | null;
   selectedQuestionContent: string | null;
   isHost: boolean;
@@ -31,6 +32,7 @@ interface ActivityRow {
   updated_at: string;
   selected_scenario_tag: string | null;
   selected_question_content: string | null;
+  started_at: string | null;
 }
 
 interface MemberRow {
@@ -68,7 +70,7 @@ export class ActivitiesService {
     const { data: activities, error: activitiesError } =
       await this.supabase.client
         .from('activities')
-        .select('id, code, name, type, status, max_participants, updated_at, selected_scenario_tag, selected_question_content')
+        .select('id, code, name, type, status, max_participants, updated_at, selected_scenario_tag, selected_question_content, started_at')
         .in('id', activityIds)
         .neq('status', 'archived')
         .order('updated_at', { ascending: false });
@@ -103,6 +105,7 @@ export class ActivitiesService {
         type: a.type,
         status: a.status,
         updatedAt: a.updated_at,
+        startedAt: a.started_at,
         selectedScenarioTag: a.selected_scenario_tag,
         selectedQuestionContent: a.selected_question_content,
         currentStep: (membership?.current_step as string | null) ?? null,
@@ -127,7 +130,7 @@ export class ActivitiesService {
     const { data: activity, error } = await this.supabase.client
       .from('activities')
       .insert({ name, type, host_id: studentUuid })
-      .select('id, code, name, type, status, max_participants, updated_at, selected_scenario_tag, selected_question_content')
+      .select('id, code, name, type, status, max_participants, updated_at, selected_scenario_tag, selected_question_content, started_at')
       .single<ActivityRow>();
 
     if (error || !activity) {
@@ -147,7 +150,7 @@ export class ActivitiesService {
 
     const { data: activity, error } = await this.supabase.client
       .from('activities')
-      .select('id, code, name, type, status, max_participants, updated_at, selected_scenario_tag, selected_question_content')
+      .select('id, code, name, type, status, max_participants, updated_at, selected_scenario_tag, selected_question_content, started_at')
       .eq('code', code)
       .eq('status', 'active')
       .maybeSingle<ActivityRow>();
@@ -155,6 +158,13 @@ export class ActivitiesService {
     if (error) throw new BadRequestException(error.message);
     if (!activity) {
       throw new NotFoundException('No open activity with that code');
+    }
+
+    // The roster is fixed once the host starts. A late arrival would change
+    // what "everyone has submitted" and "everyone has voted" mean in the
+    // middle of a round, so joining is refused rather than silently allowed.
+    if (activity.started_at) {
+      throw new ForbiddenException('That activity has already started');
     }
 
     // A returning member is already counted, so only check capacity for
@@ -183,6 +193,39 @@ export class ActivitiesService {
     await this.addMember(activity.id, studentUuid, false);
     const list = await this.listForStudent(studentUuid);
     return list.find((a) => a.id === activity.id)!;
+  }
+
+  /**
+   * The host starts the activity, which locks the roster and moves the whole
+   * team on together.
+   *
+   * Only the host can do it: leaving it to whoever clicked first meant a
+   * student could start the team on a workflow before everyone had arrived.
+   * Idempotent — starting twice keeps the original time rather than resetting.
+   */
+  async start(activityId: string, studentUuid: string): Promise<void> {
+    const { data: membership, error: membershipError } =
+      await this.supabase.client
+        .from('activity_members')
+        .select('is_host')
+        .eq('activity_id', activityId)
+        .eq('student_id', studentUuid)
+        .eq('is_active', true)
+        .maybeSingle<{ is_host: boolean }>();
+
+    if (membershipError) throw new BadRequestException(membershipError.message);
+    if (!membership) throw new ForbiddenException('You are not in this activity');
+    if (!membership.is_host) {
+      throw new ForbiddenException('Only the host can start the activity');
+    }
+
+    const { error } = await this.supabase.client
+      .from('activities')
+      .update({ started_at: new Date().toISOString() })
+      .eq('id', activityId)
+      .is('started_at', null); // first call wins; later ones change nothing
+
+    if (error) throw new BadRequestException(error.message);
   }
 
   /** Records where a student is, so the dashboard can send them back there. */

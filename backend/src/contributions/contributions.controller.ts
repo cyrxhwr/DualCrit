@@ -17,7 +17,7 @@ import {
   AuthedStudent,
   CurrentStudent,
 } from '../auth/current-student.decorator';
-import { RealtimeGateway } from '../realtime/realtime.gateway';
+import { RealtimeBus } from '../realtime/realtime.bus';
 
 function parseType(value: string): ContributionType {
   if ((CONTRIBUTION_TYPES as readonly string[]).includes(value)) {
@@ -30,7 +30,7 @@ function parseType(value: string): ContributionType {
 export class ContributionsController {
   constructor(
     private readonly contributions: ContributionsService,
-    private readonly realtime: RealtimeGateway,
+    private readonly realtime: RealtimeBus,
   ) {}
 
   @Get()
@@ -60,7 +60,7 @@ export class ContributionsController {
 
     // Tell the room something changed. Each client re-reads for itself, so
     // nobody is sent another student's `isMine` flags.
-    this.realtime.emitToActivity(id, 'contributions:changed', {
+    this.realtime.publish(id, 'contributions:changed', {
       activityId: id,
       type: contributionType,
     });

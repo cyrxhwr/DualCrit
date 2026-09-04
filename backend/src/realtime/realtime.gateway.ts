@@ -11,6 +11,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ActivitiesService } from '../activities/activities.service';
+import { RealtimeBus } from './realtime.bus';
 
 interface TokenPayload {
   sub: string;
@@ -51,7 +52,13 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
   constructor(
     private readonly jwt: JwtService,
     private readonly activities: ActivitiesService,
-  ) {}
+    private readonly bus: RealtimeBus,
+  ) {
+    // Anything published on the bus goes to that activity room.
+    this.bus.subscribe(({ activityId, event, payload }) =>
+      this.emitToActivity(activityId, event, payload),
+    );
+  }
 
   async handleConnection(socket: Socket): Promise<void> {
     const token = socket.handshake.auth?.token as string | undefined;

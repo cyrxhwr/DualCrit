@@ -76,6 +76,7 @@ export interface Activity {
   status: string;
   updatedAt: string;
   currentStep: string | null;
+  startedAt: string | null;
   selectedScenarioTag: string | null;
   selectedQuestionContent: string | null;
   isHost: boolean;
@@ -122,6 +123,9 @@ export const api = {
 
   joinActivity: (code: string) =>
     request<Activity>('/activities/join', { method: 'POST', body: { code } }),
+
+  startActivity: (activityId: string) =>
+    request<{ ok: true }>(`/activities/${activityId}/start`, { method: 'POST' }),
 
   setStep: (activityId: string, step: string) =>
     request<{ ok: true }>(`/activities/${activityId}/step`, {

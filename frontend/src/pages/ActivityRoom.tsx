@@ -18,9 +18,12 @@ type Step = 'lobby' | 'scenario' | 'question' | 'next';
  * lands in the same place. `current_step` only decides whether this student
  * has left the lobby yet.
  */
-function deriveStep(activity: Activity | null, started: boolean): Step {
+function deriveStep(activity: Activity | null): Step {
   if (!activity) return 'lobby';
-  if (!started && (activity.currentStep ?? 'lobby') === 'lobby') return 'lobby';
+  // The team is in the lobby until the host starts. After that everyone moves
+  // together, because the step follows what the team has finished rather than
+  // anything held on one student's screen.
+  if (!activity.startedAt) return 'lobby';
   if (!activity.selectedScenarioTag) return 'scenario';
   if (!activity.selectedQuestionContent) return 'question';
   return 'next';
@@ -31,7 +34,6 @@ export default function ActivityRoom() {
   const navigate = useNavigate();
   const [activity, setActivity] = useState<Activity | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [started, setStarted] = useState(false);
 
   const { members, connected } = useActivityMembers(id);
 
@@ -45,7 +47,6 @@ export default function ActivityRoom() {
         return;
       }
       setActivity(found);
-      if ((found.currentStep ?? 'lobby') !== 'lobby') setStarted(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not load it');
     }
@@ -69,11 +70,21 @@ export default function ActivityRoom() {
     };
   }, [id, loadActivity]);
 
-  const step = deriveStep(activity, started);
+  const step = deriveStep(activity);
 
-  const begin = () => {
-    setStarted(true);
-    if (id) void api.setStep(id, 'in-progress').catch(() => undefined);
+  const [starting, setStarting] = useState(false);
+
+  const begin = async () => {
+    if (!id) return;
+    setStarting(true);
+    try {
+      await api.startActivity(id);
+      await loadActivity();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not start');
+    } finally {
+      setStarting(false);
+    }
   };
 
   return (
@@ -198,20 +209,28 @@ export default function ActivityRoom() {
               </section>
             </div>
 
-            <div className="max-w-3xl flex justify-end mt-6">
-              <button
-                type="button"
-                onClick={begin}
-                disabled={activity.type !== 'interview'}
-                title={
-                  activity.type === 'interview'
-                    ? undefined
-                    : 'The POV & HMW workflow is not built yet'
-                }
-                className="bg-green-600 text-white rounded px-6 py-1.5 text-sm font-medium hover:bg-green-700 disabled:opacity-50"
-              >
-                Continue
-              </button>
+            <div className="max-w-3xl flex items-center justify-between gap-4 mt-6">
+              <p className="text-xs text-gray-500">
+                {activity.isHost
+                  ? 'Starting locks the team — nobody can join after this.'
+                  : 'Waiting for the host to start. Anyone still joining should do it now.'}
+              </p>
+
+              {activity.isHost && (
+                <button
+                  type="button"
+                  onClick={() => void begin()}
+                  disabled={starting || activity.type !== 'interview'}
+                  title={
+                    activity.type === 'interview'
+                      ? undefined
+                      : 'The POV & HMW workflow is not built yet'
+                  }
+                  className="shrink-0 bg-green-600 text-white rounded px-6 py-1.5 text-sm font-medium hover:bg-green-700 disabled:opacity-50"
+                >
+                  {starting ? 'Starting…' : 'Start activity'}
+                </button>
+              )}
             </div>
           </>
         )}

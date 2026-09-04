@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Check, Users } from 'lucide-react';
 import { api, type Contribution } from '../lib/api';
 import { getSocket } from '../lib/socket';
-import { useActivityRoom } from '../lib/useActivityRoom';
+import { useActivityMembers } from '../lib/useActivityMembers';
 import { useVoting } from '../lib/useVoting';
 import { scenarioByTag } from '../lib/scenarios';
 
@@ -26,7 +26,7 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [picked, setPicked] = useState<string | null>(null);
 
-  useActivityRoom(activityId);
+  const { members, connected } = useActivityMembers(activityId);
   const voting = useVoting(activityId, TYPE);
   const scenario = scenarioTag ? scenarioByTag(scenarioTag) : undefined;
 
@@ -41,6 +41,12 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
   useEffect(() => {
     void refresh();
   }, [refresh]);
+
+  // A broadcast missed while the socket was down would otherwise leave this
+  // list stale until the student reloaded.
+  useEffect(() => {
+    if (connected) void refresh();
+  }, [connected, refresh]);
 
   // Each client re-reads for itself, so nobody receives another student's
   // view of who wrote what.
@@ -66,7 +72,10 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
     if (voting.myVote.length > 0) setPicked(voting.myVote[0]);
   }, [voting.myVote]);
 
-  const memberCount = voting.state?.memberCount ?? 0;
+  // From the roster, which exists from the moment the activity starts. Taking
+  // it from the voting state meant it was 0 until a round began, so "everyone
+  // has submitted" could never become true and voting never opened.
+  const memberCount = members.length;
   const everyoneSubmitted =
     memberCount > 0 && questions.length >= memberCount;
   const inVoting = voting.state?.status === 'active';
@@ -119,7 +128,7 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
           <Users className="h-4 w-4" />
           {inVoting
             ? `${voting.state?.votedCount ?? 0} of ${memberCount} voted`
-            : `${questions.length} of ${memberCount || '…'} submitted`}
+            : `${questions.length} of ${memberCount} submitted`}
         </span>
       </div>
 

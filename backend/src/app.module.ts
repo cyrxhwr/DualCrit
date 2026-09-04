@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { SupabaseModule } from './supabase/supabase.module';
+import { RealtimeBusModule } from './realtime/realtime.bus';
 import { AuthModule } from './auth/auth.module';
 import { AuthGuard } from './auth/auth.guard';
 import { ActivitiesModule } from './activities/activities.module';
@@ -12,6 +13,7 @@ import { HealthController } from './common/health.controller';
 @Module({
   imports: [
     SupabaseModule,
+    RealtimeBusModule,
     AuthModule,
     ActivitiesModule,
     RealtimeModule,

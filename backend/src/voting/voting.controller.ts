@@ -13,7 +13,7 @@ import {
   AuthedStudent,
   CurrentStudent,
 } from '../auth/current-student.decorator';
-import { RealtimeGateway } from '../realtime/realtime.gateway';
+import { RealtimeBus } from '../realtime/realtime.bus';
 import { BadRequestException } from '@nestjs/common';
 
 function parseType(value: string): VoteType {
@@ -25,7 +25,7 @@ function parseType(value: string): VoteType {
 export class VotingController {
   constructor(
     private readonly voting: VotingService,
-    private readonly realtime: RealtimeGateway,
+    private readonly realtime: RealtimeBus,
   ) {}
 
   @Get()
@@ -56,7 +56,7 @@ export class VotingController {
       parseType(type),
       dto.maxSelections ?? 1,
     );
-    this.realtime.emitToActivity(id, 'voting:state', state);
+    this.realtime.publish(id, 'voting:state', state);
     return state;
   }
 
@@ -73,12 +73,12 @@ export class VotingController {
       parseType(type),
       dto.optionIds,
     );
-    this.realtime.emitToActivity(id, 'voting:state', state);
+    this.realtime.publish(id, 'voting:state', state);
 
     // A finished round writes the team's choice onto the activity, which is
     // what decides the next step. Tell the room so nobody has to reload.
     if (state.status === 'completed') {
-      this.realtime.emitToActivity(id, 'activity:updated', { activityId: id });
+      this.realtime.publish(id, 'activity:updated', { activityId: id });
     }
 
     return state;
