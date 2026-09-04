@@ -1,0 +1,22 @@
+# dependencies
+node_modules/
+
+# secrets — never commit these
+.env
+.env.*
+!.env.example
+
+# build output
+dist/
+build/
+
+# supabase local state
+supabase/.branches/
+supabase/.temp/
+
+# logs & editor
+*.log
+npm-debug.log*
+.DS_Store
+.vscode/
+.idea/
