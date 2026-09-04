@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getSocket } from './socket';
+import { useActivityRoom } from './useActivityRoom';
 
 export interface LiveMember {
   studentUuid: string;
@@ -17,17 +18,11 @@ export interface LiveMember {
  */
 export function useActivityMembers(activityId: string | undefined) {
   const [members, setMembers] = useState<LiveMember[]>([]);
-  const [connected, setConnected] = useState(false);
+  const connected = useActivityRoom(activityId);
 
   useEffect(() => {
     if (!activityId) return;
-
     const socket = getSocket();
-
-    const join = () => {
-      setConnected(true);
-      socket.emit('activity:join', { activityId });
-    };
 
     const onMembers = (payload: {
       activityId: string;
@@ -37,19 +32,9 @@ export function useActivityMembers(activityId: string | undefined) {
       setMembers(payload.members);
     };
 
-    const onDisconnect = () => setConnected(false);
-
-    socket.on('connect', join);
     socket.on('activity:members', onMembers);
-    socket.on('disconnect', onDisconnect);
-
-    if (socket.connected) join();
-    else socket.connect();
-
     return () => {
-      socket.off('connect', join);
       socket.off('activity:members', onMembers);
-      socket.off('disconnect', onDisconnect);
     };
   }, [activityId]);
 

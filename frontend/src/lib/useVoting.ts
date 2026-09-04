@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api, type VotingState } from './api';
 import { getSocket } from './socket';
+import { useActivityRoom } from './useActivityRoom';
 
 /**
  * A voting round, kept live.
@@ -16,28 +17,34 @@ export function useVoting(activityId: string | undefined, type: string) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  // Join the room ourselves rather than assuming another hook did it.
+  const connected = useActivityRoom(activityId);
+
+  const refresh = useCallback(async () => {
     if (!activityId) return;
-    let cancelled = false;
-
-    api
-      .votingState(activityId, type)
-      .then((result) => {
-        if (cancelled) return;
-        setState(result.state);
-        setMyVote(result.myVote);
-      })
-      .catch((err: unknown) =>
-        setError(err instanceof Error ? err.message : 'Could not load voting'),
-      )
-      .finally(() => !cancelled && setLoading(false));
-
-    return () => {
-      cancelled = true;
-    };
+    try {
+      const result = await api.votingState(activityId, type);
+      setState(result.state);
+      setMyVote(result.myVote);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not load voting');
+    } finally {
+      setLoading(false);
+    }
   }, [activityId, type]);
 
-  // Everyone in the room gets the new tally the moment a vote lands.
+  useEffect(() => {
+    void refresh();
+  }, [refresh]);
+
+  // Re-read on every (re)connect. A broadcast missed while the socket was
+  // down would otherwise leave this screen showing a stale tally until the
+  // student reloaded.
+  useEffect(() => {
+    if (connected) void refresh();
+  }, [connected, refresh]);
+
   useEffect(() => {
     if (!activityId) return;
     const socket = getSocket();

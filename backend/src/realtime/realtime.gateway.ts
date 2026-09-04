@@ -140,7 +140,16 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
    * notification channel rather than a second copy of the truth.
    */
   emitToActivity(activityId: string, event: string, payload: unknown): void {
+    // Logged because "the other window didn't update" is almost always a
+    // client that is not in the room, and the room size says so immediately.
+    this.logger.debug(
+      `${event} -> activity ${activityId} (${this.roomSize(activityId)} watching)`,
+    );
     this.server.to(activityId).emit(event, payload);
+  }
+
+  private roomSize(activityId: string): number {
+    return this.server.sockets.adapter.rooms.get(activityId)?.size ?? 0;
   }
 
   private onlineIn(activityId: string): Set<string> {

@@ -19,7 +19,9 @@ async function bootstrap(): Promise<void> {
   // Fail at boot with a readable message rather than at the first request.
   requireEnv('SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'JWT_SECRET');
 
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn', 'log', 'debug'],
+  });
 
   app.enableCors({
     origin: process.env.FRONTEND_URL ?? 'http://localhost:5173',
