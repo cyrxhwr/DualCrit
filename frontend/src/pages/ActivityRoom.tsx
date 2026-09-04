@@ -11,6 +11,7 @@ import QuestionFeedback from './QuestionFeedback';
 import Interview from './Interview';
 import PeerReview from './PeerReview';
 import InterviewFeedback from './InterviewFeedback';
+import Summary from './Summary';
 
 type Step =
   | 'lobby'
@@ -19,7 +20,8 @@ type Step =
   | 'feedback'
   | 'interview'
   | 'peer-review'
-  | 'my-feedback';
+  | 'my-feedback'
+  | 'summary';
 
 /**
  * Which step to show.
@@ -39,6 +41,7 @@ function deriveStep(activity: Activity | null): Step {
   if (!activity.selectedQuestionContent) return 'question';
   // From here the workflow is per student, so it follows their own recorded
   // step rather than anything the team has finished.
+  if (activity.currentStep === 'summary') return 'summary';
   if (activity.currentStep === 'my-feedback') return 'my-feedback';
   if (activity.currentStep === 'peer-review') return 'peer-review';
   if (activity.currentStep === 'interview') return 'interview';
@@ -162,7 +165,14 @@ export default function ActivityRoom() {
         )}
 
         {activity && step === 'my-feedback' && id && (
-          <InterviewFeedback activityId={id} />
+          <InterviewFeedback
+            activityId={id}
+            onContinue={() => void goToStep('summary')}
+          />
+        )}
+
+        {activity && step === 'summary' && id && (
+          <Summary activityId={id} onFinish={() => navigate('/')} />
         )}
 
         {activity && step === 'lobby' && (

@@ -100,4 +100,6 @@ vote, question creation with voting, and AI feedback on the team question all
 work end to end. The host
 picks the workflow when creating the activity, and each student resumes where
 their team actually is. Each student interviews the persona themselves, then
-reads how the rest of the team did. Feedback on your own transcript is next.
+reads how the rest of the team did, gets scored on their own interview, and
+ends on a summary they can copy or download. The interview workflow is
+complete; POV & HMW is not built.

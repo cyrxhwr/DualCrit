@@ -4,6 +4,7 @@ import { api, type StoredEvaluation } from '../lib/api';
 
 interface Props {
   activityId: string;
+  onContinue: () => void;
 }
 
 /**
@@ -26,7 +27,10 @@ function withEmphasis(text: string): ReactNode[] {
 }
 
 /** The student's own interview, scored against the five rubric standards. */
-export default function InterviewFeedback({ activityId }: Props) {
+export default function InterviewFeedback({
+  activityId,
+  onContinue,
+}: Props) {
   const [evaluation, setEvaluation] = useState<StoredEvaluation | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -122,9 +126,18 @@ export default function InterviewFeedback({ activityId }: Props) {
         ))}
       </div>
 
-      <p className="text-sm text-gray-400 mt-8">
-        Your session summary is the last step, and is not built yet.
-      </p>
+      <div className="flex items-center justify-between gap-4 mt-8">
+        <p className="text-sm text-gray-500">
+          Last step: everything you and your team produced, in one place.
+        </p>
+        <button
+          type="button"
+          onClick={onContinue}
+          className="shrink-0 bg-green-600 text-white rounded px-6 py-1.5 text-sm font-medium hover:bg-green-700"
+        >
+          See my summary
+        </button>
+      </div>
     </div>
   );
 }

@@ -11,6 +11,7 @@ import { ContributionsModule } from './contributions/contributions.module';
 import { LlmModule } from './llm/llm.module';
 import { EvaluationsModule } from './evaluations/evaluations.module';
 import { InterviewModule } from './interview/interview.module';
+import { SummaryModule } from './summary/summary.module';
 import { HealthController } from './common/health.controller';
 
 @Module({
@@ -25,6 +26,7 @@ import { HealthController } from './common/health.controller';
     LlmModule,
     EvaluationsModule,
     InterviewModule,
+    SummaryModule,
   ],
   controllers: [HealthController],
   providers: [

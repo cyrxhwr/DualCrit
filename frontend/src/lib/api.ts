@@ -155,6 +155,20 @@ export interface TeamTranscripts {
   }[];
 }
 
+export interface SessionSummary {
+  activityName: string;
+  scenarioTag: string | null;
+  myQuestion: string | null;
+  teamQuestion: string | null;
+  questionFeedback: { mistake: string; explanation: string }[];
+  transcript: { role: 'student' | 'persona'; text: string }[];
+  criteria: Criterion[];
+  questionCount: number;
+  summaryText: string;
+  /** False when the summary could be shown but not stored. */
+  saved: boolean;
+}
+
 export const api = {
   signIn: (studentId: string, fullName: string) =>
     request<{ token: string; student: Student }>('/auth/sign-in', {
@@ -236,6 +250,9 @@ export const api = {
       '/activities/' + activityId + '/evaluations/interview',
       { method: 'POST' },
     ),
+
+  sessionSummary: (activityId: string) =>
+    request<SessionSummary>('/activities/' + activityId + '/summary'),
 
   votingState: (activityId: string, type: string) =>
     request<{ state: VotingState | null; myVote: string[] }>(
