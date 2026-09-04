@@ -203,15 +203,22 @@ export default function Interview({ activityId }: Props) {
             </button>
           </form>
 
-          <div className="flex items-center justify-between mt-3">
+          <div className="flex items-center justify-between gap-4 mt-3">
             <span className="text-xs text-gray-400">
-              {state.followUpsLeft} follow-up{state.followUpsLeft === 1 ? '' : 's'} left
+              {state.followUpsLeft > 0
+                ? `${state.followUpsLeft} follow-up${state.followUpsLeft === 1 ? '' : 's'} left`
+                : 'All three follow-ups asked'}
             </span>
             <button
               type="button"
               onClick={() => void finish()}
-              disabled={busy}
-              className="bg-green-600 text-white rounded px-6 py-1.5 text-sm font-medium hover:bg-green-700 disabled:opacity-50"
+              disabled={busy || state.followUpsLeft > 0}
+              title={
+                state.followUpsLeft > 0
+                  ? 'Ask all three follow-ups first'
+                  : undefined
+              }
+              className="shrink-0 bg-green-600 text-white rounded px-6 py-1.5 text-sm font-medium hover:bg-green-700 disabled:opacity-50"
             >
               Finish interview
             </button>

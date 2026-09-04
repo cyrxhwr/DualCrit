@@ -143,8 +143,18 @@ export class InterviewService {
     await this.activities.assertMember(activityId, studentUuid);
 
     const transcript = await this.latestTranscript(activityId, studentUuid);
-    if (!transcript || transcript.messages.length === 0) {
-      throw new BadRequestException('There is no interview to finish yet');
+    const asked = this.studentTurns(transcript?.messages ?? []);
+
+    // The three follow-ups are the exercise, so finishing early is refused
+    // here rather than only hidden in the UI — a disabled button is a hint,
+    // not a rule.
+    if (asked < MAX_STUDENT_MESSAGES) {
+      const remaining = MAX_STUDENT_MESSAGES - asked;
+      throw new BadRequestException(
+        asked === 0
+          ? 'Ask your opening question first'
+          : `Ask ${remaining} more follow-up${remaining === 1 ? '' : 's'} before finishing`,
+      );
     }
 
     const { error } = await this.supabase.client
