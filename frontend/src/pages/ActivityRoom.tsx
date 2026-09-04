@@ -1,16 +1,31 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import AppShell from '../components/AppShell';
 import { api, ACTIVITY_TYPE_LABELS, type Activity } from '../lib/api';
+import { getSocket } from '../lib/socket';
 import { useActivityMembers } from '../lib/useActivityMembers';
 import ScenarioSelection from './ScenarioSelection';
+import QuestionCreation from './QuestionCreation';
+
+type Step = 'lobby' | 'scenario' | 'question' | 'next';
 
 /**
- * The lobby: join code on the left, live member list on the right.
+ * Which step to show.
  *
- * The workflow steps mount from here as they are built.
+ * Derived from what the team has actually finished, not from anything held in
+ * this component — so a reload, or opening the activity on another machine,
+ * lands in the same place. `current_step` only decides whether this student
+ * has left the lobby yet.
  */
+function deriveStep(activity: Activity | null, started: boolean): Step {
+  if (!activity) return 'lobby';
+  if (!started && (activity.currentStep ?? 'lobby') === 'lobby') return 'lobby';
+  if (!activity.selectedScenarioTag) return 'scenario';
+  if (!activity.selectedQuestionContent) return 'question';
+  return 'next';
+}
+
 export default function ActivityRoom() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -20,31 +35,46 @@ export default function ActivityRoom() {
 
   const { members, connected } = useActivityMembers(id);
 
-  // Record where this student is, so the dashboard's Continue can send them
-  // back here rather than to the beginning.
-  useEffect(() => {
+  const loadActivity = useCallback(async () => {
     if (!id) return;
-    void api
-      .setStep(id, started ? 'scenario-selection' : 'lobby')
-      .catch(() => undefined);
-  }, [id, started]);
+    try {
+      const all = await api.listActivities();
+      const found = all.find((a) => a.id === id);
+      if (!found) {
+        setError('That activity is not one of yours.');
+        return;
+      }
+      setActivity(found);
+      if ((found.currentStep ?? 'lobby') !== 'lobby') setStarted(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not load it');
+    }
+  }, [id]);
 
   useEffect(() => {
+    void loadActivity();
+  }, [loadActivity]);
+
+  // A completed vote writes the team's choice onto the activity, which is what
+  // moves everyone to the next step.
+  useEffect(() => {
     if (!id) return;
-    api
-      .listActivities()
-      .then((all) => {
-        const found = all.find((a) => a.id === id);
-        if (!found) {
-          setError('That activity is not one of yours.');
-          return;
-        }
-        setActivity(found);
-      })
-      .catch((err: unknown) =>
-        setError(err instanceof Error ? err.message : 'Could not load it'),
-      );
-  }, [id]);
+    const socket = getSocket();
+    const onUpdated = (payload: { activityId: string }) => {
+      if (payload.activityId === id) void loadActivity();
+    };
+    socket.on('activity:updated', onUpdated);
+    return () => {
+      socket.off('activity:updated', onUpdated);
+    };
+  }, [id, loadActivity]);
+
+  const step = deriveStep(activity, started);
+
+  const begin = () => {
+    setStarted(true);
+    if (id) void api.setStep(id, 'in-progress').catch(() => undefined);
+  };
 
   return (
     <AppShell>
@@ -64,11 +94,29 @@ export default function ActivityRoom() {
           </p>
         )}
 
-        {activity && started && id && (
-          <ScenarioSelection activityId={id} onDecided={() => undefined} />
+        {activity && step === 'scenario' && id && (
+          <ScenarioSelection activityId={id} onDecided={() => void loadActivity()} />
         )}
 
-        {activity && !started && (
+        {activity && step === 'question' && id && (
+          <QuestionCreation
+            activityId={id}
+            scenarioTag={activity.selectedScenarioTag}
+          />
+        )}
+
+        {activity && step === 'next' && (
+          <div className="py-10 text-center">
+            <h2 className="text-lg font-semibold text-gray-800">
+              Your team is ready to interview
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">
+              The interview step is not built yet.
+            </p>
+          </div>
+        )}
+
+        {activity && step === 'lobby' && (
           <>
             <div className="flex items-center gap-3 mb-6">
               <h1 className="text-xl font-semibold text-gray-800">
@@ -153,7 +201,7 @@ export default function ActivityRoom() {
             <div className="max-w-3xl flex justify-end mt-6">
               <button
                 type="button"
-                onClick={() => setStarted(true)}
+                onClick={begin}
                 disabled={activity.type !== 'interview'}
                 title={
                   activity.type === 'interview'

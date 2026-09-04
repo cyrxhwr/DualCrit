@@ -95,7 +95,7 @@ supabase/migrations/
 
 ## Status
 
-Sign-in, the dashboard, create/join, the live member list and the team
-scenario vote all work end to end. The host
-picks the workflow when creating the activity. The remaining interview steps
-(question creation, AI feedback, the interview itself) are not built yet.
+Sign-in, the dashboard, create/join, the live member list, the team scenario
+vote and question creation with voting all work end to end. The host
+picks the workflow when creating the activity, and each student resumes where
+their team actually is. AI feedback and the interview itself are next.

@@ -74,6 +74,13 @@ export class VotingController {
       dto.optionIds,
     );
     this.realtime.emitToActivity(id, 'voting:state', state);
+
+    // A finished round writes the team's choice onto the activity, which is
+    // what decides the next step. Tell the room so nobody has to reload.
+    if (state.status === 'completed') {
+      this.realtime.emitToActivity(id, 'activity:updated', { activityId: id });
+    }
+
     return state;
   }
 }

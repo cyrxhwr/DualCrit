@@ -6,6 +6,7 @@ import { AuthGuard } from './auth/auth.guard';
 import { ActivitiesModule } from './activities/activities.module';
 import { RealtimeModule } from './realtime/realtime.module';
 import { VotingModule } from './voting/voting.module';
+import { ContributionsModule } from './contributions/contributions.module';
 import { HealthController } from './common/health.controller';
 
 @Module({
@@ -15,6 +16,7 @@ import { HealthController } from './common/health.controller';
     ActivitiesModule,
     RealtimeModule,
     VotingModule,
+    ContributionsModule,
   ],
   controllers: [HealthController],
   providers: [

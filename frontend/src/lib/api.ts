@@ -76,8 +76,21 @@ export interface Activity {
   status: string;
   updatedAt: string;
   currentStep: string | null;
+  selectedScenarioTag: string | null;
+  selectedQuestionContent: string | null;
   isHost: boolean;
   members: string[];
+}
+
+export interface Contribution {
+  id: string;
+  studentUuid: string;
+  authorName: string;
+  type: string;
+  content: { question?: string; statement?: string };
+  orderIndex: number;
+  isSelected: boolean;
+  isMine: boolean;
 }
 
 export interface VotingState {
@@ -114,6 +127,20 @@ export const api = {
     request<{ ok: true }>(`/activities/${activityId}/step`, {
       method: 'POST',
       body: { step },
+    }),
+
+  listContributions: (activityId: string, type: string) =>
+    request<Contribution[]>(`/activities/${activityId}/contributions/${type}`),
+
+  submitContribution: (
+    activityId: string,
+    type: string,
+    text: string,
+    orderIndex = 1,
+  ) =>
+    request<Contribution[]>(`/activities/${activityId}/contributions/${type}`, {
+      method: 'POST',
+      body: { text, orderIndex },
     }),
 
   votingState: (activityId: string, type: string) =>

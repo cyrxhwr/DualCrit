@@ -15,6 +15,8 @@ export interface ActivitySummary {
   status: string;
   updatedAt: string;
   currentStep: string | null;
+  selectedScenarioTag: string | null;
+  selectedQuestionContent: string | null;
   isHost: boolean;
   members: string[];
 }
@@ -27,6 +29,8 @@ interface ActivityRow {
   status: string;
   max_participants: number;
   updated_at: string;
+  selected_scenario_tag: string | null;
+  selected_question_content: string | null;
 }
 
 interface MemberRow {
@@ -64,7 +68,7 @@ export class ActivitiesService {
     const { data: activities, error: activitiesError } =
       await this.supabase.client
         .from('activities')
-        .select('id, code, name, type, status, max_participants, updated_at')
+        .select('id, code, name, type, status, max_participants, updated_at, selected_scenario_tag, selected_question_content')
         .in('id', activityIds)
         .neq('status', 'archived')
         .order('updated_at', { ascending: false });
@@ -99,6 +103,8 @@ export class ActivitiesService {
         type: a.type,
         status: a.status,
         updatedAt: a.updated_at,
+        selectedScenarioTag: a.selected_scenario_tag,
+        selectedQuestionContent: a.selected_question_content,
         currentStep: (membership?.current_step as string | null) ?? null,
         isHost: Boolean(membership?.is_host),
         members: namesByActivity.get(a.id) ?? [],
@@ -121,7 +127,7 @@ export class ActivitiesService {
     const { data: activity, error } = await this.supabase.client
       .from('activities')
       .insert({ name, type, host_id: studentUuid })
-      .select('id, code, name, type, status, max_participants, updated_at')
+      .select('id, code, name, type, status, max_participants, updated_at, selected_scenario_tag, selected_question_content')
       .single<ActivityRow>();
 
     if (error || !activity) {
@@ -141,7 +147,7 @@ export class ActivitiesService {
 
     const { data: activity, error } = await this.supabase.client
       .from('activities')
-      .select('id, code, name, type, status, max_participants, updated_at')
+      .select('id, code, name, type, status, max_participants, updated_at, selected_scenario_tag, selected_question_content')
       .eq('code', code)
       .eq('status', 'active')
       .maybeSingle<ActivityRow>();
