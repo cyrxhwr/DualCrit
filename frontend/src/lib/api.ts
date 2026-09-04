@@ -61,11 +61,18 @@ export interface Student {
   fullName: string;
 }
 
+export type ActivityType = 'interview' | 'pov_hmw';
+
+export const ACTIVITY_TYPE_LABELS: Record<ActivityType, string> = {
+  interview: 'Interview',
+  pov_hmw: 'POV & HMW',
+};
+
 export interface Activity {
   id: string;
   code: string;
   name: string;
-  type: string;
+  type: ActivityType;
   status: string;
   updatedAt: string;
   currentStep: string | null;
@@ -84,8 +91,8 @@ export const api = {
 
   listActivities: () => request<Activity[]>('/activities'),
 
-  createActivity: (name: string) =>
-    request<Activity>('/activities', { method: 'POST', body: { name } }),
+  createActivity: (name: string, type: ActivityType) =>
+    request<Activity>('/activities', { method: 'POST', body: { name, type } }),
 
   joinActivity: (code: string) =>
     request<Activity>('/activities/join', { method: 'POST', body: { code } }),

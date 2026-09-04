@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
+import type { ActivityType } from './dto/create-activity.dto';
 
 export interface ActivitySummary {
   id: string;
@@ -98,11 +99,21 @@ export class ActivitiesService {
     });
   }
 
-  /** Create an activity and enrol the creator as host. */
-  async create(studentUuid: string, name: string): Promise<ActivitySummary> {
+  /**
+   * Create an activity and enrol the creator as host.
+   *
+   * The workflow type is fixed here, once. It describes the team's work, so
+   * it cannot be a per-student choice made later — that is how two members
+   * of one team ended up in different flows in the previous system.
+   */
+  async create(
+    studentUuid: string,
+    name: string,
+    type: ActivityType,
+  ): Promise<ActivitySummary> {
     const { data: activity, error } = await this.supabase.client
       .from('activities')
-      .insert({ name, host_id: studentUuid })
+      .insert({ name, type, host_id: studentUuid })
       .select('id, code, name, type, status, max_participants, updated_at')
       .single<ActivityRow>();
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import AppShell from '../components/AppShell';
-import { api, type Activity } from '../lib/api';
+import { api, ACTIVITY_TYPE_LABELS, type Activity } from '../lib/api';
 
 /**
  * The lobby from the mockup: join code on the left, members on the right.
@@ -53,9 +53,20 @@ export default function ActivityRoom() {
 
         {activity && (
           <>
-            <h1 className="text-xl font-semibold text-gray-800 mb-6">
-              {activity.name}
-            </h1>
+            <div className="flex items-center gap-3 mb-6">
+              <h1 className="text-xl font-semibold text-gray-800">
+                {activity.name}
+              </h1>
+              <span
+                className={`text-xs px-2.5 py-0.5 rounded-full ${
+                  activity.type === 'interview'
+                    ? 'bg-blue-50 text-blue-700'
+                    : 'bg-purple-50 text-purple-700'
+                }`}
+              >
+                {ACTIVITY_TYPE_LABELS[activity.type]}
+              </span>
+            </div>
 
             <div className="grid gap-6 md:grid-cols-[1fr_1.2fr] max-w-3xl">
               <section className="border border-gray-200 rounded-lg p-5">

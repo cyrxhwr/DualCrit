@@ -20,7 +20,7 @@ export class ActivitiesController {
     @CurrentStudent() student: AuthedStudent,
     @Body() dto: CreateActivityDto,
   ) {
-    return this.activities.create(student.id, dto.name);
+    return this.activities.create(student.id, dto.name, dto.type);
   }
 
   @Post('join')

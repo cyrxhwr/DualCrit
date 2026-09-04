@@ -95,5 +95,6 @@ supabase/migrations/
 
 ## Status
 
-Scaffold. Sign-in, the dashboard, and create/join work end to end. The
-workflow steps are not built yet.
+Scaffold. Sign-in, the dashboard, and create/join work end to end. The host
+picks the workflow when creating the activity. The workflow steps themselves
+are not built yet.
