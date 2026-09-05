@@ -160,17 +160,13 @@ export class LlmService {
   /**
    * Ask the same question `samples` times and return every answer.
    *
-   * For self-consistency (Wang et al., 2022): the caller aggregates the
-   * samples rather than trusting one. Scoring a transcript needs it. Once the
-   * prompt asks the model to reason before it commits to a number, the number
-   * inherits the variance of the reasoning — measured on one fixed transcript,
-   * single samples ranged up to two points on a five-point rubric, while the
-   * median of three moved by at most one on one of the five criteria.
+   * With `samples` above 1 this is self-consistency (Wang et al., 2022): the
+   * caller aggregates rather than trusting one answer. See EVAL_SAMPLES in
+   * consensus.ts for what that buys and what the default gives up.
    *
-   * No seed here, deliberately: samples have to be allowed to differ or the
-   * median is just a more expensive single sample. If the API ever became
-   * genuinely deterministic at temperature 0 this degrades to that — wasteful,
-   * but not wrong.
+   * The seed is sent only for a single sample, where reproducibility is the
+   * point. Seeding several would push them towards the same answer, which is
+   * exactly what an aggregate needs them not to do.
    */
   async askForJsonSamples<T>(
     promptName: string,
@@ -186,15 +182,17 @@ export class LlmService {
 
     const client = this.client;
     const system = this.prompt(promptName);
+    const count = Math.max(1, samples);
 
-    // allSettled, not all: asking three times triples the chance of meeting a
-    // rate limit, and two good samples still beat abandoning the evaluation.
+    // allSettled, not all: more samples means more chance of meeting a rate
+    // limit, and two good samples still beat abandoning the evaluation.
     const settled = await Promise.allSettled(
-      Array.from({ length: Math.max(1, samples) }, () =>
+      Array.from({ length: count }, () =>
         client.chat.completions.create({
           model,
           temperature: 0,
           max_tokens: 2000,
+          ...(count === 1 ? { seed: SEED } : {}),
           response_format: { type: 'json_object' },
           messages: [
             { role: 'system', content: system },

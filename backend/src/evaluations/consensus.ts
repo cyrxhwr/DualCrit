@@ -3,12 +3,22 @@ import type { Criterion, InterviewFeedback } from './evaluations.service';
 /**
  * How many times a transcript is scored before the scores are combined.
  *
- * Three is what was measured: on one fixed transcript, single samples of the
- * same prompt ranged up to two points on a five-point rubric, while medians of
- * three moved by at most one point on one of the five criteria. Raise it for
- * more stability at proportionally more cost; 1 disables the aggregation.
+ * One, by choice (owner, 2026-09-05): a transcript is scored once and that
+ * score stands.
+ *
+ * The trade-off that decision accepts, so nobody has to re-derive it: because
+ * the prompt has the model reason before it commits to a number, the score
+ * carries the reasoning's variance. Measured on one fixed transcript, repeated
+ * single calls ranged up to two points on a five-point rubric, and the mean
+ * across five criteria moved between 2.4 and 3.2. Medians of three runs held
+ * four of the five criteria exactly steady. So a single score is well grounded
+ * but noisy, and two students with comparable interviews can land a point
+ * apart.
+ *
+ * Set EVAL_SAMPLES=3 to turn the aggregation back on — for a final data
+ * collection run, say — at three times the cost of the interview evaluation.
  */
-export const EVAL_SAMPLES = Number(process.env.EVAL_SAMPLES ?? 3);
+export const EVAL_SAMPLES = Number(process.env.EVAL_SAMPLES ?? 1);
 
 const median = (values: number[]): number =>
   [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)];

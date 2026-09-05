@@ -1,4 +1,4 @@
-import { consensus } from './consensus';
+import { consensus, EVAL_SAMPLES } from './consensus';
 import type { InterviewFeedback } from './evaluations.service';
 
 const sample = (...scores: number[]): InterviewFeedback => ({
@@ -7,6 +7,12 @@ const sample = (...scores: number[]): InterviewFeedback => ({
     score,
     response: `said ${score}`,
   })),
+});
+
+describe('EVAL_SAMPLES', () => {
+  it('scores a transcript once unless overridden', () => {
+    expect(EVAL_SAMPLES).toBe(1);
+  });
 });
 
 describe('consensus', () => {

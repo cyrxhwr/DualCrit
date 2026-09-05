@@ -237,8 +237,8 @@ export class EvaluationsService {
       )
       .join('\n');
 
-    // Scored several times and combined, not once — see consensus.ts for what
-    // the single-sample variance actually measured at.
+    // Scored once by default; consensus() is a pass-through at one sample.
+    // See EVAL_SAMPLES for what raising it buys.
     const { parsed, raw, model } =
       await this.llm.askForJsonSamples<InterviewFeedback>(
         'interview-feedback.txt',
