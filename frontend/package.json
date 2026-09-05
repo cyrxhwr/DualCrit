@@ -9,6 +9,9 @@
     "preview": "vite preview",
     "lint": "eslint src"
   },
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
     "lucide-react": "^0.469.0",
     "react": "^18.3.1",
