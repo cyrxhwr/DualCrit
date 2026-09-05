@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
 import { ActivitiesService } from '../activities/activities.service';
 import { LlmService } from '../llm/llm.service';
+import { consensus, EVAL_SAMPLES } from './consensus';
 
 /** One entry per rubric violation, or a single "None" entry when sound. */
 export interface FeedbackItem {
@@ -109,7 +110,6 @@ export class EvaluationsService {
   private async generateQuestionFeedback(
     activityId: string,
   ): Promise<{ evaluation: StoredEvaluation | null; generating: boolean }> {
-
     const activity = await this.loadActivityForPrompt(activityId);
     if (!activity.selected_question_content) {
       throw new BadRequestException('Your team has not chosen a question yet');
@@ -122,8 +122,11 @@ export class EvaluationsService {
     const { parsed, raw, model } = await this.llm.askForJson<QuestionFeedback>(
       'question-feedback.txt',
       [
-        `Persona: ${activity.selected_scenario_tag ?? 'unknown'}`,
-        `Interview question: ${activity.selected_question_content}`,
+        '## Persona',
+        this.llm.personaBrief(activity.selected_scenario_tag ?? 'A'),
+        '',
+        '## The question the team chose',
+        activity.selected_question_content,
       ].join('\n'),
     );
 
@@ -190,9 +193,10 @@ export class EvaluationsService {
     const running = this.inFlightUser.get(key);
     if (running) return running;
 
-    const work = this.generateInterviewFeedback(activityId, studentUuid).finally(
-      () => this.inFlightUser.delete(key),
-    );
+    const work = this.generateInterviewFeedback(
+      activityId,
+      studentUuid,
+    ).finally(() => this.inFlightUser.delete(key));
     this.inFlightUser.set(key, work);
     return work;
   }
@@ -233,10 +237,22 @@ export class EvaluationsService {
       )
       .join('\n');
 
-    const { parsed, raw, model } = await this.llm.askForJson<InterviewFeedback>(
-      'interview-feedback.txt',
-      rendered,
-    );
+    // Scored several times and combined, not once — see consensus.ts for what
+    // the single-sample variance actually measured at.
+    const { parsed, raw, model } =
+      await this.llm.askForJsonSamples<InterviewFeedback>(
+        'interview-feedback.txt',
+        [
+          '## Persona',
+          this.llm.personaBrief(transcript.scenario_tag ?? 'A'),
+          '',
+          '## Transcript',
+          rendered,
+        ].join('\n'),
+        EVAL_SAMPLES,
+      );
+
+    const agreed = consensus(parsed);
 
     const { error } = await this.supabase.client.from('ai_evaluations').insert({
       activity_id: activityId,
@@ -247,10 +263,13 @@ export class EvaluationsService {
       input_data: {
         messages: transcript.messages,
         scenarioTag: transcript.scenario_tag,
+        samples: parsed.length,
       },
+      // Every sample, not just the one that won: the spread between them is
+      // the evidence for how far to trust the reported score.
       ai_response: raw,
-      processed_scores: parsed,
-      feedback_summary: parsed.criteria?.[0]?.response ?? null,
+      processed_scores: agreed,
+      feedback_summary: agreed.criteria?.[0]?.response ?? null,
     });
 
     if (error) {

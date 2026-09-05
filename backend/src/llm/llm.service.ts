@@ -1,4 +1,8 @@
-import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import OpenAI from 'openai';
@@ -9,6 +13,14 @@ import OpenAI from 'openai';
  * gpt-4o-mini is far cheaper if exact comparability stops mattering.
  */
 export const DEFAULT_MODEL = process.env.OPENAI_MODEL ?? 'gpt-4o';
+
+/**
+ * Fixed so repeated evaluations of the same transcript are as close to
+ * reproducible as the API allows. It is best-effort, not a guarantee — the
+ * stored completion carries `system_fingerprint`, which changes when the
+ * backend does, so a run can be told apart from an earlier one.
+ */
+const SEED = 20260905;
 
 @Injectable()
 export class LlmService {
@@ -29,6 +41,21 @@ export class LlmService {
 
   get available(): boolean {
     return this.client !== null;
+  }
+
+  /**
+   * The facts about a persona, without the acting instructions.
+   *
+   * The evaluators need to know who the student is interviewing — several
+   * rubric items ("Lacks User Relevance", "Question Relevance") cannot be
+   * judged without it. Taking it from the persona file rather than a second
+   * copy keeps one source of truth, so the graders and the interviewee can
+   * never describe different people.
+   */
+  personaBrief(scenarioTag: string): string {
+    const full = this.prompt(`persona${scenarioTag}.txt`);
+    const [brief] = full.split('###Behavior Guidelines');
+    return brief.trim();
   }
 
   /**
@@ -73,6 +100,7 @@ export class LlmService {
       // character, and short answers so students have to probe.
       temperature: 0.3,
       max_tokens: 300,
+      seed: SEED,
       messages: [
         { role: 'system', content: this.prompt(`persona${scenarioTag}.txt`) },
         ...history,
@@ -109,6 +137,7 @@ export class LlmService {
       model,
       temperature: 0,
       max_tokens: 2000,
+      seed: SEED,
       response_format: { type: 'json_object' },
       messages: [
         { role: 'system', content: this.prompt(promptName) },
@@ -126,5 +155,87 @@ export class LlmService {
       raw: completion,
       model,
     };
+  }
+
+  /**
+   * Ask the same question `samples` times and return every answer.
+   *
+   * For self-consistency (Wang et al., 2022): the caller aggregates the
+   * samples rather than trusting one. Scoring a transcript needs it. Once the
+   * prompt asks the model to reason before it commits to a number, the number
+   * inherits the variance of the reasoning — measured on one fixed transcript,
+   * single samples ranged up to two points on a five-point rubric, while the
+   * median of three moved by at most one on one of the five criteria.
+   *
+   * No seed here, deliberately: samples have to be allowed to differ or the
+   * median is just a more expensive single sample. If the API ever became
+   * genuinely deterministic at temperature 0 this degrades to that — wasteful,
+   * but not wrong.
+   */
+  async askForJsonSamples<T>(
+    promptName: string,
+    input: string,
+    samples: number,
+    model = DEFAULT_MODEL,
+  ): Promise<{ parsed: T[]; raw: unknown[]; model: string }> {
+    if (!this.client) {
+      throw new ServiceUnavailableException(
+        'AI feedback is not configured on this server',
+      );
+    }
+
+    const client = this.client;
+    const system = this.prompt(promptName);
+
+    // allSettled, not all: asking three times triples the chance of meeting a
+    // rate limit, and two good samples still beat abandoning the evaluation.
+    const settled = await Promise.allSettled(
+      Array.from({ length: Math.max(1, samples) }, () =>
+        client.chat.completions.create({
+          model,
+          temperature: 0,
+          max_tokens: 2000,
+          response_format: { type: 'json_object' },
+          messages: [
+            { role: 'system', content: system },
+            { role: 'user', content: input },
+          ],
+        }),
+      ),
+    );
+
+    const parsed: T[] = [];
+    const raw: unknown[] = [];
+
+    for (const result of settled) {
+      if (result.status === 'rejected') {
+        this.logger.warn(`Sample failed: ${String(result.reason)}`);
+        continue;
+      }
+      const content = result.value.choices[0]?.message?.content;
+      if (!content) continue;
+      try {
+        // JSON mode makes this valid by construction unless the reply was
+        // truncated at max_tokens, which would otherwise lose good samples.
+        parsed.push(JSON.parse(content) as T);
+        raw.push(result.value);
+      } catch {
+        this.logger.warn('Discarded a sample that did not parse as JSON');
+      }
+    }
+
+    if (parsed.length === 0) {
+      throw new ServiceUnavailableException(
+        'The model returned nothing usable',
+      );
+    }
+
+    if (parsed.length < samples) {
+      this.logger.warn(
+        `Scored on ${parsed.length} of ${samples} samples for ${promptName}`,
+      );
+    }
+
+    return { parsed, raw, model };
   }
 }

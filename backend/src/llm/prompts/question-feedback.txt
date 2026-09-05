@@ -19,6 +19,10 @@ A question may violate several, or none at all.
 - Overly Narrow — Frames the problem so tightly that alternative insights are excluded
 - Unclear Purpose or Flow — Does not fit logically or relate to clear objectives
 
+Judge "Lacks User Relevance", "Overly Narrow" and "Unclear Purpose or Flow"
+against the persona's context and the interview goal given below, not against
+needfinding in the abstract.
+
 ### Examples
 
 Closed Question — "Do you usually do your grocery shopping on weekends?"
@@ -29,6 +33,24 @@ Leading or Biased Framing — "Why is using group chats so frustrating when work
 Lacks User Relevance — "How do doctors usually update patient records?" (asked of a student)
 Overly Narrow — "How do you feel about the font size in the announcements section?"
 Unclear Purpose or Flow — "What colour do you associate with success?" (in a mobility accessibility interview)
+
+A sound question, which violates nothing:
+
+None — "Walk me through the last time you tried to submit an assignment and
+something went wrong." It is open, asks for one specific occasion rather than a
+habit, embeds no assumption about what the trouble was, and proposes nothing.
+
+### Calibration
+
+Tag only what the wording actually does. A question is not "Too Broad" merely
+because a narrower one exists, and not "Leading" merely because it names a
+topic — it must suggest the answer.
+
+Most questions violate nothing or one thing. Three or more tags on a single
+short question almost always means you are counting one flaw several times; in
+that case report only the class that best describes it. Being unable to tag a
+question is a valid, common result and is more useful to the team than a tag
+you are not confident about.
 
 ### How to write the explanation
 
