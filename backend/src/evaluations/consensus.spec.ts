@@ -10,11 +10,10 @@ const sample = (...scores: number[]): InterviewFeedback => ({
 });
 
 describe('EVAL_SAMPLES', () => {
-  // Pinned deliberately: a student sees this number as a mark, and single
-  // sampling moved one criterion from 5 to 3 between sittings of the same
-  // interview. Changing the default should be a decision, not a drive-by.
-  it('scores a transcript three times unless overridden', () => {
-    expect(EVAL_SAMPLES).toBe(3);
+  // Pinned deliberately: a student sees this number as a mark, so changing
+  // how many times it is measured should be a decision, not a drive-by.
+  it('scores a transcript once unless overridden', () => {
+    expect(EVAL_SAMPLES).toBe(1);
   });
 });
 

@@ -3,24 +3,27 @@ import type { Criterion, InterviewFeedback } from './evaluations.service';
 /**
  * How many times a transcript is scored before the scores are combined.
  *
- * Three. This was briefly 1 (owner, 2026-09-05) and went back to 3 the same
- * day, after two sessions of the same interview returned means of 4.8 and 3.4
- * — one criterion moving 5 to 3 and another 4 to 2. Single-sample scoring is
- * simply too noisy to put in front of a student as a mark.
+ * One (owner, 2026-09-05). A transcript is scored once and that score stands.
  *
- * Why one sample drifts: the prompt has the model reason before it commits to
- * a number, so the score inherits the reasoning's variance. That ordering is
- * worth keeping — it is what makes the number follow from the analysis rather
- * than precede it — so the variance is handled by sampling instead.
+ * The history matters, because the obvious reading of "1" is that nobody
+ * thought about it. Scoring once was noisy enough that two sittings of the
+ * same interview returned means of 4.8 and 3.4. The cause turned out to be
+ * the rubric anchors, not the sampling: the grader was treating "could have
+ * been more specific" as a clear violation and dropping three levels for it.
+ * Once the anchors separated meeting the standard from being perfect, single
+ * scoring measured stable on both transcripts tested — two independent
+ * sessions of the same interview agreed on every criterion.
  *
- * Measured on one fixed transcript: single samples ranged up to two points
- * across the five criteria, medians of three moved by at most one on one
- * criterion.
+ * So sampling was insurance against a problem that had already been fixed
+ * somewhere else, and it is off.
  *
- * EVAL_SAMPLES=1 restores single scoring at a third of the cost, and this is
- * the only interview call that pays it — once per student, not per turn.
+ * What to watch: the prompt still has the model reason before it commits to a
+ * number, so a score can in principle inherit the reasoning's variance. If
+ * marks start swinging between sittings again, EVAL_SAMPLES=3 takes the median
+ * of three at three times the cost of this one call — once per student, not
+ * per turn — and consensus() below is already written for it.
  */
-export const EVAL_SAMPLES = Number(process.env.EVAL_SAMPLES ?? 3);
+export const EVAL_SAMPLES = Number(process.env.EVAL_SAMPLES ?? 1);
 
 const median = (values: number[]): number =>
   [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)];
