@@ -3,22 +3,24 @@ import type { Criterion, InterviewFeedback } from './evaluations.service';
 /**
  * How many times a transcript is scored before the scores are combined.
  *
- * One, by choice (owner, 2026-09-05): a transcript is scored once and that
- * score stands.
+ * Three. This was briefly 1 (owner, 2026-09-05) and went back to 3 the same
+ * day, after two sessions of the same interview returned means of 4.8 and 3.4
+ * — one criterion moving 5 to 3 and another 4 to 2. Single-sample scoring is
+ * simply too noisy to put in front of a student as a mark.
  *
- * The trade-off that decision accepts, so nobody has to re-derive it: because
- * the prompt has the model reason before it commits to a number, the score
- * carries the reasoning's variance. Measured on one fixed transcript, repeated
- * single calls ranged up to two points on a five-point rubric, and the mean
- * across five criteria moved between 2.4 and 3.2. Medians of three runs held
- * four of the five criteria exactly steady. So a single score is well grounded
- * but noisy, and two students with comparable interviews can land a point
- * apart.
+ * Why one sample drifts: the prompt has the model reason before it commits to
+ * a number, so the score inherits the reasoning's variance. That ordering is
+ * worth keeping — it is what makes the number follow from the analysis rather
+ * than precede it — so the variance is handled by sampling instead.
  *
- * Set EVAL_SAMPLES=3 to turn the aggregation back on — for a final data
- * collection run, say — at three times the cost of the interview evaluation.
+ * Measured on one fixed transcript: single samples ranged up to two points
+ * across the five criteria, medians of three moved by at most one on one
+ * criterion.
+ *
+ * EVAL_SAMPLES=1 restores single scoring at a third of the cost, and this is
+ * the only interview call that pays it — once per student, not per turn.
  */
-export const EVAL_SAMPLES = Number(process.env.EVAL_SAMPLES ?? 1);
+export const EVAL_SAMPLES = Number(process.env.EVAL_SAMPLES ?? 3);
 
 const median = (values: number[]): number =>
   [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)];

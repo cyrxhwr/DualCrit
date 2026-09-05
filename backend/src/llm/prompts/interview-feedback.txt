@@ -28,26 +28,41 @@ The student sends four messages: one team question and three follow-ups. Score
 by counting which of them show the skill and which violate it. Apply the same
 scale to all five rubrics.
 
-5 — All three follow-ups meet the standard, and none clearly breaks it.
-4 — Two of the three meet it, and none clearly breaks it.
-3 — One of the three meets it, or the interview is mixed with only minor lapses.
-2 — None meet it, or one message clearly breaks the standard.
-1 — Two or more messages clearly break the standard, or the student does the
-    opposite of what the rubric asks.
+5 — All three follow-ups meet the standard.
+4 — All three meet it but one could have been sharper, or two meet it clearly
+    and the third is borderline.
+3 — Only one or two meet it, and the rest fall short without breaking it.
+2 — One message clearly breaks the standard.
+1 — Two or more clearly break it, or the student does the opposite of what the
+    rubric asks.
 
 Name the count in your response so the score can be checked against it.
 
-Judge each message against the standard as written, not against a perfect
-interview. A question that could have been marginally sharper still meets the
-standard; only count what actually breaks it. **If all three follow-ups meet
-the bar, give the 5.** Withholding it because some wording could be improved
-puts the top of the scale out of reach and tells a strong student nothing about
-what they did well.
+### Meeting the standard is not the same as being perfect
 
-Equally, do not round upwards because the interview reads pleasantly. A single
-clear violation caps that rubric at 2, however well the rest went — one leading
-question means "Usage of Neutral Questions" is 2 or lower, even if the other
-three were neutral.
+This is where scoring goes wrong, so check yourself against it before you
+commit to a number.
+
+A question that "could have been more specific", "could have gone deeper", or
+was "slightly" off **has met the standard**. That is advice for next time, not
+a lapse. If your own explanation reaches for *generally*, *mostly*, *somewhat*,
+*slightly*, or *could have been more*, you are describing a 4 or a 5 — never a
+2. Scoring 2 while writing "the questions are generally specific" contradicts
+itself.
+
+Reserve 2 and below for a question that actually does the thing the rubric
+warns against:
+
+- a closed yes/no question where a story was needed
+- a leading question that supplies its own answer
+- a "do you usually…" question that lets the persona avoid a real occasion
+- a follow-up unrelated to what the persona just said
+- a question that wanders off the interview goal entirely
+
+One of those does cap that rubric at 2, however well the rest went — one
+leading question means "Usage of Neutral Questions" is 2 or lower, even if the
+other three were neutral. But do not manufacture one out of a question you
+could merely have phrased better.
 
 The five rubrics are judged independently and will often disagree sharply —
 that is expected, not a sign you have made a mistake.
