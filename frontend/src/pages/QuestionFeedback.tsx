@@ -4,6 +4,7 @@ import { api, type StoredEvaluation } from '../lib/api';
 import { getSocket } from '../lib/socket';
 import { useActivityRoom } from '../lib/useActivityRoom';
 import { describeMistake, isNoIssue } from '../lib/rubric';
+import { withEmphasis } from '../lib/emphasis';
 
 interface Props {
   activityId: string;
@@ -135,7 +136,7 @@ export default function QuestionFeedback({
                       AI feedback
                     </h4>
                     <p className="text-blue-700 text-sm leading-relaxed break-words">
-                      {item.explanation}
+                      {withEmphasis(item.explanation)}
                     </p>
                   </div>
                 </div>
@@ -172,7 +173,7 @@ export default function QuestionFeedback({
                     AI feedback
                   </h4>
                   <p className="text-blue-700 text-sm leading-relaxed break-words">
-                    {items[0].explanation}
+                    {withEmphasis(items[0].explanation)}
                   </p>
                 </div>
               </div>

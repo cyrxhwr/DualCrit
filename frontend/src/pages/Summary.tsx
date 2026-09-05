@@ -1,25 +1,13 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState } from 'react';
 import { AlertTriangle, Check, Copy, Download, Mic, Star } from 'lucide-react';
 import { api, type SessionSummary } from '../lib/api';
 import { scenarioByTag } from '../lib/scenarios';
 import { describeMistake, isNoIssue } from '../lib/rubric';
+import { withEmphasis } from '../lib/emphasis';
 
 interface Props {
   activityId: string;
   onFinish: () => void;
-}
-
-/** The model writes the `**markers**` itself, so this is a plain parse. */
-function withEmphasis(text: string): ReactNode[] {
-  return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
-    part.startsWith('**') && part.endsWith('**') && part.length > 4 ? (
-      <strong key={i} className="font-semibold">
-        {part.slice(2, -2)}
-      </strong>
-    ) : (
-      <span key={i}>{part}</span>
-    ),
-  );
 }
 
 /**
@@ -150,11 +138,9 @@ export default function Summary({ activityId, onFinish }: Props) {
               Feedback on the team question
             </h3>
             {issues.length === 0 ? (
-              <p className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
-                No rubric issues were found.
-                {summary.questionFeedback[0]?.explanation
-                  ? ` ${summary.questionFeedback[0].explanation}`
-                  : ''}
+              <p className="note note-good p-4">
+                No rubric issues were found.{' '}
+                {withEmphasis(summary.questionFeedback[0]?.explanation ?? '')}
               </p>
             ) : (
               <ul className="space-y-2">
@@ -166,7 +152,9 @@ export default function Summary({ activityId, onFinish }: Props) {
                         {describeMistake(item.mistake)}
                       </p>
                     )}
-                    <p className="text-sm mt-2">{item.explanation}</p>
+                    <p className="text-sm mt-2">
+                      {withEmphasis(item.explanation)}
+                    </p>
                   </li>
                 ))}
               </ul>

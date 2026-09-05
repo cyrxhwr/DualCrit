@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Check, Users } from 'lucide-react';
 import { api, type Contribution } from '../lib/api';
 import { getSocket } from '../lib/socket';
@@ -10,6 +10,8 @@ import PersonaBrief from '../components/PersonaBrief';
 interface Props {
   activityId: string;
   scenarioTag: string | null;
+  /** Fires once the team has settled on a question, so the room can advance. */
+  onDecided: () => void;
 }
 
 const TYPE = 'interview_question';
@@ -20,7 +22,11 @@ const TYPE = 'interview_question';
  * Voting only opens once everyone has submitted, so nobody's question is
  * missing from the ballot.
  */
-export default function QuestionCreation({ activityId, scenarioTag }: Props) {
+export default function QuestionCreation({
+  activityId,
+  scenarioTag,
+  onDecided,
+}: Props) {
   const [questions, setQuestions] = useState<Contribution[]>([]);
   const [draft, setDraft] = useState('');
   const [busy, setBusy] = useState(false);
@@ -80,6 +86,17 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
   const everyoneSubmitted = memberCount > 0 && questions.length >= memberCount;
   const inVoting = voting.state?.status === 'active';
   const decided = voting.state?.status === 'completed';
+
+  // Nothing else refetches the activity when this vote closes, so without
+  // this the room stayed on the question step and the student was stuck on a
+  // screen with no way forward.
+  const announced = useRef(false);
+  useEffect(() => {
+    if (decided && !announced.current) {
+      announced.current = true;
+      onDecided();
+    }
+  }, [decided, onDecided]);
   const tied =
     voting.state?.isComplete === true &&
     (voting.state?.winners.length ?? 0) > 1;
@@ -99,7 +116,10 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
   };
 
   if (decided) {
-    const winner = questions.find((q) => q.isSelected);
+    const winningId = voting.state?.winners[0];
+    const winner =
+      questions.find((q) => q.id === winningId) ??
+      questions.find((q) => q.isSelected);
     return (
       <div className="py-6 fade-in">
         <h2 className="text-lg font-semibold text-gray-800 mb-1">

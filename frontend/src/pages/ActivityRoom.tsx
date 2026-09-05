@@ -138,6 +138,7 @@ export default function ActivityRoom() {
             <QuestionCreation
               activityId={id}
               scenarioTag={activity.selectedScenarioTag}
+              onDecided={() => void loadActivity()}
             />
           )}
 

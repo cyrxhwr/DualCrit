@@ -1,32 +1,11 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState } from 'react';
 import { Sparkles, Star } from 'lucide-react';
 import { api, type StoredEvaluation } from '../lib/api';
+import { withEmphasis } from '../lib/emphasis';
 
 interface Props {
   activityId: string;
   onContinue: () => void;
-}
-
-/**
- * Render the model's own emphasis markers.
- *
- * The model writes the sentence *and* the `**markers**`, so this is a plain
- * parse rather than a match against separate source text — nothing has to be
- * located, and a stray marker degrades to ordinary words.
- */
-function withEmphasis(text: string): ReactNode[] {
-  return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
-    part.startsWith('**') && part.endsWith('**') && part.length > 4 ? (
-      <strong
-        key={i}
-        className="font-semibold text-blue-950 bg-blue-100 rounded px-0.5"
-      >
-        {part.slice(2, -2)}
-      </strong>
-    ) : (
-      <span key={i}>{part}</span>
-    ),
-  );
 }
 
 /** The student's own interview, scored against the five rubric standards. */

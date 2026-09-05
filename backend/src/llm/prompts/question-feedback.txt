@@ -61,6 +61,16 @@ needfinding interview. Keep the tone supportive and educational, not critical.
 If the question violates nothing, use the single mistake value "None" and
 explain what makes the question work well.
 
+Students skim, so wrap the parts that carry the point in double asterisks, like
+**this**. Emphasise the words from their question that caused the problem and
+the judgement about them — not whole sentences, and not connecting words. Aim
+for one to three emphasised fragments per explanation. If nothing stands out,
+emphasise nothing rather than padding.
+
+Example: "Asking **\"would an app help\"** proposes a fix before you know what
+goes wrong, so Sofia is left **agreeing or disagreeing with your idea** instead
+of describing her own morning."
+
 ### Output
 
 Reply with a JSON object of exactly this shape:
