@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
-import { Hexagon } from 'lucide-react';
 import { useAuth } from '../lib/auth';
+import Logo from '../components/Logo';
 
 export default function SignIn() {
   const { signIn } = useAuth();
@@ -23,29 +23,18 @@ export default function SignIn() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-100 flex items-center justify-center px-6">
-      <div className="w-full max-w-sm">
-        <div className="flex items-center justify-center gap-2 mb-6">
-          <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-sm">
-            <Hexagon className="h-5 w-5 text-white" />
-          </span>
-          <span className="font-semibold text-lg text-gray-800">
-            Design Thinking System
-          </span>
+    <div className="app-bg min-h-screen flex items-center justify-center px-6">
+      <div className="w-full max-w-sm fade-in">
+        <div className="flex justify-center mb-7">
+          <Logo size="lg" />
         </div>
 
-        <form
-          onSubmit={onSubmit}
-          className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 fade-in"
-        >
-          <h1 className="text-lg font-semibold text-gray-800 mb-1">Sign in</h1>
-          <p className="text-sm text-gray-500 mb-5">
-            Your work is saved to your student ID.
-          </p>
+        <form onSubmit={onSubmit} className="card p-7">
+          <h1 className="text-lg font-semibold text-gray-900 mb-5">Sign in</h1>
 
           <label
             htmlFor="studentId"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-medium text-gray-700 mb-1.5"
           >
             Student ID
           </label>
@@ -55,13 +44,13 @@ export default function SignIn() {
             onChange={(e) => setStudentId(e.target.value)}
             required
             autoComplete="username"
-            placeholder="20260001"
-            className="w-full mb-4 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500"
+            placeholder="202XXXXX"
+            className="field mb-4"
           />
 
           <label
             htmlFor="fullName"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-medium text-gray-700 mb-1.5"
           >
             Full name
           </label>
@@ -71,8 +60,8 @@ export default function SignIn() {
             onChange={(e) => setFullName(e.target.value)}
             required
             autoComplete="name"
-            placeholder="Renz Samuel Gutierrez"
-            className="w-full mb-5 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500"
+            placeholder="Juan Dela Cruz"
+            className="field mb-5"
           />
 
           {error && (
@@ -84,7 +73,7 @@ export default function SignIn() {
           <button
             type="submit"
             disabled={busy}
-            className="w-full bg-violet-600 text-white rounded-lg py-2.5 font-semibold hover:bg-violet-700 disabled:opacity-60 btn-lift shadow-sm"
+            className="btn btn-primary w-full py-2.5"
           >
             {busy ? 'Signing in…' : 'Continue'}
           </button>

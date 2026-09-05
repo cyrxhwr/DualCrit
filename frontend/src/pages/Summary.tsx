@@ -93,7 +93,7 @@ export default function Summary({ activityId, onFinish }: Props) {
           <button
             type="button"
             onClick={() => void copy()}
-            className="flex items-center gap-1.5 text-sm border border-gray-300 rounded px-3 py-1.5 hover:bg-gray-50"
+            className="btn btn-quiet px-3 py-1.5"
           >
             {copied ? (
               <Check className="h-4 w-4 text-green-600" />
@@ -105,7 +105,7 @@ export default function Summary({ activityId, onFinish }: Props) {
           <button
             type="button"
             onClick={download}
-            className="flex items-center gap-1.5 text-sm border border-gray-300 rounded px-3 py-1.5 hover:bg-gray-50"
+            className="btn btn-quiet px-3 py-1.5"
           >
             <Download className="h-4 w-4" />
             Download
@@ -133,9 +133,7 @@ export default function Summary({ activityId, onFinish }: Props) {
             <h3 className="text-sm font-semibold text-gray-700 mb-2">
               The question you wrote
             </h3>
-            <p className="border border-gray-200 rounded-lg p-4 text-gray-800">
-              {summary.myQuestion}
-            </p>
+            <p className="panel p-4 text-gray-800">{summary.myQuestion}</p>
           </section>
         )}
 
@@ -197,7 +195,7 @@ export default function Summary({ activityId, onFinish }: Props) {
                 {summary.questionCount === 1 ? '' : 's'} asked
               </span>
             </h3>
-            <div className="border border-gray-200 rounded-xl divide-y divide-gray-100 bg-white">
+            <div className="panel divide-y divide-gray-100 overflow-hidden">
               {summary.transcript.map((message, i) => (
                 <div
                   key={i}
@@ -226,10 +224,7 @@ export default function Summary({ activityId, onFinish }: Props) {
             </h3>
             <div className="space-y-3">
               {summary.criteria.map((criterion) => (
-                <article
-                  key={criterion.standard}
-                  className="border border-gray-200 rounded-lg p-4"
-                >
+                <article key={criterion.standard} className="panel p-4">
                   <div className="flex items-center justify-between gap-3 mb-2">
                     <h4 className="font-semibold text-gray-800">
                       {criterion.standard}
@@ -270,11 +265,7 @@ export default function Summary({ activityId, onFinish }: Props) {
       </div>
 
       <div className="flex justify-end mt-8">
-        <button
-          type="button"
-          onClick={onFinish}
-          className="bg-teal-600 text-white rounded-lg px-8 py-2.5 text-sm font-semibold hover:bg-teal-700 btn-lift shadow-sm"
-        >
+        <button type="button" onClick={onFinish} className="btn btn-primary">
           Back to my activities
         </button>
       </div>

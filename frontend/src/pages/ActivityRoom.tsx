@@ -114,7 +114,7 @@ export default function ActivityRoom() {
 
   return (
     <AppShell>
-      <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+      <div className="card p-8">
         <button
           type="button"
           onClick={() => navigate('/')}
@@ -200,7 +200,7 @@ export default function ActivityRoom() {
               </div>
 
               <div className="grid gap-6 md:grid-cols-[1fr_1.2fr] max-w-3xl">
-                <section className="border border-gray-200 rounded-xl p-5 smooth-hover bg-white">
+                <section className="panel smooth-hover p-5">
                   <h2 className="text-sm text-gray-600 mb-3">Join Code</h2>
                   <p className="border-2 border-dashed border-blue-400 bg-blue-50 rounded-lg py-5 text-center text-3xl font-semibold tracking-[0.2em] text-blue-800">
                     {activity.code}
@@ -210,7 +210,7 @@ export default function ActivityRoom() {
                   </p>
                 </section>
 
-                <section className="border border-gray-200 rounded-xl p-5 smooth-hover bg-white">
+                <section className="panel smooth-hover p-5">
                   <div className="flex items-center justify-between mb-3">
                     <h2 className="text-sm text-gray-600">
                       Members ({members.length})
@@ -281,7 +281,7 @@ export default function ActivityRoom() {
                         ? undefined
                         : 'The POV & HMW workflow is not built yet'
                     }
-                    className="shrink-0 bg-green-600 text-white rounded-lg px-6 py-2 text-sm font-semibold hover:bg-green-700 disabled:opacity-50 btn-lift shadow-sm"
+                    className="btn btn-primary"
                   >
                     {starting ? 'Starting…' : 'Start activity'}
                   </button>

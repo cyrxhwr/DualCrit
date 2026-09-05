@@ -143,7 +143,7 @@ export default function ScenarioSelection({ activityId, onDecided }: Props) {
           type="button"
           disabled={!picked || picked === myVote[0]}
           onClick={() => picked && void castVote([picked])}
-          className="bg-green-600 text-white rounded-lg px-6 py-2 text-sm font-semibold hover:bg-green-700 disabled:opacity-50 btn-lift shadow-sm"
+          className="btn btn-primary"
         >
           {hasVoted ? 'Change vote' : 'Submit vote'}
         </button>

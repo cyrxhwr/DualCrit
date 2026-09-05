@@ -110,7 +110,7 @@ export default function PeerReview({
           return (
             <article
               key={transcript.studentUuid}
-              className="border border-gray-200 rounded-xl overflow-hidden bg-white"
+              className="panel overflow-hidden"
             >
               <button
                 type="button"
@@ -167,11 +167,7 @@ export default function PeerReview({
         })}
       </div>
       <div className="flex justify-end mt-8">
-        <button
-          type="button"
-          onClick={onContinue}
-          className="shrink-0 bg-green-600 text-white rounded-lg px-6 py-2 text-sm font-semibold hover:bg-green-700 btn-lift shadow-sm"
-        >
+        <button type="button" onClick={onContinue} className="btn btn-primary">
           See my feedback
         </button>
       </div>

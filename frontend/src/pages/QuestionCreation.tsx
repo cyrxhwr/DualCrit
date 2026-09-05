@@ -155,7 +155,7 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
             rows={3}
             maxLength={500}
             placeholder="What would you ask them to understand the problem better?"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500"
+            className="field"
           />
           <div className="flex items-center justify-end gap-3 mt-2">
             {mine && (
@@ -168,7 +168,7 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
               type="button"
               onClick={submit}
               disabled={busy || draft.trim().length === 0}
-              className="bg-green-600 text-white rounded-lg px-6 py-2 text-sm font-semibold hover:bg-green-700 disabled:opacity-50 btn-lift shadow-sm"
+              className="btn btn-primary"
             >
               {mine ? 'Update question' : 'Submit question'}
             </button>
@@ -228,7 +228,7 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
           <button
             type="button"
             onClick={() => void voting.start(1)}
-            className="bg-violet-600 text-white rounded-lg px-6 py-2 text-sm font-semibold hover:bg-violet-700 btn-lift shadow-sm"
+            className="btn btn-primary"
           >
             Start voting
           </button>
@@ -239,7 +239,7 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
             type="button"
             disabled={!picked || picked === voting.myVote[0]}
             onClick={() => picked && void voting.castVote([picked])}
-            className="bg-green-600 text-white rounded-lg px-6 py-2 text-sm font-semibold hover:bg-green-700 disabled:opacity-50 btn-lift shadow-sm"
+            className="btn btn-primary"
           >
             {voting.myVote.length > 0 ? 'Change vote' : 'Submit vote'}
           </button>

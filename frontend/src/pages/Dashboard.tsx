@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogIn, MessageSquareText, SquarePen, Target } from 'lucide-react';
+import {
+  ArrowRight,
+  LogIn,
+  MessageSquareText,
+  SquarePen,
+  Target,
+} from 'lucide-react';
 import AppShell from '../components/AppShell';
 import {
   api,
@@ -77,25 +83,41 @@ export default function Dashboard() {
     value: ActivityType,
     Icon: typeof MessageSquareText,
     blurb: string,
+    disabled = false,
   ) => {
     const selected = type === value;
     return (
       <button
         key={value}
         type="button"
+        disabled={disabled}
         onClick={() => setType(value)}
         aria-pressed={selected}
-        className={`flex-1 text-left rounded-lg border-2 p-4 transition-colors ${
-          selected
-            ? 'border-violet-500 bg-violet-50'
-            : 'border-gray-200 hover:border-gray-300'
+        title={disabled ? 'Not available yet' : undefined}
+        className={`relative flex-1 text-left rounded-xl border-2 p-4 transition-all ${
+          disabled
+            ? 'border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed'
+            : selected
+              ? 'border-violet-500 bg-violet-50 shadow-sm'
+              : 'border-gray-200 hover:border-violet-300 hover:bg-violet-50/40'
         }`}
       >
         <Icon
-          className={`h-5 w-5 mb-2 ${selected ? 'text-violet-600' : 'text-gray-400'}`}
+          className={`h-5 w-5 mb-2 ${
+            disabled
+              ? 'text-gray-300'
+              : selected
+                ? 'text-violet-600'
+                : 'text-gray-400'
+          }`}
         />
-        <span className="block font-medium text-gray-800">
+        <span className="flex items-center gap-2 font-semibold text-gray-800">
           {ACTIVITY_TYPE_LABELS[value]}
+          {disabled && (
+            <span className="text-[10px] font-medium uppercase tracking-wide text-gray-500 bg-gray-200 rounded-full px-1.5 py-0.5">
+              Soon
+            </span>
+          )}
         </span>
         <span className="block text-xs text-gray-500 mt-0.5">{blurb}</span>
       </button>
@@ -104,19 +126,23 @@ export default function Dashboard() {
 
   return (
     <AppShell>
-      <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 fade-in">
-        <div className="grid sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+      <div className="card p-8 fade-in">
+        <div className="grid sm:grid-cols-2 gap-5 max-w-2xl mx-auto">
           <button
             type="button"
             onClick={() => setPanel(panel === 'create' ? 'none' : 'create')}
             aria-expanded={panel === 'create'}
-            className="border-2 border-dashed border-green-400 bg-green-50 rounded-xl py-10 flex flex-col items-center gap-3 hover:bg-green-100 smooth-hover"
+            className={`smooth-hover rounded-2xl py-9 flex flex-col items-center gap-3 border-2 border-dashed transition-colors ${
+              panel === 'create'
+                ? 'border-emerald-500 bg-emerald-50'
+                : 'border-emerald-300 bg-emerald-50/50 hover:bg-emerald-50'
+            }`}
           >
-            <SquarePen className="h-8 w-8 text-green-700" />
-            <span className="font-medium text-green-800 text-center leading-tight">
-              Create New
-              <br />
-              Activity
+            <span className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-600/25">
+              <SquarePen className="h-6 w-6" />
+            </span>
+            <span className="font-semibold text-emerald-900">
+              Create activity
             </span>
           </button>
 
@@ -124,22 +150,24 @@ export default function Dashboard() {
             type="button"
             onClick={() => setPanel(panel === 'join' ? 'none' : 'join')}
             aria-expanded={panel === 'join'}
-            className="border-2 border-dashed border-orange-400 bg-orange-50 rounded-xl py-10 flex flex-col items-center gap-3 hover:bg-orange-100 smooth-hover"
+            className={`smooth-hover rounded-2xl py-9 flex flex-col items-center gap-3 border-2 border-dashed transition-colors ${
+              panel === 'join'
+                ? 'border-orange-500 bg-orange-50'
+                : 'border-orange-300 bg-orange-50/50 hover:bg-orange-50'
+            }`}
           >
-            <LogIn className="h-8 w-8 text-orange-600" />
-            <span className="font-medium text-orange-800 text-center leading-tight">
-              Join
-              <br />
-              Activity
+            <span className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 text-white flex items-center justify-center shadow-lg shadow-orange-600/25">
+              <LogIn className="h-6 w-6" />
             </span>
+            <span className="font-semibold text-orange-900">Join activity</span>
           </button>
         </div>
 
         {panel === 'create' && (
-          <div className="max-w-2xl mx-auto mt-6 border border-gray-200 rounded-xl p-5 slide-in-up">
+          <div className="max-w-2xl mx-auto mt-5 panel p-5 slide-in-up">
             <label
               htmlFor="activityName"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-700 mb-1.5"
             >
               Activity name
             </label>
@@ -149,7 +177,7 @@ export default function Dashboard() {
               onChange={(e) => setName(e.target.value)}
               maxLength={80}
               placeholder="Team HCI"
-              className="w-full mb-5 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500"
+              className="field mb-5"
             />
 
             <p className="text-sm font-medium text-gray-700 mb-1">
@@ -166,6 +194,7 @@ export default function Dashboard() {
                 'pov_hmw',
                 Target,
                 'Needs and insights, POV statements, then HMW questions',
+                true,
               )}
             </div>
 
@@ -174,7 +203,7 @@ export default function Dashboard() {
                 type="button"
                 onClick={createActivity}
                 disabled={busy || name.trim().length === 0}
-                className="bg-green-600 text-white rounded-lg px-6 py-2 text-sm font-semibold hover:bg-green-700 disabled:opacity-50 btn-lift shadow-sm"
+                className="btn btn-emerald"
               >
                 {busy ? 'Creating…' : 'Create activity'}
               </button>
@@ -183,20 +212,20 @@ export default function Dashboard() {
         )}
 
         {panel === 'join' && (
-          <div className="max-w-2xl mx-auto mt-6 flex gap-2 slide-in-up">
+          <div className="max-w-2xl mx-auto mt-5 flex gap-2 slide-in-up">
             <input
               value={joinCode}
               onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
               maxLength={6}
               placeholder="ABC123"
               aria-label="Join code"
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg tracking-[0.3em] text-center font-mono uppercase focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="field flex-1 tracking-[0.35em] text-center font-mono uppercase text-lg"
             />
             <button
               type="button"
               onClick={join}
               disabled={busy || joinCode.length !== 6}
-              className="bg-orange-500 text-white rounded-lg px-5 font-semibold hover:bg-orange-600 disabled:opacity-50 btn-lift"
+              className="btn btn-amber px-7"
             >
               Join
             </button>
@@ -209,47 +238,48 @@ export default function Dashboard() {
           </p>
         )}
 
-        <h2 className="text-xl font-semibold text-center text-gray-800 mt-10 mb-5">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400 mt-10 mb-4">
           Activities
         </h2>
 
         {loading ? (
           <p className="text-center text-gray-500 py-8">Loading…</p>
         ) : activities.length === 0 ? (
-          <p className="text-center text-gray-500 py-8">No activities yet.</p>
+          <p className="text-center text-gray-400 py-10">No activities yet.</p>
         ) : (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 stagger">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 stagger">
             {activities.map((activity) => (
               <article
                 key={activity.id}
-                className="border border-gray-200 rounded-xl p-4 flex flex-col smooth-hover bg-white"
+                className="panel smooth-hover p-5 flex flex-col"
               >
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-semibold text-gray-800">
+                  <h3 className="font-semibold text-gray-900">
                     {activity.name}
                   </h3>
                   <span
-                    className={`shrink-0 text-[11px] px-2 py-0.5 rounded-full ${
+                    className={`shrink-0 text-[11px] font-medium px-2 py-0.5 rounded-full ${
                       activity.type === 'interview'
-                        ? 'bg-blue-50 text-blue-700'
+                        ? 'bg-violet-50 text-violet-700'
                         : 'bg-purple-50 text-purple-700'
                     }`}
                   >
                     {ACTIVITY_TYPE_LABELS[activity.type]}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                <p className="text-sm text-gray-600 mt-1.5 line-clamp-2">
                   {activity.members.join(', ')}
                 </p>
-                <p className="text-sm text-gray-400 italic mt-1">
+                <p className="text-xs text-gray-400 mt-1">
                   {formatDate(activity.updatedAt)}
                 </p>
                 <button
                   type="button"
                   onClick={() => navigate(`/activity/${activity.id}`)}
-                  className="mt-4 self-center bg-green-600 text-white rounded-lg px-6 py-1.5 text-sm font-semibold hover:bg-green-700 btn-lift"
+                  className="btn btn-primary mt-4 w-full"
                 >
                   Continue
+                  <ArrowRight className="h-4 w-4" />
                 </button>
               </article>
             ))}

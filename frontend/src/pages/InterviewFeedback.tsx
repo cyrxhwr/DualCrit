@@ -90,10 +90,7 @@ export default function InterviewFeedback({ activityId, onContinue }: Props) {
 
       <div className="space-y-5 stagger">
         {criteria.map((criterion) => (
-          <article
-            key={criterion.standard}
-            className="border border-gray-200 rounded-xl p-6 smooth-hover bg-white"
-          >
+          <article key={criterion.standard} className="panel smooth-hover p-6">
             <div className="flex items-center justify-between gap-4 mb-4">
               <h3 className="text-lg font-bold text-gray-800">
                 {criterion.standard}
@@ -131,11 +128,7 @@ export default function InterviewFeedback({ activityId, onContinue }: Props) {
         ))}
       </div>
       <div className="flex justify-end mt-8">
-        <button
-          type="button"
-          onClick={onContinue}
-          className="shrink-0 bg-green-600 text-white rounded-lg px-6 py-2 text-sm font-semibold hover:bg-green-700 btn-lift shadow-sm"
-        >
+        <button type="button" onClick={onContinue} className="btn btn-primary">
           See my summary
         </button>
       </div>

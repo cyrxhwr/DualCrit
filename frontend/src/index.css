@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------- motion */
+
 /*
- * Motion carried over from the previous system, so screens feel the same:
- * content fades up on arrival, cards lift slightly on hover.
+ * Content fades up on arrival, cards lift slightly on hover. Kept small on
+ * purpose — students move through eight screens in a sitting.
  */
 
 .fade-in {
@@ -53,26 +55,161 @@
 .smooth-hover:hover {
   transform: translateY(-2px);
   box-shadow:
-    0 20px 25px -5px rgb(0 0 0 / 0.1),
-    0 10px 10px -5px rgb(0 0 0 / 0.04);
+    0 18px 30px -12px rgb(76 29 149 / 0.18),
+    0 4px 10px -4px rgb(15 23 42 / 0.06);
 }
 
-/* Primary actions lift a little; it reads as the page's main move. */
-.btn-lift {
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+/* ------------------------------------------------------------ the ground */
+
+/*
+ * Two soft colour washes over near-white, rather than one flat gradient —
+ * it gives the raised cards something to sit on.
+ */
+.app-bg {
+  background-color: #fbfaff;
+  background-image:
+    radial-gradient(
+      ellipse 80% 60% at 8% 0%,
+      rgb(167 139 250 / 0.22),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 70% 60% at 100% 100%,
+      rgb(129 140 248 / 0.18),
+      transparent 60%
+    );
+  background-attachment: fixed;
 }
 
-.btn-lift:hover:not(:disabled) {
-  transform: translateY(-1px) scale(1.02);
+/* -------------------------------------------------------------- surfaces */
+
+/* A hairline ring instead of a border: it survives on any ground. */
+.card {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow:
+    0 1px 2px rgb(15 23 42 / 0.04),
+    0 12px 32px -12px rgb(76 29 149 / 0.16);
+  outline: 1px solid rgb(15 23 42 / 0.06);
+  outline-offset: -1px;
 }
 
-.btn-lift:active:not(:disabled) {
+.panel {
+  background: #fff;
+  border-radius: 0.875rem;
+  outline: 1px solid rgb(15 23 42 / 0.08);
+  outline-offset: -1px;
+}
+
+/* --------------------------------------------------------------- buttons */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-radius: 0.7rem;
+  padding: 0.55rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn:active:not(:disabled) {
   transform: translateY(0) scale(0.99);
 }
 
+.btn:focus-visible {
+  outline: 2px solid #7c3aed;
+  outline-offset: 2px;
+}
+
+/* One primary for every "advance" action, so the next move is never in doubt. */
+.btn-primary {
+  background-image: linear-gradient(135deg, #7c3aed, #4f46e5);
+  color: #fff;
+  box-shadow: 0 6px 16px -6px rgb(79 70 229 / 0.6);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-image: linear-gradient(135deg, #6d28d9, #4338ca);
+  box-shadow: 0 10px 22px -8px rgb(79 70 229 / 0.7);
+}
+
+.btn-emerald {
+  background-image: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  box-shadow: 0 6px 16px -6px rgb(5 150 105 / 0.55);
+}
+
+.btn-emerald:hover:not(:disabled) {
+  background-image: linear-gradient(135deg, #059669, #047857);
+}
+
+.btn-amber {
+  background-image: linear-gradient(135deg, #fb923c, #ea580c);
+  color: #fff;
+  box-shadow: 0 6px 16px -6px rgb(234 88 12 / 0.55);
+}
+
+.btn-amber:hover:not(:disabled) {
+  background-image: linear-gradient(135deg, #f97316, #c2410c);
+}
+
+.btn-quiet {
+  background: #fff;
+  color: #475569;
+  outline: 1px solid rgb(15 23 42 / 0.12);
+  outline-offset: -1px;
+}
+
+.btn-quiet:hover:not(:disabled) {
+  color: #7c3aed;
+  outline-color: rgb(124 58 237 / 0.35);
+}
+
+/* ---------------------------------------------------------------- fields */
+
+.field {
+  width: 100%;
+  border-radius: 0.7rem;
+  background: #f8fafc;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.9375rem;
+  color: #0f172a;
+  outline: 1px solid rgb(15 23 42 / 0.1);
+  outline-offset: -1px;
+  transition: all 0.18s ease;
+}
+
+.field::placeholder {
+  color: #94a3b8;
+}
+
+.field:focus {
+  background: #fff;
+  outline: 2px solid #8b5cf6;
+  outline-offset: -1px;
+  box-shadow: 0 0 0 4px rgb(139 92 246 / 0.12);
+}
+
+/* ------------------------------------------------------------ scrollbars */
+
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgb(156 163 175 / 0.5) transparent;
+  scrollbar-color: rgb(148 163 184 / 0.5) transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -84,12 +221,12 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgb(156 163 175 / 0.5);
+  background-color: rgb(148 163 184 / 0.5);
   border-radius: 3px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: rgb(156 163 175 / 0.7);
+  background-color: rgb(148 163 184 / 0.75);
 }
 
 /* Everything above is decoration; nobody should be made queasy by it. */
@@ -104,7 +241,8 @@
   }
 
   .smooth-hover:hover,
-  .btn-lift:hover:not(:disabled) {
+  .btn:hover:not(:disabled),
+  .btn:active:not(:disabled) {
     transform: none;
   }
 }

@@ -123,7 +123,7 @@ export default function Interview({ activityId, onContinue }: Props) {
       )}
 
       {!started && (
-        <div className="border border-gray-200 rounded-xl p-6 mb-6 slide-in-up">
+        <div className="panel p-6 mb-6 slide-in-up">
           <p className="text-sm text-gray-600 mb-2">
             Your team's opening question
           </p>
@@ -134,7 +134,7 @@ export default function Interview({ activityId, onContinue }: Props) {
             type="button"
             disabled={busy || !state.openingQuestion}
             onClick={() => void send(state.openingQuestion ?? '')}
-            className="bg-green-600 text-white rounded-lg px-6 py-2 text-sm font-semibold hover:bg-green-700 disabled:opacity-50 btn-lift shadow-sm"
+            className="btn btn-primary"
           >
             {busy ? 'Asking…' : 'Ask this question'}
           </button>
@@ -142,7 +142,7 @@ export default function Interview({ activityId, onContinue }: Props) {
       )}
 
       {started && (
-        <div className="border border-gray-200 rounded-xl divide-y divide-gray-100 mb-4 max-h-[28rem] overflow-y-auto custom-scrollbar">
+        <div className="panel divide-y divide-gray-100 mb-4 max-h-[28rem] overflow-y-auto overflow-x-hidden custom-scrollbar">
           {state.messages.map((message, i) => (
             <div
               key={i}
@@ -199,12 +199,12 @@ export default function Interview({ activityId, onContinue }: Props) {
                   ? 'Ask a follow-up…'
                   : 'You have used all three follow-ups'
               }
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 disabled:bg-gray-50"
+              className="field flex-1"
             />
             <button
               type="submit"
               disabled={busy || !draft.trim() || state.followUpsLeft <= 0}
-              className="bg-violet-600 text-white rounded-lg px-4 flex items-center gap-1.5 text-sm font-semibold hover:bg-violet-700 disabled:opacity-50 btn-lift"
+              className="btn btn-primary px-5"
             >
               <Send className="h-4 w-4" />
               Ask
@@ -226,7 +226,7 @@ export default function Interview({ activityId, onContinue }: Props) {
                   ? 'Ask all three follow-ups first'
                   : undefined
               }
-              className="shrink-0 bg-green-600 text-white rounded-lg px-6 py-2 text-sm font-semibold hover:bg-green-700 disabled:opacity-50 btn-lift shadow-sm"
+              className="btn btn-primary"
             >
               Finish interview
             </button>
@@ -250,7 +250,7 @@ export default function Interview({ activityId, onContinue }: Props) {
             <button
               type="button"
               onClick={onContinue}
-              className="shrink-0 bg-green-600 text-white rounded-lg px-6 py-2 text-sm font-semibold hover:bg-green-700 btn-lift shadow-sm"
+              className="btn btn-primary"
             >
               Read the team's interviews
             </button>

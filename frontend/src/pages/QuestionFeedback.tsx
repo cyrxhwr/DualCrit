@@ -121,7 +121,7 @@ export default function QuestionFeedback({
           {issues.map((item, i) => (
             <article
               key={`${item.mistake}-detail-${i}`}
-              className="border border-gray-200 rounded-xl p-6 smooth-hover bg-white"
+              className="panel smooth-hover p-6"
             >
               <h3 className="text-lg font-bold text-gray-800 mb-1">
                 {item.mistake}
@@ -191,7 +191,7 @@ export default function QuestionFeedback({
           type="button"
           onClick={onContinue}
           disabled={loading}
-          className="shrink-0 bg-green-600 text-white rounded-lg px-6 py-2 text-sm font-semibold hover:bg-green-700 disabled:opacity-50 btn-lift shadow-sm"
+          className="btn btn-primary"
         >
           Start my interview
         </button>
