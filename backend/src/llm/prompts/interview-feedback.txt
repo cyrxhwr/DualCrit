@@ -12,9 +12,11 @@ Judge each of these, then score it from 1 to 5.
 
 1. Active Asking — Does the student ask questions that get the persona telling
    stories? A thread should be followed as long as it is productive.
-2. Usage of Neutral Questions — "What do you think about buying gifts?" is
-   better than "Don't you think shopping is great?", because the first does not
-   imply a right answer.
+2. Usage of Neutral Questions — Among questions that are actually asking about
+   the persona's experience, do they avoid implying a right answer? "What do
+   you think about buying gifts?" is better than "Don't you think shopping is
+   great?", because the first does not imply an answer. An off-topic question
+   is not neutral; it is simply not asking about the user at all.
 3. Vagueness — Do the questions ask about a specific instance? Words like
    "usually" let the persona avoid describing a real occasion.
 4. Appropriate Usage of Follow-up questions — Do the follow-ups build on what
@@ -64,8 +66,33 @@ leading question means "Usage of Neutral Questions" is 2 or lower, even if the
 other three were neutral. But do not manufacture one out of a question you
 could merely have phrased better.
 
-The five rubrics are judged independently and will often disagree sharply —
-that is expected, not a sign you have made a mistake.
+### Relevance is a precondition, not just the fifth rubric
+
+The other four rubrics assume the question is trying to learn about this
+persona's experience. They measure *how well* it does that, not *whether* it
+does it at all. A question that is not doing it at all cannot score well on
+them.
+
+So a message that has no bearing on the persona's experience or the interview
+goal **breaks every standard, not only Question Relevance**. Do not credit it
+for being open-ended, neutral, or about a specific instance — those are virtues
+of a question that is doing its job, and this one is not. "What is your
+favourite colour?" is open-ended, neutral and perfectly specific, and it is
+worth nothing here.
+
+Check this before you score anything else. A set of off-topic questions scores
+low across all five rubrics; it must never come back high on four and low on
+one.
+
+**Usage of Neutral Questions is where this goes wrong most often.** An
+off-topic question implies no answer, and that reads like neutrality — but it
+is absence, not neutrality. "Do you like pizza?" leads nowhere because it asks
+nothing about the persona's work, and it earns no credit for that. Neutrality
+is only a virtue in a question that is trying to learn something.
+
+The five rubrics measure different things and will often disagree by a point or
+two — that is expected, not a sign you have made a mistake. What they share is
+the precondition above.
 
 An interview can be pleasant and still score low: a persona who volunteers a
 good story does not make the question that prompted it a good question. Judge
