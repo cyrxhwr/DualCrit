@@ -52,7 +52,9 @@ async function request<T>(
     throw new ApiError(response.status, message);
   }
 
-  return response.status === 204 ? (undefined as T) : ((await response.json()) as T);
+  return response.status === 204
+    ? (undefined as T)
+    : ((await response.json()) as T);
 }
 
 export interface Student {
@@ -83,10 +85,9 @@ export interface Activity {
   members: string[];
 }
 
+/** Anonymous by design — the server sends no author for a contribution. */
 export interface Contribution {
   id: string;
-  studentUuid: string;
-  authorName: string;
   type: string;
   content: { question?: string; statement?: string };
   orderIndex: number;
@@ -187,7 +188,9 @@ export const api = {
     request<Activity>('/activities/join', { method: 'POST', body: { code } }),
 
   startActivity: (activityId: string) =>
-    request<{ ok: true }>(`/activities/${activityId}/start`, { method: 'POST' }),
+    request<{ ok: true }>(`/activities/${activityId}/start`, {
+      method: 'POST',
+    }),
 
   setStep: (activityId: string, step: string) =>
     request<{ ok: true }>(`/activities/${activityId}/step`, {
@@ -241,9 +244,7 @@ export const api = {
     ),
 
   teamTranscripts: (activityId: string) =>
-    request<TeamTranscripts>(
-      `/activities/${activityId}/interview/transcripts`,
-    ),
+    request<TeamTranscripts>(`/activities/${activityId}/interview/transcripts`),
 
   interviewFeedback: (activityId: string) =>
     request<{ evaluation: StoredEvaluation | null }>(

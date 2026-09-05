@@ -9,10 +9,13 @@ export const CONTRIBUTION_TYPES = [
 ] as const;
 export type ContributionType = (typeof CONTRIBUTION_TYPES)[number];
 
+/**
+ * Deliberately carries no author: questions are voted on anonymously, so the
+ * name and the student id both stay on the server. `isMine` is enough for a
+ * student to pick their own out of the list.
+ */
 export interface Contribution {
   id: string;
-  studentUuid: string;
-  authorName: string;
   type: ContributionType;
   content: Record<string, unknown>;
   orderIndex: number;
@@ -27,7 +30,6 @@ interface ContributionRow {
   content: Record<string, unknown>;
   order_index: number;
   is_selected: boolean;
-  students: { full_name: string } | null;
 }
 
 @Injectable()
@@ -46,19 +48,19 @@ export class ContributionsService {
 
     const { data, error } = await this.supabase.client
       .from('contributions')
-      .select(
-        'id, student_id, type, content, order_index, is_selected, students(full_name)',
-      )
+      .select('id, student_id, type, content, order_index, is_selected')
       .eq('activity_id', activityId)
       .eq('type', type)
-      .order('created_at', { ascending: true });
+      // Not created_at: with a live "n of m submitted" counter, submission
+      // order is enough to work out who wrote which question. Ordering by id
+      // is stable across reads but unrelated to who submitted when.
+      .order('order_index', { ascending: true })
+      .order('id', { ascending: true });
 
     if (error) throw new BadRequestException(error.message);
 
     return ((data ?? []) as unknown as ContributionRow[]).map((row) => ({
       id: row.id,
-      studentUuid: row.student_id,
-      authorName: row.students?.full_name ?? 'Student',
       type: row.type,
       content: row.content,
       orderIndex: row.order_index,

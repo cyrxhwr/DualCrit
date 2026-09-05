@@ -5,6 +5,7 @@ import { getSocket } from '../lib/socket';
 import { useActivityMembers } from '../lib/useActivityMembers';
 import { useVoting } from '../lib/useVoting';
 import { scenarioByTag } from '../lib/scenarios';
+import PersonaBrief from '../components/PersonaBrief';
 
 interface Props {
   activityId: string;
@@ -79,6 +80,9 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
   const everyoneSubmitted = memberCount > 0 && questions.length >= memberCount;
   const inVoting = voting.state?.status === 'active';
   const decided = voting.state?.status === 'completed';
+  const tied =
+    voting.state?.isComplete === true &&
+    (voting.state?.winners.length ?? 0) > 1;
 
   const submit = async () => {
     setBusy(true);
@@ -106,11 +110,6 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
         </p>
         <blockquote className="border-l-4 border-violet-500 bg-violet-50 rounded-r-lg p-5">
           <p className="text-gray-800">{winner?.content.question}</p>
-          {winner && (
-            <footer className="text-xs text-gray-500 mt-2">
-              written by {winner.authorName}
-            </footer>
-          )}
         </blockquote>
       </div>
     );
@@ -130,10 +129,17 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
         </span>
       </div>
 
-      {scenario && (
-        <p className="text-sm text-gray-500 mb-5">
-          You are interviewing {scenario.persona.name} —{' '}
-          {scenario.persona.role.toLowerCase()}.
+      <p className="text-sm text-gray-500 mb-5">
+        {inVoting
+          ? 'Questions are anonymous — vote for the one you would rather ask.'
+          : 'Everyone writes one. The team then votes on which to use.'}
+      </p>
+
+      {scenario && <PersonaBrief scenario={scenario} />}
+
+      {tied && (
+        <p className="mb-4 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+          It's a tie — change a vote to break it.
         </p>
       )}
 
@@ -202,9 +208,11 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  {question.isMine ? 'You' : question.authorName}
-                </p>
+                {question.isMine && (
+                  <p className="text-xs font-medium text-violet-600 mt-1">
+                    Your question
+                  </p>
+                )}
               </button>
             </li>
           );

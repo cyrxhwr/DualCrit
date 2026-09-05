@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { AlertTriangle, Check, Copy, Download, Star } from 'lucide-react';
+import { AlertTriangle, Check, Copy, Download, Mic, Star } from 'lucide-react';
 import { api, type SessionSummary } from '../lib/api';
 import { scenarioByTag } from '../lib/scenarios';
 import { describeMistake, isNoIssue } from '../lib/rubric';
@@ -203,10 +203,18 @@ export default function Summary({ activityId, onFinish }: Props) {
                     message.role === 'student' ? 'bg-white' : 'bg-gray-50'
                   }`}
                 >
-                  <span className="w-7 h-7 rounded-full shrink-0 flex items-center justify-center text-xs bg-white border border-gray-200">
-                    {message.role === 'student'
-                      ? '❓'
-                      : (scenario?.persona.image ?? '🙂')}
+                  <span
+                    className={`w-7 h-7 rounded-full shrink-0 flex items-center justify-center text-xs ${
+                      message.role === 'student'
+                        ? 'bg-violet-100 text-violet-600'
+                        : 'bg-white border border-gray-200'
+                    }`}
+                  >
+                    {message.role === 'student' ? (
+                      <Mic className="h-3.5 w-3.5" />
+                    ) : (
+                      (scenario?.persona.image ?? '🙂')
+                    )}
                   </span>
                   <p className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap">
                     {message.text}

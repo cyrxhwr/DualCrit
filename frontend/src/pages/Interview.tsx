@@ -10,6 +10,7 @@ import { api, type InterviewState } from '../lib/api';
 import { getSocket } from '../lib/socket';
 import { useActivityRoom } from '../lib/useActivityRoom';
 import { scenarioByTag } from '../lib/scenarios';
+import PersonaBrief from '../components/PersonaBrief';
 
 interface Props {
   activityId: string;
@@ -115,6 +116,8 @@ export default function Interview({ activityId, onContinue }: Props) {
       <p className="text-sm text-gray-500 mb-5">
         Ask your team’s question, then probe with three follow-ups.
       </p>
+
+      {scenario && <PersonaBrief scenario={scenario} showPresence />}
 
       {error && (
         <p className="mb-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
