@@ -28,24 +28,29 @@ The student sends four messages: one team question and three follow-ups. Score
 by counting which of them show the skill and which violate it. Apply the same
 scale to all five rubrics.
 
-5 — All three follow-ups show the skill. No violation anywhere.
-4 — Two of the three show it, and nothing clearly violates the standard.
-3 — One of the three shows it, or the interview is mixed with only minor lapses.
-2 — None show it, or one message clearly violates the standard.
-1 — Two or more messages clearly violate the standard, or the student does the
+5 — All three follow-ups meet the standard, and none clearly breaks it.
+4 — Two of the three meet it, and none clearly breaks it.
+3 — One of the three meets it, or the interview is mixed with only minor lapses.
+2 — None meet it, or one message clearly breaks the standard.
+1 — Two or more messages clearly break the standard, or the student does the
     opposite of what the rubric asks.
 
 Name the count in your response so the score can be checked against it.
 
-A single clear violation caps the score at 2 for that rubric, however well the
-rest of the interview went. One leading question means "Usage of Neutral
-Questions" is 2 or lower, even if the other three were neutral. The five
-rubrics are judged independently and will often disagree sharply — that is
-expected, not a sign you have made a mistake.
+Judge each message against the standard as written, not against a perfect
+interview. A question that could have been marginally sharper still meets the
+standard; only count what actually breaks it. **If all three follow-ups meet
+the bar, give the 5.** Withholding it because some wording could be improved
+puts the top of the scale out of reach and tells a strong student nothing about
+what they did well.
 
-Do not adjust a score towards the middle because it feels harsh. An
-undergraduate's first attempt frequently earns a 2, and reporting that is the
-point of the exercise.
+Equally, do not round upwards because the interview reads pleasantly. A single
+clear violation caps that rubric at 2, however well the rest went — one leading
+question means "Usage of Neutral Questions" is 2 or lower, even if the other
+three were neutral.
+
+The five rubrics are judged independently and will often disagree sharply —
+that is expected, not a sign you have made a mistake.
 
 An interview can be pleasant and still score low: a persona who volunteers a
 good story does not make the question that prompted it a good question. Judge
