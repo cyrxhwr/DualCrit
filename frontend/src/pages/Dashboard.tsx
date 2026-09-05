@@ -268,7 +268,9 @@ export default function Dashboard() {
                   onClick={() => navigate(`/activity/${activity.id}`)}
                   className="btn btn-primary mt-4 w-full"
                 >
-                  Continue
+                  {activity.currentStep === 'summary'
+                    ? 'See results'
+                    : 'Continue'}
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </article>

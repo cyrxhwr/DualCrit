@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ChevronDown, ChevronRight, Mic, Users } from 'lucide-react';
+import { ChevronDown, ChevronRight, Users } from 'lucide-react';
 import { api, type TeamTranscripts } from '../lib/api';
 import { getSocket } from '../lib/socket';
 import { useActivityRoom } from '../lib/useActivityRoom';
 import { scenarioByTag } from '../lib/scenarios';
+import { initialOf } from '../lib/name';
 
 interface Props {
   activityId: string;
@@ -149,15 +150,13 @@ export default function PeerReview({
                       <span
                         className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-sm ${
                           message.role === 'student'
-                            ? 'bg-blue-100 text-blue-600'
+                            ? 'bg-blue-100 text-blue-700 font-semibold'
                             : 'bg-white border border-gray-200'
                         }`}
                       >
-                        {message.role === 'student' ? (
-                          <Mic className="h-4 w-4" />
-                        ) : (
-                          (scenario?.persona.image ?? '🙂')
-                        )}
+                        {message.role === 'student'
+                          ? initialOf(transcript.authorName)
+                          : (scenario?.persona.image ?? '🙂')}
                       </span>
                       <p className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap">
                         {message.text}

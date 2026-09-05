@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Check, Copy, Download, Mic, Star } from 'lucide-react';
+import { AlertTriangle, Check, Copy, Download, Star } from 'lucide-react';
 import { api, type SessionSummary } from '../lib/api';
 import { scenarioByTag } from '../lib/scenarios';
 import { describeMistake, isNoIssue } from '../lib/rubric';
 import { withEmphasis } from '../lib/emphasis';
+import { initialOf } from '../lib/name';
+import { useAuth } from '../lib/auth';
 
 interface Props {
   activityId: string;
@@ -17,6 +19,7 @@ interface Props {
  * were shown at each step.
  */
 export default function Summary({ activityId, onFinish }: Props) {
+  const { student } = useAuth();
   const [summary, setSummary] = useState<SessionSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -183,15 +186,13 @@ export default function Summary({ activityId, onFinish }: Props) {
                   <span
                     className={`w-7 h-7 rounded-full shrink-0 flex items-center justify-center text-xs ${
                       message.role === 'student'
-                        ? 'bg-blue-100 text-blue-600'
+                        ? 'bg-blue-100 text-blue-700 font-semibold'
                         : 'bg-white border border-gray-200'
                     }`}
                   >
-                    {message.role === 'student' ? (
-                      <Mic className="h-3.5 w-3.5" />
-                    ) : (
-                      (scenario?.persona.image ?? '🙂')
-                    )}
+                    {message.role === 'student'
+                      ? initialOf(student?.fullName)
+                      : (scenario?.persona.image ?? '🙂')}
                   </span>
                   <p className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap">
                     {message.text}
