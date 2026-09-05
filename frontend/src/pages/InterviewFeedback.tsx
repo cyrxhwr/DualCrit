@@ -19,7 +19,7 @@ function withEmphasis(text: string): ReactNode[] {
     part.startsWith('**') && part.endsWith('**') && part.length > 4 ? (
       <strong
         key={i}
-        className="font-semibold text-emerald-950 bg-emerald-100 rounded px-0.5"
+        className="font-semibold text-blue-950 bg-blue-100 rounded px-0.5"
       >
         {part.slice(2, -2)}
       </strong>
@@ -60,11 +60,7 @@ export default function InterviewFeedback({ activityId, onContinue }: Props) {
   }
 
   if (error) {
-    return (
-      <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-        {error}
-      </p>
-    );
+    return <p className="note note-error">{error}</p>;
   }
 
   if (!evaluation) {
@@ -96,7 +92,7 @@ export default function InterviewFeedback({ activityId, onContinue }: Props) {
                 {criterion.standard}
               </h3>
               <div className="flex items-center gap-2 shrink-0">
-                <span className="text-xl font-bold text-emerald-600">
+                <span className="text-xl font-bold text-blue-600">
                   {criterion.score}
                   <span className="text-sm font-normal text-gray-500">/5</span>
                 </span>
@@ -110,7 +106,7 @@ export default function InterviewFeedback({ activityId, onContinue }: Props) {
                       aria-hidden="true"
                       className={`w-4 h-4 ${
                         i < Math.round(criterion.score)
-                          ? 'text-yellow-400 fill-current'
+                          ? 'text-[#f0704f] fill-current'
                           : 'text-gray-300'
                       }`}
                     />
@@ -119,8 +115,8 @@ export default function InterviewFeedback({ activityId, onContinue }: Props) {
               </div>
             </div>
 
-            <div className="bg-emerald-50 rounded-lg p-4">
-              <p className="text-emerald-900 leading-relaxed break-words">
+            <div className="bg-blue-50 rounded-lg p-4">
+              <p className="text-blue-900 leading-relaxed break-words">
                 {withEmphasis(criterion.response)}
               </p>
             </div>

@@ -124,11 +124,7 @@ export default function ActivityRoom() {
           Dashboard
         </button>
 
-        {error && (
-          <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-            {error}
-          </p>
-        )}
+        {error && <p className="note note-error">{error}</p>}
 
         <div key={step} className="fade-in">
           {activity && step === 'scenario' && id && (
@@ -192,7 +188,7 @@ export default function ActivityRoom() {
                   className={`text-xs px-2.5 py-0.5 rounded-full ${
                     activity.type === 'interview'
                       ? 'bg-blue-50 text-blue-700'
-                      : 'bg-purple-50 text-purple-700'
+                      : 'bg-blue-50 text-blue-700'
                   }`}
                 >
                   {ACTIVITY_TYPE_LABELS[activity.type]}
@@ -225,7 +221,7 @@ export default function ActivityRoom() {
                     >
                       <span
                         className={`w-1.5 h-1.5 rounded-full ${
-                          connected ? 'bg-green-500' : 'bg-gray-300'
+                          connected ? 'bg-blue-500' : 'bg-gray-300'
                         }`}
                       />
                       {connected ? 'Live' : 'Offline'}
@@ -241,7 +237,7 @@ export default function ActivityRoom() {
                         <span className="flex items-center gap-2">
                           <span
                             className={`w-1.5 h-1.5 rounded-full ${
-                              member.isOnline ? 'bg-green-500' : 'bg-blue-300'
+                              member.isOnline ? 'bg-blue-500' : 'bg-blue-300'
                             }`}
                             title={member.isOnline ? 'In the room' : 'Away'}
                           />

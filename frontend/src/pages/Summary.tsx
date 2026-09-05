@@ -67,11 +67,7 @@ export default function Summary({ activityId, onFinish }: Props) {
   };
 
   if (error && !summary) {
-    return (
-      <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-        {error}
-      </p>
-    );
+    return <p className="note note-error">{error}</p>;
   }
 
   if (!summary) {
@@ -96,7 +92,7 @@ export default function Summary({ activityId, onFinish }: Props) {
             className="btn btn-quiet px-3 py-1.5"
           >
             {copied ? (
-              <Check className="h-4 w-4 text-green-600" />
+              <Check className="h-4 w-4 text-blue-600" />
             ) : (
               <Copy className="h-4 w-4" />
             )}
@@ -120,7 +116,7 @@ export default function Summary({ activityId, onFinish }: Props) {
       )}
 
       {!summary.saved && (
-        <p className="mb-5 flex items-start gap-2 text-sm text-amber-900 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+        <p className="note note-attention mb-5 flex items-start gap-2">
           <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
           This could not be saved to your record. Download a copy and tell your
           instructor.
@@ -142,7 +138,7 @@ export default function Summary({ activityId, onFinish }: Props) {
             <h3 className="text-sm font-semibold text-gray-700 mb-2">
               The question your team chose
             </h3>
-            <blockquote className="border-l-4 border-violet-500 bg-violet-50 rounded-r-lg p-4 text-gray-800">
+            <blockquote className="border-l-4 border-blue-500 bg-blue-50 rounded-r-lg p-4 text-gray-800">
               {summary.teamQuestion}
             </blockquote>
           </section>
@@ -154,7 +150,7 @@ export default function Summary({ activityId, onFinish }: Props) {
               Feedback on the team question
             </h3>
             {issues.length === 0 ? (
-              <p className="bg-green-50 border border-green-200 rounded-lg p-4 text-sm text-green-800">
+              <p className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
                 No rubric issues were found.
                 {summary.questionFeedback[0]?.explanation
                   ? ` ${summary.questionFeedback[0].explanation}`
@@ -163,21 +159,14 @@ export default function Summary({ activityId, onFinish }: Props) {
             ) : (
               <ul className="space-y-2">
                 {issues.map((item, i) => (
-                  <li
-                    key={i}
-                    className="border border-amber-200 bg-amber-50 rounded-lg p-4"
-                  >
-                    <p className="text-sm font-medium text-amber-900">
-                      {item.mistake}
-                    </p>
+                  <li key={i} className="note note-attention p-4">
+                    <p className="text-sm font-semibold">{item.mistake}</p>
                     {describeMistake(item.mistake) && (
-                      <p className="text-xs text-amber-800 mt-0.5">
+                      <p className="text-xs opacity-80 mt-0.5">
                         {describeMistake(item.mistake)}
                       </p>
                     )}
-                    <p className="text-sm text-amber-900 mt-2">
-                      {item.explanation}
-                    </p>
+                    <p className="text-sm mt-2">{item.explanation}</p>
                   </li>
                 ))}
               </ul>
@@ -206,7 +195,7 @@ export default function Summary({ activityId, onFinish }: Props) {
                   <span
                     className={`w-7 h-7 rounded-full shrink-0 flex items-center justify-center text-xs ${
                       message.role === 'student'
-                        ? 'bg-violet-100 text-violet-600'
+                        ? 'bg-blue-100 text-blue-600'
                         : 'bg-white border border-gray-200'
                     }`}
                   >
@@ -238,7 +227,7 @@ export default function Summary({ activityId, onFinish }: Props) {
                       {criterion.standard}
                     </h4>
                     <span className="flex items-center gap-2 shrink-0">
-                      <span className="text-sm font-bold text-emerald-600">
+                      <span className="text-sm font-bold text-blue-600">
                         {criterion.score}
                         <span className="text-xs font-normal text-gray-500">
                           /5
@@ -254,7 +243,7 @@ export default function Summary({ activityId, onFinish }: Props) {
                             aria-hidden="true"
                             className={`w-3.5 h-3.5 ${
                               i < Math.round(criterion.score)
-                                ? 'text-yellow-400 fill-current'
+                                ? 'text-[#f0704f] fill-current'
                                 : 'text-gray-300'
                             }`}
                           />
@@ -262,7 +251,7 @@ export default function Summary({ activityId, onFinish }: Props) {
                       </span>
                     </span>
                   </div>
-                  <p className="text-sm text-emerald-900 bg-emerald-50 rounded p-3 leading-relaxed">
+                  <p className="text-sm text-blue-900 bg-blue-50 rounded p-3 leading-relaxed">
                     {withEmphasis(criterion.response)}
                   </p>
                 </article>

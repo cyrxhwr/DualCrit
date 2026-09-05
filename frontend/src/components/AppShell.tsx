@@ -20,7 +20,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
             {student && (
               <span className="hidden sm:flex items-center gap-2 text-sm bg-white rounded-full pl-3 pr-1.5 py-1 outline outline-1 -outline-offset-1 outline-gray-900/10">
                 <span className="text-gray-700">{student.fullName}</span>
-                <span className="text-[11px] font-medium text-violet-700 bg-violet-50 rounded-full px-2 py-0.5">
+                <span className="text-[11px] font-medium text-blue-700 bg-blue-50 rounded-full px-2 py-0.5">
                   {student.studentId}
                 </span>
               </span>
@@ -28,7 +28,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
             <button
               type="button"
               aria-label="Help"
-              className="p-2 rounded-lg text-gray-400 hover:text-violet-600 hover:bg-violet-50 transition-colors"
+              className="p-2 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
             >
               <HelpCircle className="h-5 w-5" />
             </button>
@@ -38,7 +38,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
                 onClick={signOut}
                 aria-label="Sign out"
                 title="Sign out"
-                className="p-2 rounded-lg text-gray-400 hover:text-violet-600 hover:bg-violet-50 transition-colors"
+                className="p-2 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
               >
                 <LogOut className="h-5 w-5" />
               </button>

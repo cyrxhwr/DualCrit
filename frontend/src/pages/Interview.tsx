@@ -119,18 +119,14 @@ export default function Interview({ activityId, onContinue }: Props) {
 
       {scenario && <PersonaBrief scenario={scenario} showPresence />}
 
-      {error && (
-        <p className="mb-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-          {error}
-        </p>
-      )}
+      {error && <p className="note note-error mb-4">{error}</p>}
 
       {!started && (
         <div className="panel p-6 mb-6 slide-in-up">
           <p className="text-sm text-gray-600 mb-2">
             Your team's opening question
           </p>
-          <blockquote className="border-l-4 border-violet-500 bg-violet-50 rounded-r-lg p-4 mb-4">
+          <blockquote className="border-l-4 border-blue-500 bg-blue-50 rounded-r-lg p-4 mb-4">
             <p className="text-gray-800">{state.openingQuestion}</p>
           </blockquote>
           <button
@@ -156,7 +152,7 @@ export default function Interview({ activityId, onContinue }: Props) {
               <span
                 className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-sm ${
                   message.role === 'student'
-                    ? 'bg-violet-100 text-violet-700 font-semibold text-xs'
+                    ? 'bg-blue-100 text-blue-700 font-semibold text-xs'
                     : 'bg-white border border-gray-200'
                 }`}
               >
@@ -238,11 +234,11 @@ export default function Interview({ activityId, onContinue }: Props) {
       )}
 
       {state.completed && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-5 flex items-start gap-3">
-          <CheckCircle className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-5 flex items-start gap-3">
+          <CheckCircle className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="font-medium text-green-800">Interview finished</p>
-            <p className="text-sm text-green-700 mt-0.5">
+            <p className="font-medium text-blue-800">Interview finished</p>
+            <p className="text-sm text-blue-700 mt-0.5">
               {progress.completed === progress.total
                 ? 'Everyone is done — you can read how the rest of your team interviewed.'
                 : `Waiting for the rest of your team — ${progress.completed} of ${progress.total} finished.`}

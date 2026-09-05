@@ -73,11 +73,11 @@ export default function QuestionFeedback({
         The same notes for everyone — it is the team’s question.
       </p>
 
-      <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 mb-6">
-        <h3 className="font-semibold text-indigo-800 mb-2 text-sm">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <h3 className="font-semibold text-blue-800 mb-2 text-sm">
           Selected question
         </h3>
-        <p className="text-indigo-700 text-lg break-words">“{question}”</p>
+        <p className="text-blue-700 text-lg break-words">“{question}”</p>
       </div>
 
       {loading && (
@@ -87,11 +87,7 @@ export default function QuestionFeedback({
         </p>
       )}
 
-      {error && (
-        <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-          {error}
-        </p>
-      )}
+      {error && <p className="note note-error">{error}</p>}
 
       {!loading && !error && !evaluation && (
         <p className="text-sm text-gray-500 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
@@ -102,15 +98,13 @@ export default function QuestionFeedback({
 
       {issues.length > 0 && (
         <div className="space-y-4 stagger">
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <h3 className="font-semibold text-yellow-800 mb-2 text-sm">
-              Identified issues
-            </h3>
+          <div className="note note-attention p-4">
+            <h3 className="font-semibold mb-2 text-sm">Identified issues</h3>
             <div className="flex flex-wrap gap-2">
               {issues.map((item, i) => (
                 <span
                   key={`${item.mistake}-${i}`}
-                  className="bg-yellow-200 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium"
+                  className="badge badge-accent text-sm px-3 py-1"
                 >
                   {item.mistake}
                 </span>
@@ -131,16 +125,16 @@ export default function QuestionFeedback({
                   {describeMistake(item.mistake)}
                 </p>
               )}
-              <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-4">
+              <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
                 <div className="flex items-start gap-3">
-                  <span className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center shrink-0 text-indigo-600 font-bold text-xs">
+                  <span className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center shrink-0 text-blue-600 font-bold text-xs">
                     AI
                   </span>
                   <div>
-                    <h4 className="font-semibold text-indigo-800 mb-1 text-sm">
+                    <h4 className="font-semibold text-blue-800 mb-1 text-sm">
                       AI feedback
                     </h4>
-                    <p className="text-indigo-700 text-sm leading-relaxed break-words">
+                    <p className="text-blue-700 text-sm leading-relaxed break-words">
                       {item.explanation}
                     </p>
                   </div>
@@ -152,32 +146,32 @@ export default function QuestionFeedback({
       )}
 
       {isSound && (
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-8">
+        <div className="note note-good p-8">
           <div className="flex items-center gap-4 mb-6">
-            <span className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center shrink-0">
-              <CheckCircle className="w-7 h-7 text-green-600" />
+            <span className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
+              <CheckCircle className="w-7 h-7 text-blue-600" />
             </span>
             <div>
-              <h3 className="text-xl font-bold text-green-800">
+              <h3 className="text-xl font-bold text-blue-800">
                 Excellent question
               </h3>
-              <p className="text-green-600 text-sm">
+              <p className="text-blue-600 text-sm">
                 No rubric issues were found
               </p>
             </div>
           </div>
 
           {items[0]?.explanation && (
-            <div className="bg-white border border-green-100 rounded-lg p-6">
+            <div className="bg-white border border-blue-100 rounded-lg p-6">
               <div className="flex items-start gap-3">
-                <span className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center shrink-0 text-green-600 font-bold text-xs">
+                <span className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center shrink-0 text-blue-600 font-bold text-xs">
                   AI
                 </span>
                 <div>
-                  <h4 className="font-semibold text-green-800 mb-1 text-sm">
+                  <h4 className="font-semibold text-blue-800 mb-1 text-sm">
                     AI feedback
                   </h4>
-                  <p className="text-green-700 text-sm leading-relaxed break-words">
+                  <p className="text-blue-700 text-sm leading-relaxed break-words">
                     {items[0].explanation}
                   </p>
                 </div>

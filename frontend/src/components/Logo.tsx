@@ -1,63 +1,59 @@
-import { useId } from 'react';
+export const BRAND_BLUE = '#2563eb';
+export const BRAND_CORAL = '#f0704f';
 
 /**
- * Two discs with the overlap cut away, so the lens between them is a hard
- * edge rather than a shade — it survives at 20px in a browser tab.
+ * Two bracket halves facing each other, with a spark in the gap between them.
  *
- * It reads as two viewpoints laid over each other, which is what the app is
- * for: your interview and your team's, judged against the same rubric.
+ * The halves are the two critiques — the question and the interview — and the
+ * space they leave is where the judgement happens. Drawn rather than imported
+ * so it stays sharp at any size and can inherit the page's colours.
  */
-export function LogoMark({ className = 'h-5 w-5' }: { className?: string }) {
-  // Two marks render on the same page (header, and a page's own heading), so
-  // the mask ids have to be per-instance or the second one reuses the first.
-  const id = useId();
-  const maskId = `dc-mask-${id}`;
-  const clipId = `dc-clip-${id}`;
-
+export function LogoMark({ className = 'h-6 w-6' }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 24 24"
+      viewBox="0 0 96 96"
       fill="none"
       aria-hidden="true"
       className={className}
     >
-      <defs>
-        <clipPath id={clipId}>
-          <circle cx="9.1" cy="12" r="6.1" />
-        </clipPath>
-        <mask id={maskId}>
-          <circle cx="9.1" cy="12" r="6.1" fill="#fff" />
-          <circle cx="14.9" cy="12" r="6.1" fill="#fff" />
-          <g clipPath={`url(#${clipId})`}>
-            <circle cx="14.9" cy="12" r="6.1" fill="#000" />
-          </g>
-        </mask>
-      </defs>
+      {/* Left half: rounded on the outside, notched into a "<" on the inside. */}
+      <path
+        d="M44 11H31C19.954 11 11 19.954 11 31v34c0 11.046 8.954 20 20 20h13L28.5 48Z"
+        fill={BRAND_BLUE}
+      />
+      {/* Right half: the same shape mirrored about the centre line. */}
+      <path
+        d="M52 11h13c11.046 0 20 8.954 20 20v34c0 11.046-8.954 20-20 20H52l15.5-37Z"
+        fill={BRAND_CORAL}
+      />
+      {/* The spark, sitting in the negative space the two halves leave. Four
+          points with concave sides, so it reads as a spark and not a plus. */}
+      <path
+        d="M48 30 Q50.5 45 62 48 Q50.5 51 48 66 Q45.5 51 34 48 Q45.5 45 48 30 Z"
+        fill={BRAND_CORAL}
+      />
       <rect
-        width="24"
-        height="24"
-        fill="currentColor"
-        mask={`url(#${maskId})`}
+        x="46.7"
+        y="60"
+        width="2.6"
+        height="18"
+        rx="1.3"
+        fill={BRAND_CORAL}
       />
     </svg>
   );
 }
 
-/** The mark on its gradient tile, beside the wordmark. */
+/** The mark beside the wordmark. */
 export default function Logo({ size = 'md' }: { size?: 'md' | 'lg' }) {
-  const tile = size === 'lg' ? 'w-10 h-10 rounded-xl' : 'w-8 h-8 rounded-lg';
-  const mark = size === 'lg' ? 'h-6 w-6' : 'h-5 w-5';
-  const text = size === 'lg' ? 'text-xl' : 'text-base';
+  const mark = size === 'lg' ? 'h-10 w-10' : 'h-8 w-8';
+  const text = size === 'lg' ? 'text-2xl' : 'text-lg';
 
   return (
-    <span className="inline-flex items-center gap-2.5">
-      <span
-        className={`${tile} bg-gradient-to-br from-violet-500 via-violet-600 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-violet-600/25`}
-      >
-        <LogoMark className={mark} />
-      </span>
-      <span className={`${text} font-bold tracking-tight text-gray-900`}>
-        Dual<span className="text-violet-600">Crit</span>
+    <span className="inline-flex items-center gap-2">
+      <LogoMark className={mark} />
+      <span className={`${text} font-semibold tracking-tight text-gray-900`}>
+        Dual<span style={{ color: BRAND_CORAL }}>Crit</span>
       </span>
     </span>
   );

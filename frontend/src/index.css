@@ -1,20 +1,71 @@
 @import "tailwindcss";
 
-/* ---------------------------------------------------------------- motion */
+/* ================================================================= tokens */
 
 /*
- * Content fades up on arrival, cards lift slightly on hover. Kept small on
- * purpose — students move through eight screens in a sitting.
+ * Both hues are taken from the logo: the blue and the coral halves of the
+ * mark. Everything the interface colours in comes from one of the two, so
+ * nothing on screen is a hue the logo does not contain.
  */
+:root {
+  --brand-50: #eff4ff;
+  --brand-100: #dbe6fe;
+  --brand-200: #bfd3fe;
+  --brand-300: #93b4fd;
+  --brand-400: #6090fa;
+  --brand-500: #3b73f6;
+  --brand-600: #2563eb;
+  --brand-700: #1d4fd8;
+  --brand-800: #1e42af;
+  --brand-900: #1e3a8a;
+
+  --accent-50: #fef4f1;
+  --accent-100: #ffe6df;
+  --accent-200: #ffd0c3;
+  --accent-300: #ffb09a;
+  --accent-400: #fa8a6c;
+  --accent-500: #f0704f;
+  --accent-600: #dd5836;
+  --accent-700: #b9432a;
+  --accent-800: #963a27;
+  --accent-900: #7c3524;
+
+  --ink: #101828;
+  --ink-muted: #667085;
+  --ink-faint: #98a2b3;
+  --line: #e7e9ee;
+  --line-soft: #f0f1f4;
+  --surface: #ffffff;
+  --ground: #fbfbfc;
+}
+
+/*
+ * Inter, matching the reference interface's grotesque. cv11 gives the
+ * single-storey g and straight-tailed l that keep long rubric text legible.
+ */
+html {
+  font-family:
+    'Inter',
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+  font-feature-settings: 'cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
+  color: var(--ink);
+}
+
+/* ================================================================= motion */
 
 .fade-in {
-  animation: fadeIn 0.5s ease-out both;
+  animation: fadeIn 0.4s ease-out both;
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -23,13 +74,13 @@
 }
 
 .slide-in-up {
-  animation: slideInUp 0.45s ease-out both;
+  animation: slideInUp 0.35s ease-out both;
 }
 
 @keyframes slideInUp {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -39,83 +90,61 @@
 
 /* Stagger a list without hand-writing a delay on every item. */
 .stagger > * {
-  animation: slideInUp 0.45s ease-out both;
+  animation: slideInUp 0.35s ease-out both;
 }
-.stagger > *:nth-child(1) { animation-delay: 0.04s; }
-.stagger > *:nth-child(2) { animation-delay: 0.08s; }
-.stagger > *:nth-child(3) { animation-delay: 0.12s; }
-.stagger > *:nth-child(4) { animation-delay: 0.16s; }
-.stagger > *:nth-child(5) { animation-delay: 0.2s; }
-.stagger > *:nth-child(n + 6) { animation-delay: 0.24s; }
+.stagger > *:nth-child(1) { animation-delay: 0.03s; }
+.stagger > *:nth-child(2) { animation-delay: 0.06s; }
+.stagger > *:nth-child(3) { animation-delay: 0.09s; }
+.stagger > *:nth-child(4) { animation-delay: 0.12s; }
+.stagger > *:nth-child(5) { animation-delay: 0.15s; }
+.stagger > *:nth-child(n + 6) { animation-delay: 0.18s; }
 
 .smooth-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .smooth-hover:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 18px 30px -12px rgb(76 29 149 / 0.18),
-    0 4px 10px -4px rgb(15 23 42 / 0.06);
+  border-color: var(--brand-300);
+  box-shadow: 0 1px 2px rgb(16 24 40 / 0.04), 0 8px 20px -12px rgb(16 24 40 / 0.14);
 }
 
-/* ------------------------------------------------------------ the ground */
+/* =============================================================== surfaces */
 
 /*
- * Two soft colour washes over near-white, rather than one flat gradient —
- * it gives the raised cards something to sit on.
+ * Flat, not floating: a hairline border and almost no shadow, so a page of
+ * cards reads as one sheet rather than a stack of tiles.
  */
 .app-bg {
-  background-color: #fbfaff;
-  background-image:
-    radial-gradient(
-      ellipse 80% 60% at 8% 0%,
-      rgb(167 139 250 / 0.22),
-      transparent 60%
-    ),
-    radial-gradient(
-      ellipse 70% 60% at 100% 100%,
-      rgb(129 140 248 / 0.18),
-      transparent 60%
-    );
-  background-attachment: fixed;
+  background: var(--ground);
 }
 
-/* -------------------------------------------------------------- surfaces */
-
-/* A hairline ring instead of a border: it survives on any ground. */
 .card {
-  background: #fff;
-  border-radius: 1rem;
-  box-shadow:
-    0 1px 2px rgb(15 23 42 / 0.04),
-    0 12px 32px -12px rgb(76 29 149 / 0.16);
-  outline: 1px solid rgb(15 23 42 / 0.06);
-  outline-offset: -1px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0.875rem;
 }
 
 .panel {
-  background: #fff;
-  border-radius: 0.875rem;
-  outline: 1px solid rgb(15 23 42 / 0.08);
-  outline-offset: -1px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
 }
 
-/* --------------------------------------------------------------- buttons */
+/* ================================================================ buttons */
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  border-radius: 0.7rem;
-  padding: 0.55rem 1.25rem;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.25rem;
   white-space: nowrap;
   cursor: pointer;
-  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.15s ease;
 }
 
 .btn:disabled {
@@ -123,93 +152,153 @@
   cursor: not-allowed;
 }
 
-.btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-}
-
-.btn:active:not(:disabled) {
-  transform: translateY(0) scale(0.99);
-}
-
 .btn:focus-visible {
-  outline: 2px solid #7c3aed;
+  outline: 2px solid var(--brand-600);
   outline-offset: 2px;
 }
 
 /* One primary for every "advance" action, so the next move is never in doubt. */
 .btn-primary {
-  background-image: linear-gradient(135deg, #7c3aed, #4f46e5);
+  background: var(--brand-600);
   color: #fff;
-  box-shadow: 0 6px 16px -6px rgb(79 70 229 / 0.6);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-image: linear-gradient(135deg, #6d28d9, #4338ca);
-  box-shadow: 0 10px 22px -8px rgb(79 70 229 / 0.7);
+  background: var(--brand-700);
 }
 
-.btn-emerald {
-  background-image: linear-gradient(135deg, #10b981, #059669);
+.btn-accent {
+  background: var(--accent-500);
   color: #fff;
-  box-shadow: 0 6px 16px -6px rgb(5 150 105 / 0.55);
 }
 
-.btn-emerald:hover:not(:disabled) {
-  background-image: linear-gradient(135deg, #059669, #047857);
-}
-
-.btn-amber {
-  background-image: linear-gradient(135deg, #fb923c, #ea580c);
-  color: #fff;
-  box-shadow: 0 6px 16px -6px rgb(234 88 12 / 0.55);
-}
-
-.btn-amber:hover:not(:disabled) {
-  background-image: linear-gradient(135deg, #f97316, #c2410c);
+.btn-accent:hover:not(:disabled) {
+  background: var(--accent-600);
 }
 
 .btn-quiet {
-  background: #fff;
-  color: #475569;
-  outline: 1px solid rgb(15 23 42 / 0.12);
-  outline-offset: -1px;
+  background: var(--surface);
+  color: var(--ink-muted);
+  border: 1px solid var(--line);
 }
 
 .btn-quiet:hover:not(:disabled) {
-  color: #7c3aed;
-  outline-color: rgb(124 58 237 / 0.35);
+  color: var(--brand-700);
+  border-color: var(--brand-300);
+  background: var(--brand-50);
 }
 
-/* ---------------------------------------------------------------- fields */
+/* ================================================================= fields */
 
 .field {
   width: 100%;
-  border-radius: 0.7rem;
-  background: #f8fafc;
-  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  padding: 0.55rem 0.85rem;
   font-size: 0.9375rem;
-  color: #0f172a;
-  outline: 1px solid rgb(15 23 42 / 0.1);
-  outline-offset: -1px;
-  transition: all 0.18s ease;
+  color: var(--ink);
+  transition: all 0.15s ease;
 }
 
 .field::placeholder {
-  color: #94a3b8;
+  color: var(--ink-faint);
 }
 
 .field:focus {
-  background: #fff;
-  outline: 2px solid #8b5cf6;
-  outline-offset: -1px;
-  box-shadow: 0 0 0 4px rgb(139 92 246 / 0.12);
+  outline: none;
+  border-color: var(--brand-500);
+  box-shadow: 0 0 0 3px var(--brand-100);
 }
 
-/* ------------------------------------------------------------ scrollbars */
+/* =============================================================== callouts */
+
+/*
+ * Three tints, all drawn from the two brand hues: blue says "this is fine",
+ * coral says "look here". A true red is kept for hard failures only, so it
+ * never competes with coral for attention.
+ */
+.note {
+  border-radius: 0.5rem;
+  border: 1px solid;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.875rem;
+}
+
+.note-good {
+  background: var(--brand-50);
+  border-color: var(--brand-200);
+  color: var(--brand-900);
+}
+
+.note-attention {
+  background: var(--accent-50);
+  border-color: var(--accent-200);
+  color: var(--accent-900);
+}
+
+.note-error {
+  background: #fef3f2;
+  border-color: #fecdc9;
+  color: #b42318;
+}
+
+/* ================================================================= badges */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+}
+
+.badge-brand {
+  background: var(--brand-50);
+  color: var(--brand-700);
+}
+
+.badge-accent {
+  background: var(--accent-50);
+  color: var(--accent-700);
+}
+
+.badge-muted {
+  background: var(--line-soft);
+  color: var(--ink-muted);
+}
+
+/* ============================================================ selectables */
+
+/* Scenario and question cards: a chosen one is outlined, never filled hard. */
+.selectable {
+  border: 1.5px solid var(--line);
+  border-radius: 0.75rem;
+  background: var(--surface);
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.selectable:hover:not(:disabled) {
+  border-color: var(--brand-300);
+}
+
+.selectable[aria-pressed='true'] {
+  border-color: var(--brand-600);
+  background: var(--brand-50);
+}
+
+.selectable:disabled {
+  cursor: default;
+}
+
+/* ============================================================= scrollbars */
 
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgb(148 163 184 / 0.5) transparent;
+  scrollbar-color: #cdd2dc transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -221,12 +310,12 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgb(148 163 184 / 0.5);
+  background-color: #cdd2dc;
   border-radius: 3px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: rgb(148 163 184 / 0.75);
+  background-color: #aeb5c2;
 }
 
 /* Everything above is decoration; nobody should be made queasy by it. */
@@ -238,11 +327,5 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
-  }
-
-  .smooth-hover:hover,
-  .btn:hover:not(:disabled),
-  .btn:active:not(:disabled) {
-    transform: none;
   }
 }

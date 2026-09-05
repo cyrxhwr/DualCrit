@@ -73,16 +73,12 @@ export default function ScenarioSelection({ activityId, onDecided }: Props) {
       </p>
 
       {tied && (
-        <p className="mb-4 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+        <p className="note note-attention mb-4">
           It's a tie — change a vote to break it.
         </p>
       )}
 
-      {error && (
-        <p className="mb-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-          {error}
-        </p>
-      )}
+      {error && <p className="note note-error mb-4">{error}</p>}
 
       <div className="grid gap-4 md:grid-cols-2 stagger">
         {SCENARIOS.map((scenario) => {
@@ -95,11 +91,7 @@ export default function ScenarioSelection({ activityId, onDecided }: Props) {
               type="button"
               onClick={() => setPicked(scenario.tag)}
               aria-pressed={isPicked}
-              className={`text-left rounded-xl border-2 p-5 smooth-hover ${
-                isPicked
-                  ? 'border-violet-500 bg-violet-50'
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
+              className="selectable p-5"
             >
               <div className="flex items-start gap-3">
                 <span className="text-3xl leading-none">
@@ -122,7 +114,7 @@ export default function ScenarioSelection({ activityId, onDecided }: Props) {
                   <p className="text-sm text-gray-700 mt-2">
                     {scenario.scenario}
                   </p>
-                  <p className="text-sm text-violet-700 mt-2 font-medium">
+                  <p className="text-sm text-blue-700 mt-2 font-medium">
                     {scenario.description}
                   </p>
                 </div>
@@ -134,7 +126,7 @@ export default function ScenarioSelection({ activityId, onDecided }: Props) {
 
       <div className="flex items-center justify-end gap-3 mt-6">
         {hasVoted && (
-          <span className="flex items-center gap-1.5 text-sm text-green-700">
+          <span className="flex items-center gap-1.5 text-sm text-blue-700">
             <Check className="h-4 w-4" />
             Vote saved
           </span>

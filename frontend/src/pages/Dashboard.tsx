@@ -98,8 +98,8 @@ export default function Dashboard() {
           disabled
             ? 'border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed'
             : selected
-              ? 'border-violet-500 bg-violet-50 shadow-sm'
-              : 'border-gray-200 hover:border-violet-300 hover:bg-violet-50/40'
+              ? 'border-blue-500 bg-blue-50 shadow-sm'
+              : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50/40'
         }`}
       >
         <Icon
@@ -107,14 +107,14 @@ export default function Dashboard() {
             disabled
               ? 'text-gray-300'
               : selected
-                ? 'text-violet-600'
+                ? 'text-blue-600'
                 : 'text-gray-400'
           }`}
         />
         <span className="flex items-center gap-2 font-semibold text-gray-800">
           {ACTIVITY_TYPE_LABELS[value]}
           {disabled && (
-            <span className="text-[10px] font-medium uppercase tracking-wide text-gray-500 bg-gray-200 rounded-full px-1.5 py-0.5">
+            <span className="badge badge-muted uppercase tracking-wide">
               Soon
             </span>
           )}
@@ -132,34 +132,32 @@ export default function Dashboard() {
             type="button"
             onClick={() => setPanel(panel === 'create' ? 'none' : 'create')}
             aria-expanded={panel === 'create'}
-            className={`smooth-hover rounded-2xl py-9 flex flex-col items-center gap-3 border-2 border-dashed transition-colors ${
+            className={`smooth-hover rounded-xl py-8 flex flex-col items-center gap-3 border border-dashed transition-colors ${
               panel === 'create'
-                ? 'border-emerald-500 bg-emerald-50'
-                : 'border-emerald-300 bg-emerald-50/50 hover:bg-emerald-50'
+                ? 'border-blue-600 bg-blue-50'
+                : 'border-blue-200 bg-blue-50/50 hover:bg-blue-50'
             }`}
           >
-            <span className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-600/25">
+            <span className="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center">
               <SquarePen className="h-6 w-6" />
             </span>
-            <span className="font-semibold text-emerald-900">
-              Create activity
-            </span>
+            <span className="font-semibold text-blue-900">Create activity</span>
           </button>
 
           <button
             type="button"
             onClick={() => setPanel(panel === 'join' ? 'none' : 'join')}
             aria-expanded={panel === 'join'}
-            className={`smooth-hover rounded-2xl py-9 flex flex-col items-center gap-3 border-2 border-dashed transition-colors ${
+            className={`smooth-hover rounded-xl py-8 flex flex-col items-center gap-3 border border-dashed transition-colors ${
               panel === 'join'
-                ? 'border-orange-500 bg-orange-50'
-                : 'border-orange-300 bg-orange-50/50 hover:bg-orange-50'
+                ? 'border-[#f0704f] bg-[#fef4f1]'
+                : 'border-[#ffd0c3] bg-[#fef4f1]/60 hover:bg-[#fef4f1]'
             }`}
           >
-            <span className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 text-white flex items-center justify-center shadow-lg shadow-orange-600/25">
+            <span className="w-11 h-11 rounded-xl bg-[#f0704f] text-white flex items-center justify-center">
               <LogIn className="h-6 w-6" />
             </span>
-            <span className="font-semibold text-orange-900">Join activity</span>
+            <span className="font-semibold text-[#b9432a]">Join activity</span>
           </button>
         </div>
 
@@ -203,7 +201,7 @@ export default function Dashboard() {
                 type="button"
                 onClick={createActivity}
                 disabled={busy || name.trim().length === 0}
-                className="btn btn-emerald"
+                className="btn btn-primary"
               >
                 {busy ? 'Creating…' : 'Create activity'}
               </button>
@@ -225,7 +223,7 @@ export default function Dashboard() {
               type="button"
               onClick={join}
               disabled={busy || joinCode.length !== 6}
-              className="btn btn-amber px-7"
+              className="btn btn-accent px-7"
             >
               Join
             </button>
@@ -233,9 +231,7 @@ export default function Dashboard() {
         )}
 
         {error && (
-          <p className="max-w-2xl mx-auto mt-5 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-            {error}
-          </p>
+          <p className="note note-error max-w-2xl mx-auto mt-5">{error}</p>
         )}
 
         <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400 mt-10 mb-4">
@@ -257,13 +253,7 @@ export default function Dashboard() {
                   <h3 className="font-semibold text-gray-900">
                     {activity.name}
                   </h3>
-                  <span
-                    className={`shrink-0 text-[11px] font-medium px-2 py-0.5 rounded-full ${
-                      activity.type === 'interview'
-                        ? 'bg-violet-50 text-violet-700'
-                        : 'bg-purple-50 text-purple-700'
-                    }`}
-                  >
+                  <span className="badge badge-brand shrink-0">
                     {ACTIVITY_TYPE_LABELS[activity.type]}
                   </span>
                 </div>

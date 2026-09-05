@@ -64,11 +64,7 @@ export default function SignIn() {
             className="field mb-5"
           />
 
-          {error && (
-            <p className="mb-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-              {error}
-            </p>
-          )}
+          {error && <p className="note note-error mb-4">{error}</p>}
 
           <button
             type="submit"

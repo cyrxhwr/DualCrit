@@ -108,7 +108,7 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
         <p className="text-sm text-gray-500 mb-4">
           Everyone interviews with this.
         </p>
-        <blockquote className="border-l-4 border-violet-500 bg-violet-50 rounded-r-lg p-5">
+        <blockquote className="border-l-4 border-blue-500 bg-blue-50 rounded-r-lg p-5">
           <p className="text-gray-800">{winner?.content.question}</p>
         </blockquote>
       </div>
@@ -138,15 +138,13 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
       {scenario && <PersonaBrief scenario={scenario} />}
 
       {tied && (
-        <p className="mb-4 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+        <p className="note note-attention mb-4">
           It's a tie — change a vote to break it.
         </p>
       )}
 
       {(error ?? voting.error) && (
-        <p className="mb-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-          {error ?? voting.error}
-        </p>
+        <p className="note note-error mb-4">{error ?? voting.error}</p>
       )}
 
       {!inVoting && (
@@ -165,7 +163,7 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
           />
           <div className="flex items-center justify-end gap-3 mt-2">
             {mine && (
-              <span className="flex items-center gap-1.5 text-sm text-green-700">
+              <span className="flex items-center gap-1.5 text-sm text-blue-700">
                 <Check className="h-4 w-4" />
                 Submitted
               </span>
@@ -194,11 +192,7 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
                 disabled={!inVoting}
                 onClick={() => setPicked(question.id)}
                 aria-pressed={isPicked}
-                className={`w-full text-left rounded-lg border-2 p-4 transition-colors ${
-                  isPicked
-                    ? 'border-violet-500 bg-violet-50'
-                    : 'border-gray-200'
-                } ${inVoting ? 'hover:border-gray-300' : 'cursor-default'}`}
+                className="selectable w-full p-4"
               >
                 <div className="flex items-start justify-between gap-3">
                   <p className="text-gray-800">{question.content.question}</p>
@@ -209,7 +203,7 @@ export default function QuestionCreation({ activityId, scenarioTag }: Props) {
                   )}
                 </div>
                 {question.isMine && (
-                  <p className="text-xs font-medium text-violet-600 mt-1">
+                  <p className="text-xs font-medium text-blue-600 mt-1">
                     Your question
                   </p>
                 )}

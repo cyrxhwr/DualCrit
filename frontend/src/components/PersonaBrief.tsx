@@ -20,7 +20,7 @@ export default function PersonaBrief({ scenario, showPresence }: Props) {
         </span>
         <div className="min-w-0 flex-1">
           <h3 className="font-bold text-gray-900">{scenario.persona.name}</h3>
-          <p className="text-sm font-medium text-violet-600">
+          <p className="text-sm font-medium text-blue-600">
             {scenario.persona.role}
           </p>
           <p className="text-sm text-gray-600 leading-relaxed mt-1.5">
@@ -28,16 +28,16 @@ export default function PersonaBrief({ scenario, showPresence }: Props) {
           </p>
         </div>
         {showPresence && (
-          <span className="shrink-0 flex items-center gap-1.5 text-xs font-medium text-emerald-600">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+          <span className="shrink-0 flex items-center gap-1.5 text-xs font-medium text-blue-600">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
             Online
           </span>
         )}
       </div>
 
-      <dl className="border-t border-gray-900/[0.07] bg-violet-50/40 p-5 space-y-3">
+      <dl className="border-t border-gray-900/[0.07] bg-blue-50/40 p-5 space-y-3">
         <div>
-          <dt className="text-xs font-semibold uppercase tracking-wide text-violet-700">
+          <dt className="text-xs font-semibold uppercase tracking-wide text-blue-700">
             Interview goal
           </dt>
           <dd className="text-sm text-gray-700 leading-relaxed mt-0.5">
@@ -45,7 +45,7 @@ export default function PersonaBrief({ scenario, showPresence }: Props) {
           </dd>
         </div>
         <div>
-          <dt className="text-xs font-semibold uppercase tracking-wide text-violet-700">
+          <dt className="text-xs font-semibold uppercase tracking-wide text-blue-700">
             Context
           </dt>
           <dd className="text-sm text-gray-700 leading-relaxed mt-0.5">
@@ -53,7 +53,7 @@ export default function PersonaBrief({ scenario, showPresence }: Props) {
           </dd>
         </div>
         <div>
-          <dt className="text-xs font-semibold uppercase tracking-wide text-violet-700">
+          <dt className="text-xs font-semibold uppercase tracking-wide text-blue-700">
             Sample scenario
           </dt>
           <dd className="text-sm text-gray-700 leading-relaxed mt-0.5">

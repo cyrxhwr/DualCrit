@@ -64,11 +64,7 @@ export default function PeerReview({
   }, [activityId, load]);
 
   if (error) {
-    return (
-      <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-        {error}
-      </p>
-    );
+    return <p className="note note-error">{error}</p>;
   }
 
   if (!data) {
@@ -131,7 +127,7 @@ export default function PeerReview({
                   )}
                   {transcript.authorName}
                   {transcript.isMine && (
-                    <span className="text-[10px] uppercase tracking-wide bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] uppercase tracking-wide bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
                       You
                     </span>
                   )}
@@ -153,7 +149,7 @@ export default function PeerReview({
                       <span
                         className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-sm ${
                           message.role === 'student'
-                            ? 'bg-violet-100 text-violet-600'
+                            ? 'bg-blue-100 text-blue-600'
                             : 'bg-white border border-gray-200'
                         }`}
                       >
