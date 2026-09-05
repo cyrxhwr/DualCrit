@@ -12,7 +12,7 @@
     "test": "jest"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "dependencies": {
     "@nestjs/common": "^10.4.15",
