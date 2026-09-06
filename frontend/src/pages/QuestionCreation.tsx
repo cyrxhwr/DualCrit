@@ -137,30 +137,6 @@ export default function QuestionCreation({
 
   return (
     <div>
-      {/* Two named phases, always visible, so the switch from writing to
-          voting is a state the student can see rather than infer. */}
-      <div className="phases">
-        <span
-          className="phase-pill"
-          data-state={inVoting ? 'done' : 'active'}
-          aria-current={inVoting ? undefined : 'step'}
-        >
-          <span className="dot">
-            {inVoting ? <Check className="h-3 w-3" /> : '1'}
-          </span>
-          Write
-        </span>
-        <span className="phase-rule" />
-        <span
-          className="phase-pill"
-          data-state={inVoting ? 'active' : 'todo'}
-          aria-current={inVoting ? 'step' : undefined}
-        >
-          <span className="dot">2</span>
-          Vote
-        </span>
-      </div>
-
       {/* Keyed on the phase, so arriving at voting replays the animation and
           the whole block visibly changes rather than quietly swapping words. */}
       <div key={inVoting ? 'vote' : 'write'} className="fade-in">

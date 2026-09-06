@@ -305,69 +305,6 @@ html {
   border-color: var(--line-soft);
 }
 
-/* ------------------------------------------------------------ phase strip */
-
-.phases {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 1.25rem;
-}
-
-.phase-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  border-radius: 999px;
-  padding: 0.3rem 0.8rem 0.3rem 0.35rem;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--ink-faint);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  transition: all 0.25s ease;
-}
-
-.phase-pill .dot {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.15rem;
-  height: 1.15rem;
-  border-radius: 999px;
-  background: var(--line-soft);
-  color: var(--ink-muted);
-  font-size: 0.6875rem;
-  font-weight: 600;
-}
-
-.phase-pill[data-state='done'] {
-  color: var(--brand-700);
-  background: var(--brand-50);
-  border-color: transparent;
-}
-.phase-pill[data-state='done'] .dot {
-  background: var(--brand-600);
-  color: #fff;
-}
-
-.phase-pill[data-state='active'] {
-  color: #fff;
-  background: var(--brand-600);
-  border-color: transparent;
-}
-.phase-pill[data-state='active'] .dot {
-  background: rgb(255 255 255 / 0.25);
-  color: #fff;
-}
-
-.phase-rule {
-  flex: 1;
-  height: 1px;
-  background: var(--line);
-  max-width: 3rem;
-}
-
 /* ============================================================= scrollbars */
 
 .custom-scrollbar {
