@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Check, Users } from 'lucide-react';
+import { Check, Users, Vote } from 'lucide-react';
 import { api, type Contribution } from '../lib/api';
 import { getSocket } from '../lib/socket';
 import { useActivityMembers } from '../lib/useActivityMembers';
@@ -137,23 +137,77 @@ export default function QuestionCreation({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-1">
-        <h2 className="text-lg font-semibold text-gray-800">
-          {inVoting ? 'Vote for the best question' : 'Write your question'}
-        </h2>
-        <span className="flex items-center gap-1.5 text-sm text-gray-500">
-          <Users className="h-4 w-4" />
-          {inVoting
-            ? `${voting.state?.votedCount ?? 0} of ${memberCount} voted`
-            : `${questions.length} of ${memberCount} submitted`}
+      {/* Two named phases, always visible, so the switch from writing to
+          voting is a state the student can see rather than infer. */}
+      <div className="phases">
+        <span
+          className="phase-pill"
+          data-state={inVoting ? 'done' : 'active'}
+          aria-current={inVoting ? undefined : 'step'}
+        >
+          <span className="dot">
+            {inVoting ? <Check className="h-3 w-3" /> : '1'}
+          </span>
+          Write
+        </span>
+        <span className="phase-rule" />
+        <span
+          className="phase-pill"
+          data-state={inVoting ? 'active' : 'todo'}
+          aria-current={inVoting ? 'step' : undefined}
+        >
+          <span className="dot">2</span>
+          Vote
         </span>
       </div>
 
-      <p className="text-sm text-gray-500 mb-5">
-        {inVoting
-          ? 'Questions are anonymous — vote for the one you would rather ask.'
-          : 'Everyone writes one. The team then votes on which to use.'}
-      </p>
+      {/* Keyed on the phase, so arriving at voting replays the animation and
+          the whole block visibly changes rather than quietly swapping words. */}
+      <div key={inVoting ? 'vote' : 'write'} className="fade-in">
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="text-lg font-semibold text-gray-800">
+            {inVoting ? 'Vote for the best question' : 'Write your question'}
+          </h2>
+          <span className="flex items-center gap-1.5 text-sm text-gray-500">
+            <Users className="h-4 w-4" />
+            {inVoting
+              ? `${voting.state?.votedCount ?? 0} of ${memberCount} voted`
+              : `${questions.length} of ${memberCount} submitted`}
+          </span>
+        </div>
+
+        <p className="text-sm text-gray-500 mb-4">
+          {inVoting
+            ? 'Questions are anonymous — vote for the one you would rather ask.'
+            : 'Everyone writes one. The team then votes on which to use.'}
+        </p>
+
+        {inVoting ? (
+          <p className="note note-good mb-5 flex items-center gap-2">
+            <Vote className="h-4 w-4 shrink-0" />
+            <span>
+              <b>Voting is open.</b> Pick a question below, then press Submit
+              vote.
+            </span>
+          </p>
+        ) : everyoneSubmitted ? (
+          <p className="note note-good mb-5 flex items-center gap-2">
+            <Check className="h-4 w-4 shrink-0" />
+            <span>
+              <b>Everyone has submitted.</b> Start voting when your team is
+              ready — it opens for all of you at once.
+            </span>
+          </p>
+        ) : (
+          questions.length > 0 && (
+            <p className="note mb-5 flex items-center gap-2 text-gray-600 bg-transparent border-gray-200">
+              <Users className="h-4 w-4 shrink-0" />
+              Waiting for everyone to submit — {questions.length} of{' '}
+              {memberCount} so far.
+            </p>
+          )
+        )}
+      </div>
 
       {scenario && <PersonaBrief scenario={scenario} />}
 
@@ -214,8 +268,26 @@ export default function QuestionCreation({
                 aria-pressed={isPicked}
                 className="selectable w-full p-4"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <p className="text-gray-800">{question.content.question}</p>
+                <div className="flex items-start gap-3">
+                  {/* Only drawn while voting: a radio is a promise that the
+                      card can be chosen, so it must not appear before it can. */}
+                  {inVoting && (
+                    <span
+                      aria-hidden="true"
+                      className={`mt-0.5 shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${
+                        isPicked
+                          ? 'border-blue-600 bg-blue-600'
+                          : 'border-gray-300'
+                      }`}
+                    >
+                      {isPicked && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                      )}
+                    </span>
+                  )}
+                  <p className="flex-1 text-gray-800">
+                    {question.content.question}
+                  </p>
                   {votes > 0 && (
                     <span className="shrink-0 text-xs bg-white border border-gray-200 text-gray-600 rounded-full px-2 py-0.5">
                       {votes}
@@ -223,7 +295,11 @@ export default function QuestionCreation({
                   )}
                 </div>
                 {question.isMine && (
-                  <p className="text-xs font-medium text-blue-600 mt-1">
+                  <p
+                    className={`text-xs font-medium text-blue-600 mt-1 ${
+                      inVoting ? 'ml-7' : ''
+                    }`}
+                  >
                     Your question
                   </p>
                 )}
@@ -240,31 +316,40 @@ export default function QuestionCreation({
       )}
 
       <div className="flex items-center justify-end gap-3 mt-6">
-        {!inVoting && !everyoneSubmitted && questions.length > 0 && (
-          <span className="text-sm text-gray-500">
-            Waiting for everyone to submit…
-          </span>
-        )}
-
         {!inVoting && everyoneSubmitted && (
           <button
             type="button"
             onClick={() => void voting.start(1)}
             className="btn btn-primary"
           >
-            Start voting
+            <Vote className="h-4 w-4" />
+            Start voting for the team
           </button>
         )}
 
         {inVoting && (
-          <button
-            type="button"
-            disabled={!picked || picked === voting.myVote[0]}
-            onClick={() => picked && void voting.castVote([picked])}
-            className="btn btn-primary"
-          >
-            {voting.myVote.length > 0 ? 'Change vote' : 'Submit vote'}
-          </button>
+          <>
+            {voting.myVote.length > 0 ? (
+              <span className="flex items-center gap-1.5 text-sm text-blue-700">
+                <Check className="h-4 w-4" />
+                Vote saved
+              </span>
+            ) : (
+              !picked && (
+                <span className="text-sm text-gray-500">
+                  Pick a question above first
+                </span>
+              )
+            )}
+            <button
+              type="button"
+              disabled={!picked || picked === voting.myVote[0]}
+              onClick={() => picked && void voting.castVote([picked])}
+              className="btn btn-primary"
+            >
+              {voting.myVote.length > 0 ? 'Change vote' : 'Submit vote'}
+            </button>
+          </>
         )}
       </div>
     </div>
