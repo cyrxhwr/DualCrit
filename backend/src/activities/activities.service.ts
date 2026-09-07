@@ -17,6 +17,10 @@ export interface ActivitySummary {
   currentStep: string | null;
   startedAt: string | null;
   selectedScenarioTag: string | null;
+  selectedPovContent: string | null;
+  selectedHmwContents: string[] | null;
+  /** True once the host has recorded the team's needs and insights. */
+  needsInsightsSet: boolean;
   selectedQuestionContent: string | null;
   isHost: boolean;
   members: string[];
@@ -32,6 +36,9 @@ interface ActivityRow {
   updated_at: string;
   selected_scenario_tag: string | null;
   selected_question_content: string | null;
+  selected_pov_content: string | null;
+  selected_hmw_contents: string[] | null;
+  pov_hmw_data: { activity_id: string } | { activity_id: string }[] | null;
   started_at: string | null;
 }
 
@@ -71,7 +78,7 @@ export class ActivitiesService {
       await this.supabase.client
         .from('activities')
         .select(
-          'id, code, name, type, status, max_participants, updated_at, selected_scenario_tag, selected_question_content, started_at',
+          'id, code, name, type, status, max_participants, updated_at, selected_scenario_tag, selected_question_content, selected_pov_content, selected_hmw_contents, started_at, pov_hmw_data(activity_id)',
         )
         .in('id', activityIds)
         .neq('status', 'archived')
@@ -112,6 +119,13 @@ export class ActivitiesService {
         startedAt: a.started_at,
         selectedScenarioTag: a.selected_scenario_tag,
         selectedQuestionContent: a.selected_question_content,
+        selectedPovContent: a.selected_pov_content,
+        selectedHmwContents: a.selected_hmw_contents,
+        // PostgREST returns an embedded one-to-one as an object, but an array
+        // if it decides the relationship is to-many; accept either.
+        needsInsightsSet: Array.isArray(a.pov_hmw_data)
+          ? a.pov_hmw_data.length > 0
+          : a.pov_hmw_data !== null,
         currentStep: (membership?.current_step as string | null) ?? null,
         isHost: Boolean(membership?.is_host),
         members: namesByActivity.get(a.id) ?? [],
@@ -135,7 +149,7 @@ export class ActivitiesService {
       .from('activities')
       .insert({ name, type, host_id: studentUuid })
       .select(
-        'id, code, name, type, status, max_participants, updated_at, selected_scenario_tag, selected_question_content, started_at',
+        'id, code, name, type, status, max_participants, updated_at, selected_scenario_tag, selected_question_content, selected_pov_content, selected_hmw_contents, started_at, pov_hmw_data(activity_id)',
       )
       .single<ActivityRow>();
 
@@ -157,7 +171,7 @@ export class ActivitiesService {
     const { data: activity, error } = await this.supabase.client
       .from('activities')
       .select(
-        'id, code, name, type, status, max_participants, updated_at, selected_scenario_tag, selected_question_content, started_at',
+        'id, code, name, type, status, max_participants, updated_at, selected_scenario_tag, selected_question_content, selected_pov_content, selected_hmw_contents, started_at, pov_hmw_data(activity_id)',
       )
       .eq('code', code)
       .eq('status', 'active')

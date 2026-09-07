@@ -50,11 +50,22 @@ export class ContributionsController {
     @Body() dto: SubmitContributionDto,
   ) {
     const contributionType = parseType(type);
+
+    // A POV is a statement, not a question, and the readers downstream —
+    // the evaluator and the POV screen — look for it under that key. Storing
+    // everything as `question` left them reading an empty string, so every
+    // POV was scored as if it were blank.
+    const text = dto.text.trim();
+    const content =
+      contributionType === 'pov_statement'
+        ? { statement: text }
+        : { question: text };
+
     const mine = await this.contributions.submit(
       id,
       student.id,
       contributionType,
-      { question: dto.text.trim() },
+      content,
       dto.orderIndex ?? 1,
     );
 

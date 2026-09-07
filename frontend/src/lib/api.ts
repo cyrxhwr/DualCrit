@@ -81,6 +81,10 @@ export interface Activity {
   startedAt: string | null;
   selectedScenarioTag: string | null;
   selectedQuestionContent: string | null;
+  selectedPovContent: string | null;
+  selectedHmwContents: string[] | null;
+  /** True once the host has recorded the team's needs and insights. */
+  needsInsightsSet: boolean;
   isHost: boolean;
   members: string[];
 }
@@ -126,6 +130,32 @@ export interface StoredEvaluation {
     /** Interview feedback: the five rubric scores. */
     criteria?: Criterion[];
   };
+}
+
+/** The team's shared research, recorded once by the host. */
+export interface PovHmwData {
+  needs: string[];
+  insights: string[];
+  /** False until the host has recorded them, which gates the POV step. */
+  isSet: boolean;
+}
+
+/** One rubric line. POV and HMW share the shape, so one renderer serves both. */
+export interface RubricCriterion {
+  standard: string;
+  reason: string;
+  score: number;
+}
+
+/** A statement or question with its rubric scores. */
+export interface ScoredItem {
+  text: string;
+  isSelected: boolean;
+  criteria: RubricCriterion[];
+}
+
+export interface ScoredSet {
+  items: ScoredItem[];
 }
 
 export interface InterviewMessage {
@@ -271,4 +301,25 @@ export const api = {
       method: 'POST',
       body: { optionIds },
     }),
+
+  povHmwData: (activityId: string) =>
+    request<PovHmwData>(`/activities/${activityId}/pov-hmw`),
+
+  setNeedsInsights: (activityId: string, needs: string[], insights: string[]) =>
+    request<PovHmwData>(`/activities/${activityId}/pov-hmw`, {
+      method: 'POST',
+      body: { needs, insights },
+    }),
+
+  povFeedback: (activityId: string) =>
+    request<{ evaluation: { feedback: ScoredSet } | null }>(
+      `/activities/${activityId}/evaluations/pov`,
+      { method: 'POST' },
+    ),
+
+  hmwFeedback: (activityId: string) =>
+    request<{
+      mine: { feedback: ScoredSet } | null;
+      team: { feedback: ScoredSet } | null;
+    }>(`/activities/${activityId}/evaluations/hmw`, { method: 'POST' }),
 };

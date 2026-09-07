@@ -12,6 +12,11 @@ import Interview from './Interview';
 import PeerReview from './PeerReview';
 import InterviewFeedback from './InterviewFeedback';
 import Summary from './Summary';
+import NeedsInsights from './NeedsInsights';
+import PovCreation from './PovCreation';
+import PovFeedback from './PovFeedback';
+import HmwCreation from './HmwCreation';
+import HmwFeedback from './HmwFeedback';
 
 type Step =
   | 'lobby'
@@ -21,7 +26,13 @@ type Step =
   | 'interview'
   | 'peer-review'
   | 'my-feedback'
-  | 'summary';
+  | 'summary'
+  // POV & HMW workflow
+  | 'needs-insights'
+  | 'pov'
+  | 'pov-feedback'
+  | 'hmw'
+  | 'hmw-feedback';
 
 /**
  * Which step to show.
@@ -37,6 +48,9 @@ function deriveStep(activity: Activity | null): Step {
   // together, because the step follows what the team has finished rather than
   // anything held on one student's screen.
   if (!activity.startedAt) return 'lobby';
+
+  if (activity.type === 'pov_hmw') return derivePovHmwStep(activity);
+
   if (!activity.selectedScenarioTag) return 'scenario';
   if (!activity.selectedQuestionContent) return 'question';
   // From here the workflow is per student, so it follows their own recorded
@@ -46,6 +60,23 @@ function deriveStep(activity: Activity | null): Step {
   if (activity.currentStep === 'peer-review') return 'peer-review';
   if (activity.currentStep === 'interview') return 'interview';
   return 'feedback';
+}
+
+/**
+ * The POV & HMW workflow.
+ *
+ * Same principle as the interview: the team-level facts decide first, so
+ * everyone moves together and a reload lands in the right place. `currentStep`
+ * only separates the two screens that sit between one team decision and the
+ * next.
+ */
+function derivePovHmwStep(activity: Activity): Step {
+  if (!activity.needsInsightsSet) return 'needs-insights';
+  if (!activity.selectedPovContent) return 'pov';
+  if ((activity.selectedHmwContents?.length ?? 0) === 0) {
+    return activity.currentStep === 'hmw' ? 'hmw' : 'pov-feedback';
+  }
+  return 'hmw-feedback';
 }
 
 export default function ActivityRoom() {
@@ -179,6 +210,42 @@ export default function ActivityRoom() {
             <Summary activityId={id} onFinish={() => navigate('/')} />
           )}
 
+          {/* ------------------------------------------- POV & HMW workflow */}
+
+          {activity && step === 'needs-insights' && id && (
+            <NeedsInsights
+              activityId={id}
+              isHost={activity.isHost}
+              onDone={() => void loadActivity()}
+            />
+          )}
+
+          {activity && step === 'pov' && id && (
+            <PovCreation
+              activityId={id}
+              onDecided={() => void loadActivity()}
+            />
+          )}
+
+          {activity && step === 'pov-feedback' && id && (
+            <PovFeedback
+              activityId={id}
+              onContinue={() => void goToStep('hmw')}
+            />
+          )}
+
+          {activity && step === 'hmw' && id && (
+            <HmwCreation
+              activityId={id}
+              pov={activity.selectedPovContent}
+              onDecided={() => void loadActivity()}
+            />
+          )}
+
+          {activity && step === 'hmw-feedback' && id && (
+            <HmwFeedback activityId={id} onContinue={() => navigate('/')} />
+          )}
+
           {activity && step === 'lobby' && (
             <>
               <div className="flex items-center gap-3 mb-6">
@@ -272,12 +339,7 @@ export default function ActivityRoom() {
                   <button
                     type="button"
                     onClick={() => void begin()}
-                    disabled={starting || activity.type !== 'interview'}
-                    title={
-                      activity.type === 'interview'
-                        ? undefined
-                        : 'The POV & HMW workflow is not built yet'
-                    }
+                    disabled={starting}
                     className="btn btn-primary"
                   >
                     {starting ? 'Starting…' : 'Start activity'}

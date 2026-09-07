@@ -192,7 +192,6 @@ export default function Dashboard() {
                 'pov_hmw',
                 Target,
                 'Needs and insights, POV statements, then HMW questions',
-                true,
               )}
             </div>
 
