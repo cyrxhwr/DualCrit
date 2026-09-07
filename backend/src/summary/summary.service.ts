@@ -5,6 +5,7 @@ import type {
   Criterion,
   FeedbackItem,
 } from '../evaluations/evaluations.service';
+import type { ScoredSet } from '../evaluations/pov-hmw-evaluations.service';
 
 interface Message {
   role: 'student' | 'persona';
@@ -20,6 +21,29 @@ export interface SessionSummary {
   transcript: Message[];
   criteria: Criterion[];
   questionCount: number;
+  summaryText: string;
+  /** False when the summary could be shown but not stored. */
+  saved: boolean;
+}
+
+/**
+ * The POV & HMW equivalent.
+ *
+ * Both halves of each step are here: what this student wrote and what the team
+ * settled on, so the summary shows the comparison the workflow is built around.
+ */
+export interface PovHmwSummary {
+  activityName: string;
+  needs: string[];
+  insights: string[];
+  myPov: string | null;
+  teamPov: string | null;
+  /** Every member's statement, scored together. Anonymous, as on the step. */
+  povFeedback: ScoredSet | null;
+  myHmw: string[];
+  teamHmw: string[];
+  myHmwFeedback: ScoredSet | null;
+  teamHmwFeedback: ScoredSet | null;
   summaryText: string;
   /** False when the summary could be shown but not stored. */
   saved: boolean;
@@ -91,7 +115,7 @@ export class SummaryService {
     activityId: string,
     studentUuid: string,
     summaryText: string,
-    questionCount: number,
+    questionCount: number | null,
   ): Promise<boolean> {
     const { error } = await this.supabase.client
       .from('interview_summaries')
@@ -250,6 +274,254 @@ export class SummaryService {
     return {
       questionFeedback: team?.processed_scores.feedback ?? [],
       criteria: mine?.processed_scores.criteria ?? [],
+    };
+  }
+
+  // ----------------------------------------------------------- POV & HMW
+
+  /**
+   * The POV & HMW equivalent of build().
+   *
+   * Same principle: every part was written down when it happened, so this is a
+   * read rather than a regeneration and cannot drift from what the student was
+   * shown. It shares interview_summaries, keyed by (activity, student) — an
+   * activity is one type or the other, so the two never collide.
+   */
+  async buildPovHmw(
+    activityId: string,
+    studentUuid: string,
+  ): Promise<PovHmwSummary> {
+    await this.activities.assertMember(activityId, studentUuid);
+
+    const [activity, research, contributions, evaluations] = await Promise.all([
+      this.loadPovHmwActivity(activityId),
+      this.loadResearch(activityId),
+      this.loadPovHmwContributions(activityId, studentUuid),
+      this.loadPovHmwEvaluations(activityId, studentUuid),
+    ]);
+
+    const summary: Omit<PovHmwSummary, 'summaryText' | 'saved'> = {
+      activityName: activity.name,
+      needs: research.needs,
+      insights: research.insights,
+      myPov: contributions.myPov,
+      teamPov: activity.selected_pov_content,
+      povFeedback: evaluations.povFeedback,
+      myHmw: contributions.myHmw,
+      teamHmw: activity.selected_hmw_contents ?? contributions.teamHmw,
+      myHmwFeedback: evaluations.myHmwFeedback,
+      teamHmwFeedback: evaluations.teamHmwFeedback,
+    };
+
+    const summaryText = this.renderPovHmw(summary);
+    const saved = await this.store(activityId, studentUuid, summaryText, null);
+
+    return { ...summary, summaryText, saved };
+  }
+
+  private renderPovHmw(
+    s: Omit<PovHmwSummary, 'summaryText' | 'saved'>,
+  ): string {
+    const lines: string[] = [`# ${s.activityName}`, ''];
+    const list = (items: string[]) => items.map((t, i) => `${i + 1}. ${t}`);
+
+    if (s.needs.length > 0) {
+      lines.push("## My team's needs", '', ...list(s.needs), '');
+    }
+    if (s.insights.length > 0) {
+      lines.push("## My team's insights", '', ...list(s.insights), '');
+    }
+
+    if (s.teamPov) {
+      lines.push('## The POV statement my team chose', '', s.teamPov, '');
+    }
+
+    if (
+      !this.renderScored(
+        lines,
+        "## Feedback on my team's POV statements",
+        s.povFeedback,
+        s.myPov,
+      ) &&
+      s.myPov
+    ) {
+      lines.push('## The POV statement I wrote', '', s.myPov, '');
+    }
+
+    if (
+      !this.renderScored(
+        lines,
+        '## Feedback on my HMW questions',
+        s.myHmwFeedback,
+      ) &&
+      s.myHmw.length > 0
+    ) {
+      lines.push('## The HMW questions I wrote', '', ...list(s.myHmw), '');
+    }
+
+    if (
+      !this.renderScored(
+        lines,
+        "## Feedback on my team's HMW questions",
+        s.teamHmwFeedback,
+        s.myHmw,
+      ) &&
+      s.teamHmw.length > 0
+    ) {
+      lines.push(
+        '## The HMW questions my team chose',
+        '',
+        ...list(s.teamHmw),
+        '',
+      );
+    }
+
+    return lines.join('\n').trim();
+  }
+
+  /**
+   * One scored set as markdown.
+   *
+   * `mine` is matched on the text because the sets are anonymous — the stored
+   * evaluation deliberately carries no authorship, so the student's own entries
+   * can only be found by what they wrote. Returns false when there was nothing
+   * to write, which is what makes the plain list a fallback rather than a
+   * duplicate.
+   */
+  private renderScored(
+    lines: string[],
+    heading: string,
+    set: ScoredSet | null,
+    mine?: string | string[] | null,
+  ): boolean {
+    if (!set || set.items.length === 0) return false;
+
+    const ours = mine == null ? [] : Array.isArray(mine) ? mine : [mine];
+
+    lines.push(heading, '');
+    for (const item of set.items) {
+      const tags = [
+        ours.includes(item.text) ? 'mine' : null,
+        item.isSelected ? "my team's choice" : null,
+      ].filter(Boolean);
+
+      lines.push(
+        `### ${item.text}${tags.length > 0 ? ` _(${tags.join(', ')})_` : ''}`,
+        '',
+      );
+      for (const criterion of item.criteria) {
+        lines.push(
+          `- **${criterion.standard} — ${criterion.score}/5** — ${criterion.reason}`,
+        );
+      }
+      lines.push('');
+    }
+    return true;
+  }
+
+  private async loadPovHmwActivity(activityId: string) {
+    const { data, error } = await this.supabase.client
+      .from('activities')
+      .select('name, selected_pov_content, selected_hmw_contents')
+      .eq('id', activityId)
+      .single<{
+        name: string;
+        selected_pov_content: string | null;
+        selected_hmw_contents: string[] | null;
+      }>();
+
+    if (error) throw new BadRequestException(error.message);
+    return data;
+  }
+
+  private async loadResearch(
+    activityId: string,
+  ): Promise<{ needs: string[]; insights: string[] }> {
+    const { data, error } = await this.supabase.client
+      .from('pov_hmw_data')
+      .select('needs, insights')
+      .eq('activity_id', activityId)
+      .maybeSingle<{ needs: string[] | null; insights: string[] | null }>();
+
+    if (error) throw new BadRequestException(error.message);
+    return { needs: data?.needs ?? [], insights: data?.insights ?? [] };
+  }
+
+  private async loadPovHmwContributions(
+    activityId: string,
+    studentUuid: string,
+  ): Promise<{ myPov: string | null; myHmw: string[]; teamHmw: string[] }> {
+    const { data, error } = await this.supabase.client
+      .from('contributions')
+      .select('student_id, type, content, is_selected, order_index')
+      .eq('activity_id', activityId)
+      .in('type', ['pov_statement', 'hmw_question'])
+      .order('order_index', { ascending: true })
+      .order('id', { ascending: true });
+
+    if (error) throw new BadRequestException(error.message);
+
+    const rows = (data ?? []) as {
+      student_id: string;
+      type: string;
+      content: { statement?: string; question?: string };
+      is_selected: boolean;
+    }[];
+
+    const hmw = rows.filter((r) => r.type === 'hmw_question');
+
+    return {
+      myPov:
+        rows.find(
+          (r) => r.type === 'pov_statement' && r.student_id === studentUuid,
+        )?.content.statement ?? null,
+      myHmw: hmw
+        .filter((r) => r.student_id === studentUuid)
+        .map((r) => r.content.question ?? ''),
+      teamHmw: hmw
+        .filter((r) => r.is_selected)
+        .map((r) => r.content.question ?? ''),
+    };
+  }
+
+  private async loadPovHmwEvaluations(
+    activityId: string,
+    studentUuid: string,
+  ): Promise<{
+    povFeedback: ScoredSet | null;
+    myHmwFeedback: ScoredSet | null;
+    teamHmwFeedback: ScoredSet | null;
+  }> {
+    const { data, error } = await this.supabase.client
+      .from('ai_evaluations')
+      .select('evaluation_type, scope, student_id, processed_scores')
+      .eq('activity_id', activityId)
+      .in('evaluation_type', ['pov_feedback', 'hmw_feedback']);
+
+    if (error) throw new BadRequestException(error.message);
+
+    const rows = (data ?? []) as {
+      evaluation_type: string;
+      scope: 'team' | 'user';
+      student_id: string | null;
+      processed_scores: ScoredSet;
+    }[];
+
+    const pick = (type: string, scope: 'team' | 'user', student?: string) =>
+      rows.find(
+        (r) =>
+          r.evaluation_type === type &&
+          r.scope === scope &&
+          (scope === 'team' || r.student_id === student),
+      )?.processed_scores ?? null;
+
+    // The POV evaluation is the team's single pass over every statement; the
+    // HMW step produces two, and the personal one is matched on this student
+    // so it never falls back to somebody else's.
+    return {
+      povFeedback: pick('pov_feedback', 'team'),
+      myHmwFeedback: pick('hmw_feedback', 'user', studentUuid),
+      teamHmwFeedback: pick('hmw_feedback', 'team'),
     };
   }
 }

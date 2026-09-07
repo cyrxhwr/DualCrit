@@ -97,7 +97,7 @@ export default function HmwFeedback({ activityId, onContinue }: Props) {
           disabled={loading}
           className="btn btn-primary"
         >
-          Back to my activities
+          See my summary
         </button>
       </div>
     </div>

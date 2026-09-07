@@ -158,6 +158,23 @@ export interface ScoredSet {
   items: ScoredItem[];
 }
 
+/** The POV & HMW equivalent of SessionSummary. */
+export interface PovHmwSummary {
+  activityName: string;
+  needs: string[];
+  insights: string[];
+  myPov: string | null;
+  teamPov: string | null;
+  povFeedback: ScoredSet | null;
+  myHmw: string[];
+  teamHmw: string[];
+  myHmwFeedback: ScoredSet | null;
+  teamHmwFeedback: ScoredSet | null;
+  summaryText: string;
+  /** False when the summary could be shown but not stored. */
+  saved: boolean;
+}
+
 export interface InterviewMessage {
   role: 'student' | 'persona';
   text: string;
@@ -322,4 +339,7 @@ export const api = {
       mine: { feedback: ScoredSet } | null;
       team: { feedback: ScoredSet } | null;
     }>(`/activities/${activityId}/evaluations/hmw`, { method: 'POST' }),
+
+  povHmwSummary: (activityId: string) =>
+    request<PovHmwSummary>(`/activities/${activityId}/summary/pov-hmw`),
 };

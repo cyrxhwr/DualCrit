@@ -6,6 +6,11 @@ interface Props {
   item: ScoredItem;
   /** Wording for the badge on the entry the team voted for. */
   selectedLabel?: string;
+  /**
+   * Marks this as the reader's own. Only used after the vote has closed —
+   * during voting the sets stay anonymous.
+   */
+  isMine?: boolean;
 }
 
 const mean = (item: ScoredItem) =>
@@ -19,7 +24,7 @@ const mean = (item: ScoredItem) =>
  * POV and HMW are scored on different standards but share this shape, so the
  * two feedback screens render through one component and stay consistent.
  */
-export default function ScoredItemCard({ item, selectedLabel }: Props) {
+export default function ScoredItemCard({ item, selectedLabel, isMine }: Props) {
   const average = mean(item);
 
   return (
@@ -34,8 +39,13 @@ export default function ScoredItemCard({ item, selectedLabel }: Props) {
         </span>
       </div>
 
-      {item.isSelected && selectedLabel && (
-        <span className="badge badge-brand mb-3">{selectedLabel}</span>
+      {(isMine || (item.isSelected && selectedLabel)) && (
+        <div className="flex flex-wrap gap-2 mb-3">
+          {isMine && <span className="badge badge-accent">Yours</span>}
+          {item.isSelected && selectedLabel && (
+            <span className="badge badge-brand">{selectedLabel}</span>
+          )}
+        </div>
       )}
 
       <dl className="space-y-3 mt-3">

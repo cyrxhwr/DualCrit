@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Check, Copy, Download, Star } from 'lucide-react';
+import { AlertTriangle, Star } from 'lucide-react';
 import { api, type SessionSummary } from '../lib/api';
 import { scenarioByTag } from '../lib/scenarios';
 import { describeMistake, isNoIssue } from '../lib/rubric';
 import { withEmphasis } from '../lib/emphasis';
 import { initialOf } from '../lib/name';
 import { useAuth } from '../lib/auth';
+import SummaryActions from '../components/SummaryActions';
 
 interface Props {
   activityId: string;
@@ -22,7 +23,6 @@ export default function Summary({ activityId, onFinish }: Props) {
   const { student } = useAuth();
   const [summary, setSummary] = useState<SessionSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     api
@@ -32,30 +32,6 @@ export default function Summary({ activityId, onFinish }: Props) {
         setError(err instanceof Error ? err.message : 'Could not load summary'),
       );
   }, [activityId]);
-
-  const copy = async () => {
-    if (!summary) return;
-    try {
-      await navigator.clipboard.writeText(summary.summaryText);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1600);
-    } catch {
-      setError('Your browser would not let the page copy to the clipboard');
-    }
-  };
-
-  const download = () => {
-    if (!summary) return;
-    const blob = new Blob([summary.summaryText], {
-      type: 'text/markdown;charset=utf-8',
-    });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${summary.activityName.replace(/[^\w-]+/g, '-')}-summary.md`;
-    link.click();
-    URL.revokeObjectURL(url);
-  };
 
   if (error && !summary) {
     return <p className="note note-error">{error}</p>;
@@ -76,28 +52,11 @@ export default function Summary({ activityId, onFinish }: Props) {
         <h2 className="text-lg font-semibold text-gray-800">
           Your session summary
         </h2>
-        <div className="flex gap-2 shrink-0">
-          <button
-            type="button"
-            onClick={() => void copy()}
-            className="btn btn-quiet px-3 py-1.5"
-          >
-            {copied ? (
-              <Check className="h-4 w-4 text-blue-600" />
-            ) : (
-              <Copy className="h-4 w-4" />
-            )}
-            {copied ? 'Copied' : 'Copy'}
-          </button>
-          <button
-            type="button"
-            onClick={download}
-            className="btn btn-quiet px-3 py-1.5"
-          >
-            <Download className="h-4 w-4" />
-            Download
-          </button>
-        </div>
+        <SummaryActions
+          text={summary.summaryText}
+          activityName={summary.activityName}
+          onError={setError}
+        />
       </div>
       {scenario && (
         <p className="text-sm text-gray-500 mb-5">

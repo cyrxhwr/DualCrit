@@ -17,6 +17,7 @@ import PovCreation from './PovCreation';
 import PovFeedback from './PovFeedback';
 import HmwCreation from './HmwCreation';
 import HmwFeedback from './HmwFeedback';
+import PovHmwSummary from './PovHmwSummary';
 
 type Step =
   | 'lobby'
@@ -32,7 +33,8 @@ type Step =
   | 'pov'
   | 'pov-feedback'
   | 'hmw'
-  | 'hmw-feedback';
+  | 'hmw-feedback'
+  | 'hmw-summary';
 
 /**
  * Which step to show.
@@ -76,7 +78,9 @@ function derivePovHmwStep(activity: Activity): Step {
   if ((activity.selectedHmwContents?.length ?? 0) === 0) {
     return activity.currentStep === 'hmw' ? 'hmw' : 'pov-feedback';
   }
-  return 'hmw-feedback';
+  return activity.currentStep === 'hmw-summary'
+    ? 'hmw-summary'
+    : 'hmw-feedback';
 }
 
 export default function ActivityRoom() {
@@ -243,7 +247,14 @@ export default function ActivityRoom() {
           )}
 
           {activity && step === 'hmw-feedback' && id && (
-            <HmwFeedback activityId={id} onContinue={() => navigate('/')} />
+            <HmwFeedback
+              activityId={id}
+              onContinue={() => void goToStep('hmw-summary')}
+            />
+          )}
+
+          {activity && step === 'hmw-summary' && id && (
+            <PovHmwSummary activityId={id} onFinish={() => navigate('/')} />
           )}
 
           {activity && step === 'lobby' && (
