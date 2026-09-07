@@ -9,6 +9,8 @@ import type { StoredEvaluation } from './evaluations.service';
 export interface Criterion {
   standard: string;
   reason: string;
+  /** One concrete action, or "" when the entry is already fully met. */
+  nextStep?: string;
   score: number;
 }
 

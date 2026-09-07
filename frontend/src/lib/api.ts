@@ -116,6 +116,8 @@ export interface Criterion {
   standard: string;
   score: number;
   response: string;
+  /** One concrete action, or "" when the entry is already fully met. */
+  nextStep?: string;
 }
 
 export interface StoredEvaluation {
@@ -126,7 +128,7 @@ export interface StoredEvaluation {
   createdAt: string;
   feedback: {
     /** Question feedback: one entry per rubric violation, or a single "None". */
-    feedback?: { mistake: string; explanation: string }[];
+    feedback?: { mistake: string; explanation: string; nextStep?: string }[];
     /** Interview feedback: the five rubric scores. */
     criteria?: Criterion[];
   };
@@ -145,6 +147,8 @@ export interface RubricCriterion {
   standard: string;
   reason: string;
   score: number;
+  /** One concrete action, or "" when the entry is already fully met. */
+  nextStep?: string;
 }
 
 /** A statement or question with its rubric scores. */
@@ -158,6 +162,16 @@ export interface ScoredSet {
   items: ScoredItem[];
 }
 
+/**
+ * A scored entry with authorship attached.
+ *
+ * The stored evaluations carry none — that is what keeps voting anonymous — so
+ * the server works this out per reader when it assembles the summary.
+ */
+export interface SummaryScoredItem extends ScoredItem {
+  isMine: boolean;
+}
+
 /** The POV & HMW equivalent of SessionSummary. */
 export interface PovHmwSummary {
   activityName: string;
@@ -165,11 +179,11 @@ export interface PovHmwSummary {
   insights: string[];
   myPov: string | null;
   teamPov: string | null;
-  povFeedback: ScoredSet | null;
+  povFeedback: SummaryScoredItem[];
   myHmw: string[];
   teamHmw: string[];
-  myHmwFeedback: ScoredSet | null;
-  teamHmwFeedback: ScoredSet | null;
+  /** The team's chosen questions and the student's own, merged into one set. */
+  hmwFeedback: SummaryScoredItem[];
   summaryText: string;
   /** False when the summary could be shown but not stored. */
   saved: boolean;
@@ -208,7 +222,11 @@ export interface SessionSummary {
   scenarioTag: string | null;
   myQuestion: string | null;
   teamQuestion: string | null;
-  questionFeedback: { mistake: string; explanation: string }[];
+  questionFeedback: {
+    mistake: string;
+    explanation: string;
+    nextStep?: string;
+  }[];
   transcript: { role: 'student' | 'persona'; text: string }[];
   criteria: Criterion[];
   questionCount: number;

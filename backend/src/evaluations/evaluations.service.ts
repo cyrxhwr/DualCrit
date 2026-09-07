@@ -8,6 +8,8 @@ import { consensus, EVAL_SAMPLES } from './consensus';
 export interface FeedbackItem {
   mistake: string;
   explanation: string;
+  /** One concrete action, or "" when the entry is already fully met. */
+  nextStep?: string;
 }
 
 export interface QuestionFeedback {
@@ -18,6 +20,8 @@ export interface Criterion {
   standard: string;
   score: number;
   response: string;
+  /** One concrete action, or "" when the entry is already fully met. */
+  nextStep?: string;
 }
 
 export interface InterviewFeedback {

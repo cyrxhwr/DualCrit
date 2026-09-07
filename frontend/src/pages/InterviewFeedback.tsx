@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Sparkles, Star } from 'lucide-react';
 import { api, type StoredEvaluation } from '../lib/api';
 import { withEmphasis } from '../lib/emphasis';
+import NextStep from '../components/NextStep';
 
 interface Props {
   activityId: string;
@@ -99,6 +100,7 @@ export default function InterviewFeedback({ activityId, onContinue }: Props) {
                 {withEmphasis(criterion.response)}
               </p>
             </div>
+            <NextStep text={criterion.nextStep} />
           </article>
         ))}
       </div>

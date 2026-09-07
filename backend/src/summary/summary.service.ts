@@ -5,7 +5,10 @@ import type {
   Criterion,
   FeedbackItem,
 } from '../evaluations/evaluations.service';
-import type { ScoredSet } from '../evaluations/pov-hmw-evaluations.service';
+import type {
+  ScoredItem,
+  ScoredSet,
+} from '../evaluations/pov-hmw-evaluations.service';
 
 interface Message {
   role: 'student' | 'persona';
@@ -32,18 +35,36 @@ export interface SessionSummary {
  * Both halves of each step are here: what this student wrote and what the team
  * settled on, so the summary shows the comparison the workflow is built around.
  */
+/**
+ * A scored entry with the reader's own authorship attached.
+ *
+ * The stored evaluations carry no authorship — that is what keeps voting
+ * anonymous — so this is worked out per reader at read time and never written
+ * back.
+ */
+export interface SummaryScoredItem extends ScoredItem {
+  isMine: boolean;
+}
+
 export interface PovHmwSummary {
   activityName: string;
   needs: string[];
   insights: string[];
   myPov: string | null;
   teamPov: string | null;
-  /** Every member's statement, scored together. Anonymous, as on the step. */
-  povFeedback: ScoredSet | null;
+  /** Every member's statement, scored together. */
+  povFeedback: SummaryScoredItem[];
   myHmw: string[];
   teamHmw: string[];
-  myHmwFeedback: ScoredSet | null;
-  teamHmwFeedback: ScoredSet | null;
+  /**
+   * The team's chosen questions and the student's own, merged into one set.
+   *
+   * A question that is both was previously scored twice — once in the team's
+   * evaluation and once in the student's — by two separate model calls that
+   * could disagree about the same words. The team's scores win here, so a
+   * chosen question reads the same for everyone looking at it.
+   */
+  hmwFeedback: SummaryScoredItem[];
   summaryText: string;
   /** False when the summary could be shown but not stored. */
   saved: boolean;
@@ -155,6 +176,9 @@ export class SummaryService {
       lines.push('## Feedback on the team question', '');
       for (const item of s.questionFeedback) {
         lines.push(`- **${item.mistake}** — ${item.explanation}`);
+        if (item.nextStep?.trim()) {
+          lines.push(`  - Try next: ${item.nextStep}`);
+        }
       }
       lines.push('');
     }
@@ -178,6 +202,9 @@ export class SummaryService {
           criterion.response,
           '',
         );
+        if (criterion.nextStep?.trim()) {
+          lines.push(`**Try next:** ${criterion.nextStep}`, '');
+        }
       }
     }
 
@@ -306,17 +333,58 @@ export class SummaryService {
       insights: research.insights,
       myPov: contributions.myPov,
       teamPov: activity.selected_pov_content,
-      povFeedback: evaluations.povFeedback,
+      povFeedback: this.markMine(evaluations.povFeedback, [
+        contributions.myPov,
+      ]),
       myHmw: contributions.myHmw,
       teamHmw: activity.selected_hmw_contents ?? contributions.teamHmw,
-      myHmwFeedback: evaluations.myHmwFeedback,
-      teamHmwFeedback: evaluations.teamHmwFeedback,
+      hmwFeedback: this.mergeHmw(
+        evaluations.teamHmwFeedback,
+        evaluations.myHmwFeedback,
+        contributions.myHmw,
+      ),
     };
 
     const summaryText = this.renderPovHmw(summary);
     const saved = await this.store(activityId, studentUuid, summaryText, null);
 
     return { ...summary, summaryText, saved };
+  }
+
+  /** Attach authorship by matching the text, since the sets carry none. */
+  private markMine(
+    set: ScoredSet | null,
+    myTexts: (string | null)[],
+  ): SummaryScoredItem[] {
+    const ours = myTexts.filter((t): t is string => Boolean(t));
+    return (set?.items ?? []).map((item) => ({
+      ...item,
+      isMine: ours.includes(item.text),
+    }));
+  }
+
+  /**
+   * One HMW set instead of two overlapping ones.
+   *
+   * The team's evaluation goes in first, so the chosen questions lead and
+   * their scores are the ones everyone sees; the student's own questions that
+   * did not win follow. A question in both appears once.
+   */
+  private mergeHmw(
+    team: ScoredSet | null,
+    mine: ScoredSet | null,
+    myTexts: string[],
+  ): SummaryScoredItem[] {
+    const seen = new Set<string>();
+    const merged: SummaryScoredItem[] = [];
+
+    for (const item of [...(team?.items ?? []), ...(mine?.items ?? [])]) {
+      if (seen.has(item.text)) continue;
+      seen.add(item.text);
+      merged.push({ ...item, isMine: myTexts.includes(item.text) });
+    }
+
+    return merged;
   }
 
   private renderPovHmw(
@@ -341,7 +409,6 @@ export class SummaryService {
         lines,
         "## Feedback on my team's POV statements",
         s.povFeedback,
-        s.myPov,
       ) &&
       s.myPov
     ) {
@@ -351,29 +418,21 @@ export class SummaryService {
     if (
       !this.renderScored(
         lines,
-        '## Feedback on my HMW questions',
-        s.myHmwFeedback,
-      ) &&
-      s.myHmw.length > 0
+        '## Feedback on the HMW questions',
+        s.hmwFeedback,
+      )
     ) {
-      lines.push('## The HMW questions I wrote', '', ...list(s.myHmw), '');
-    }
-
-    if (
-      !this.renderScored(
-        lines,
-        "## Feedback on my team's HMW questions",
-        s.teamHmwFeedback,
-        s.myHmw,
-      ) &&
-      s.teamHmw.length > 0
-    ) {
-      lines.push(
-        '## The HMW questions my team chose',
-        '',
-        ...list(s.teamHmw),
-        '',
-      );
+      if (s.myHmw.length > 0) {
+        lines.push('## The HMW questions I wrote', '', ...list(s.myHmw), '');
+      }
+      if (s.teamHmw.length > 0) {
+        lines.push(
+          '## The HMW questions my team chose',
+          '',
+          ...list(s.teamHmw),
+          '',
+        );
+      }
     }
 
     return lines.join('\n').trim();
@@ -382,26 +441,20 @@ export class SummaryService {
   /**
    * One scored set as markdown.
    *
-   * `mine` is matched on the text because the sets are anonymous — the stored
-   * evaluation deliberately carries no authorship, so the student's own entries
-   * can only be found by what they wrote. Returns false when there was nothing
-   * to write, which is what makes the plain list a fallback rather than a
-   * duplicate.
+   * Returns false when there was nothing to write, which is what makes the
+   * plain lists a fallback rather than a duplicate.
    */
   private renderScored(
     lines: string[],
     heading: string,
-    set: ScoredSet | null,
-    mine?: string | string[] | null,
+    items: SummaryScoredItem[],
   ): boolean {
-    if (!set || set.items.length === 0) return false;
-
-    const ours = mine == null ? [] : Array.isArray(mine) ? mine : [mine];
+    if (items.length === 0) return false;
 
     lines.push(heading, '');
-    for (const item of set.items) {
+    for (const item of items) {
       const tags = [
-        ours.includes(item.text) ? 'mine' : null,
+        item.isMine ? 'mine' : null,
         item.isSelected ? "my team's choice" : null,
       ].filter(Boolean);
 
@@ -413,6 +466,9 @@ export class SummaryService {
         lines.push(
           `- **${criterion.standard} — ${criterion.score}/5** — ${criterion.reason}`,
         );
+        if (criterion.nextStep?.trim()) {
+          lines.push(`  - Try next: ${criterion.nextStep}`);
+        }
       }
       lines.push('');
     }

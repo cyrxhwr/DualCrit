@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
-import { api, type PovHmwSummary as Summary, type ScoredSet } from '../lib/api';
+import {
+  api,
+  type PovHmwSummary as Summary,
+  type SummaryScoredItem,
+} from '../lib/api';
 import ScoredItemCard from '../components/ScoredItemCard';
 import ResearchBrief from '../components/ResearchBrief';
 import SummaryActions from '../components/SummaryActions';
@@ -58,33 +62,23 @@ export default function PovHmwSummary({ activityId, onFinish }: Props) {
       </section>
     );
 
-  const scored = (
-    title: string,
-    blurb: string,
-    set: ScoredSet | null,
-    /** Matched on the text: the stored sets are anonymous by design. */
-    mine?: string | string[] | null,
-  ) => {
-    if (!set || set.items.length === 0) return false;
-    const ours = mine == null ? [] : Array.isArray(mine) ? mine : [mine];
-
-    return (
+  const scored = (title: string, blurb: string, items: SummaryScoredItem[]) =>
+    items.length > 0 && (
       <section>
         <h3 className="text-sm font-semibold text-gray-700">{title}</h3>
         <p className="text-sm text-gray-500 mb-3">{blurb}</p>
         <div className="space-y-4">
-          {set.items.map((item, i) => (
+          {items.map((item, i) => (
             <ScoredItemCard
               key={i}
               item={item}
-              isMine={ours.includes(item.text)}
+              isMine={item.isMine}
               selectedLabel="Your team chose this"
             />
           ))}
         </div>
       </section>
     );
-  };
 
   return (
     <div>
@@ -124,7 +118,6 @@ export default function PovHmwSummary({ activityId, onFinish }: Props) {
           "Feedback on your team's POV statements",
           'Every statement your team wrote, scored together.',
           summary.povFeedback,
-          summary.myPov,
         ) ||
           (summary.myPov && (
             <section>
@@ -136,22 +129,19 @@ export default function PovHmwSummary({ activityId, onFinish }: Props) {
           ))}
 
         {scored(
-          'Feedback on your HMW questions',
-          'The three you wrote, whether or not the team picked them.',
-          summary.myHmwFeedback,
-        ) || list('The HMW questions you wrote', summary.myHmw)}
-
-        {scored(
-          "Feedback on your team's HMW questions",
-          'The three that won the vote — these are the brainstorm seeds.',
-          summary.teamHmwFeedback,
-          summary.myHmw,
-        ) ||
-          list(
-            'The HMW questions your team chose',
-            summary.teamHmw,
-            /* accent */ true,
-          )}
+          'Feedback on the HMW questions',
+          'The three your team chose, and your own — a question that is both appears once.',
+          summary.hmwFeedback,
+        ) || (
+          <>
+            {list('The HMW questions you wrote', summary.myHmw)}
+            {list(
+              'The HMW questions your team chose',
+              summary.teamHmw,
+              /* accent */ true,
+            )}
+          </>
+        )}
       </div>
 
       <div className="flex justify-end mt-8">
