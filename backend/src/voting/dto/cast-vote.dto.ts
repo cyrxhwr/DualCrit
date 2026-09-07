@@ -1,4 +1,9 @@
-import { ArrayMaxSize, ArrayNotEmpty, IsArray, IsString } from 'class-validator';
+import {
+  ArrayMaxSize,
+  ArrayNotEmpty,
+  IsArray,
+  IsString,
+} from 'class-validator';
 
 export class CastVoteDto {
   @IsArray()

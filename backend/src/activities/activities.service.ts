@@ -70,7 +70,9 @@ export class ActivitiesService {
     const { data: activities, error: activitiesError } =
       await this.supabase.client
         .from('activities')
-        .select('id, code, name, type, status, max_participants, updated_at, selected_scenario_tag, selected_question_content, started_at')
+        .select(
+          'id, code, name, type, status, max_participants, updated_at, selected_scenario_tag, selected_question_content, started_at',
+        )
         .in('id', activityIds)
         .neq('status', 'archived')
         .order('updated_at', { ascending: false });
@@ -81,7 +83,9 @@ export class ActivitiesService {
     // rather than a request per activity.
     const { data: members, error: membersError } = await this.supabase.client
       .from('activity_members')
-      .select('activity_id, student_id, is_host, current_step, students(full_name)')
+      .select(
+        'activity_id, student_id, is_host, current_step, students(full_name)',
+      )
       .in('activity_id', activityIds)
       .eq('is_active', true);
 
@@ -130,7 +134,9 @@ export class ActivitiesService {
     const { data: activity, error } = await this.supabase.client
       .from('activities')
       .insert({ name, type, host_id: studentUuid })
-      .select('id, code, name, type, status, max_participants, updated_at, selected_scenario_tag, selected_question_content, started_at')
+      .select(
+        'id, code, name, type, status, max_participants, updated_at, selected_scenario_tag, selected_question_content, started_at',
+      )
       .single<ActivityRow>();
 
     if (error || !activity) {
@@ -150,7 +156,9 @@ export class ActivitiesService {
 
     const { data: activity, error } = await this.supabase.client
       .from('activities')
-      .select('id, code, name, type, status, max_participants, updated_at, selected_scenario_tag, selected_question_content, started_at')
+      .select(
+        'id, code, name, type, status, max_participants, updated_at, selected_scenario_tag, selected_question_content, started_at',
+      )
       .eq('code', code)
       .eq('status', 'active')
       .maybeSingle<ActivityRow>();
@@ -214,7 +222,8 @@ export class ActivitiesService {
         .maybeSingle<{ is_host: boolean }>();
 
     if (membershipError) throw new BadRequestException(membershipError.message);
-    if (!membership) throw new ForbiddenException('You are not in this activity');
+    if (!membership)
+      throw new ForbiddenException('You are not in this activity');
     if (!membership.is_host) {
       throw new ForbiddenException('Only the host can start the activity');
     }

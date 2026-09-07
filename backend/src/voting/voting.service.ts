@@ -326,7 +326,10 @@ export class VotingService {
         .in('id', winners);
 
       const texts = (data ?? []).map((row) => {
-        const content = row.content as { question?: string; statement?: string };
+        const content = row.content as {
+          question?: string;
+          statement?: string;
+        };
         return content.question ?? content.statement ?? '';
       });
 

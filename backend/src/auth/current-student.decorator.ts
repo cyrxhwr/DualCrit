@@ -14,9 +14,7 @@ export interface AuthedStudent {
  */
 export const CurrentStudent = createParamDecorator(
   (_data: unknown, ctx: ExecutionContext): AuthedStudent => {
-    const request = ctx
-      .switchToHttp()
-      .getRequest<{ student: AuthedStudent }>();
+    const request = ctx.switchToHttp().getRequest<{ student: AuthedStudent }>();
     return request.student;
   },
 );

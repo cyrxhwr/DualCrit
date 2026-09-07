@@ -8,6 +8,7 @@ import { ActivitiesModule } from './activities/activities.module';
 import { RealtimeModule } from './realtime/realtime.module';
 import { VotingModule } from './voting/voting.module';
 import { ContributionsModule } from './contributions/contributions.module';
+import { PovHmwModule } from './pov-hmw/pov-hmw.module';
 import { LlmModule } from './llm/llm.module';
 import { EvaluationsModule } from './evaluations/evaluations.module';
 import { InterviewModule } from './interview/interview.module';
@@ -23,6 +24,7 @@ import { HealthController } from './common/health.controller';
     RealtimeModule,
     VotingModule,
     ContributionsModule,
+    PovHmwModule,
     LlmModule,
     EvaluationsModule,
     InterviewModule,

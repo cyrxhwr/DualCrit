@@ -42,7 +42,9 @@ interface SocketState {
     credentials: true,
   },
 })
-export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class RealtimeGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer() private server!: Server;
   private readonly logger = new Logger(RealtimeGateway.name);
 

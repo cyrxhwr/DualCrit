@@ -1,10 +1,20 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+} from '@nestjs/common';
 import { ActivitiesService } from './activities.service';
 import { RealtimeBus } from '../realtime/realtime.bus';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { JoinActivityDto } from './dto/join-activity.dto';
 import { SetStepDto } from './dto/set-step.dto';
-import { AuthedStudent, CurrentStudent } from '../auth/current-student.decorator';
+import {
+  AuthedStudent,
+  CurrentStudent,
+} from '../auth/current-student.decorator';
 
 @Controller('activities')
 export class ActivitiesController {
@@ -28,10 +38,7 @@ export class ActivitiesController {
   }
 
   @Post('join')
-  join(
-    @CurrentStudent() student: AuthedStudent,
-    @Body() dto: JoinActivityDto,
-  ) {
+  join(@CurrentStudent() student: AuthedStudent, @Body() dto: JoinActivityDto) {
     return this.activities.join(student.id, dto.code);
   }
 

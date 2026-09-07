@@ -1,7 +1,10 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
 import { ActivitiesService } from '../activities/activities.service';
-import type { Criterion, FeedbackItem } from '../evaluations/evaluations.service';
+import type {
+  Criterion,
+  FeedbackItem,
+} from '../evaluations/evaluations.service';
 
 interface Message {
   role: 'student' | 'persona';
@@ -52,9 +55,7 @@ export class SummaryService {
         this.loadEvaluations(activityId, studentUuid),
       ]);
 
-    const questionCount = transcript.filter(
-      (m) => m.role === 'student',
-    ).length;
+    const questionCount = transcript.filter((m) => m.role === 'student').length;
 
     const summary: Omit<SessionSummary, 'summaryText' | 'saved'> = {
       activityName: activity.name,
@@ -211,7 +212,7 @@ export class SummaryService {
       .limit(1);
 
     if (error) throw new BadRequestException(error.message);
-    return ((data?.[0] as { messages: Message[] } | undefined)?.messages) ?? [];
+    return (data?.[0] as { messages: Message[] } | undefined)?.messages ?? [];
   }
 
   private async loadEvaluations(

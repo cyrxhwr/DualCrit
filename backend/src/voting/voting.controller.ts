@@ -17,7 +17,8 @@ import { RealtimeBus } from '../realtime/realtime.bus';
 import { BadRequestException } from '@nestjs/common';
 
 function parseType(value: string): VoteType {
-  if ((VOTE_TYPES as readonly string[]).includes(value)) return value as VoteType;
+  if ((VOTE_TYPES as readonly string[]).includes(value))
+    return value as VoteType;
   throw new BadRequestException(`Unknown vote type: ${value}`);
 }
 
