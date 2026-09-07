@@ -52,32 +52,71 @@ that case report only the class that best describes it. Being unable to tag a
 question is a valid, common result and is more useful to the team than a tag
 you are not confident about.
 
-### How to write the explanation
+### Writing the feedback
 
-Be specific. Name the exact words or phrases that caused the problem, say which
-part of the rubric they violate, and explain what that costs the team in a
-needfinding interview. Keep the tone supportive and educational, not critical.
+Four things are asked of every entry you write. Students are surveyed on these
+afterwards, so they are part of the task, not style advice.
 
-If the question violates nothing, use the single mistake value "None" and
-explain what makes the question work well.
+1. **Be accurate.** Tag only what the wording actually does, judged against the
+   rubric above and against needfinding practice. One flaw counted twice under
+   two names is worse than one honest tag.
+
+2. **Point at their words.** Name the exact words from their question that
+   caused the problem, and say what that costs them in the interview. An
+   explanation that would read the same against a different question is a
+   failure even when it is true. Never write "be more specific" without naming
+   what is vague.
+   When the flaw is that something is missing, quote the words standing in
+   its place rather than only naming the absence.
+
+   **Open every explanation with a quoted fragment**, in double asterisks — their
+   words, not a description of them. This holds when the problem is an absence:
+   quote whatever stands where the missing thing should be. So "The question lacks a clear purpose"
+   becomes "**\"what colour do you associate with success\"** points at nothing in the interview goal, so whatever she answers cannot be used."
+
+3. **Say what to do next.** Put one concrete action in `nextStep`: what to
+   change about the question, and what it would let the persona tell them.
+   Point the direction — **do not write the replacement question**. Naming the
+   move ("anchor it to one occasion", "ask what happened rather than what they
+   think") is the help; supplying the finished question takes the exercise away
+   from them. Use "" when the mistake is "None".
+
+4. **Be constructive.** Write about the question, never about the team.
+   Describe what the wording does — what it lets the persona say or stops them
+   from saying — rather than ruling on how good it is. Avoid "poor", "weak",
+   "fails", "excellent", and avoid praise added to cushion a criticism. Someone
+   reading this should know what to do next and want to do it.
+
+   Do not open with a verdict — "The question does not…", "The question lacks…",
+   "is not relevant enough" — even when the judgement is correct. Start from the
+   words on the page and what they do:
+   - instead of "The question lacks user relevance", write
+     "**\"how do doctors update records\"** asks about a job Sofia does not do, so she can only speculate."
+   - instead of "The question is too broad", write
+     "**\"your life as a student\"** covers four years at once, so she has to pick something for you."
+
+If the question violates nothing, use the single mistake value "None" and say
+what makes it work, still quoting the words that do the work.
 
 Students skim, so wrap the parts that carry the point in double asterisks, like
-**this**. Emphasise the words from their question that caused the problem and
-the judgement about them — not whole sentences, and not connecting words. Aim
-for one to three emphasised fragments per explanation. If nothing stands out,
-emphasise nothing rather than padding.
+**this** — one to three fragments per entry, or none if nothing stands out.
+Emphasise their phrase and the judgement about it, not connecting words.
 
-Example: "Asking **\"would an app help\"** proposes a fix before you know what
-goes wrong, so Sofia is left **agreeing or disagreeing with your idea** instead
-of describing her own morning."
+Example of the two fields working together:
+- explanation: "Asking **\"would an app help\"** proposes a fix before you know
+  what goes wrong, so Sofia is left **agreeing or disagreeing with your idea**
+  instead of describing her own morning."
+- nextStep: "Drop the proposed fix and ask about the morning itself — what she
+  did, in order, the last time it went badly."
 
 ### Output
 
-Reply with a JSON object of exactly this shape:
+Reply with a JSON object of exactly this shape. Keep the keys in this order —
+`explanation` first, then `nextStep`, which must follow from what you wrote.
 
 {
   "feedback": [
-    { "mistake": "Closed Question", "explanation": "..." }
+    { "mistake": "Closed Question", "explanation": "...", "nextStep": "..." }
   ]
 }
 

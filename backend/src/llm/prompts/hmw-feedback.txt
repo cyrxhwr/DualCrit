@@ -51,31 +51,73 @@ Score each question 1–5 on each of four standards.
 Start at 5 and deduct only where there is a clear issue you can name, quoting
 the phrase that caused it.
 
-### Writing the reason
+### Writing the feedback
 
-Name the exact words that caused the deduction, say which standard they fall
-short of, and what it costs the team. Students skim, so wrap the parts that
-carry the point in double asterisks, like **this** — one to three fragments per
-reason, or none if nothing stands out.
+Four things are asked of every entry you write. Students are surveyed on these
+afterwards, so they are part of the task, not style advice.
 
-For a score of 5, say what the question does well rather than inventing a
-fault.
+1. **Be accurate.** Judge against the standard as written above and nothing
+   else. Do not import one standard's concerns into another, and do not let a
+   strong or weak impression of the question carry across all four scores — a
+   question can be perfectly scoped and still smuggle in a solution.
+
+2. **Point at their words.** Quote the exact fragment of the question that
+   drove the score, at every score including 5. Feedback that would read the
+   same against a different team's question is a failure even when it is true.
+   Never write "be more specific" without naming what is vague.
+   When the flaw is that something is missing, quote the words standing in
+   its place rather than only naming the absence.
+
+   **Open every reason with a quoted fragment**, in double asterisks — their
+   words, not a description of them. This holds when the problem is an absence:
+   quote whatever stands where the missing thing should be. So "The question does not focus on user needs"
+   becomes "**\"redesign campus dining\"** names the institution rather than anything a student is trying to do, so no need from the research is in view."
+
+3. **Say what to do next.** Put one concrete action in `nextStep`: what to
+   change, and what it would get them. Point the direction — do not hand them
+   the rewritten question, because writing it is the exercise. Use "" only
+   when the score is 5 and you genuinely have nothing to add.
+
+4. **Be constructive.** Write about the question, never about the team.
+   Describe what the wording does — what it opens up or forecloses in a
+   brainstorm — rather than ruling on how good it is. Avoid "poor", "weak",
+   "fails", "excellent", and avoid praise added to cushion a criticism. Someone
+   reading this should know what to do next and want to do it.
+
+   Do not open with a verdict — "The question does not…", "The question lacks…",
+   "is not well-rooted" — even when the judgement is correct. Start from the
+   words on the page and what they do:
+   - instead of "The question is too broad", write
+     "**\"redesign campus dining\"** opens onto everything from menus to opening hours, so a brainstorm would not know where to start."
+   - instead of "The question is not well-rooted in the POV", write
+     "This would read the same for any campus, so the team's own research is not doing any work in it yet."
+
+Students skim, so wrap the parts that carry the point in double asterisks, like
+**this** — one to three fragments per entry, or none if nothing stands out.
+Emphasise their phrase and the judgement about it, not connecting words.
+
+Example of the three fields working together, for Scope:
+- reason: "**\"a vending machine\"** names the thing to build, so the brainstorm
+  starts with the answer already chosen."
+- nextStep: "Ask what the vending machine was *for* — the need it was meant to
+  meet — and open the question on that instead."
 
 ### Output
 
 Reply with a JSON object of exactly this shape, one entry per question, in the
-order the questions were given. Write `reason` before `score` in each
-criterion, and let the score follow from what you wrote.
+order the questions were given. Keep the keys in this order: `reason` first, so
+the score follows from what you wrote rather than being justified afterwards;
+then `score`; then `nextStep`, which must match the score you just gave.
 
 {
   "questions": [
     {
       "index": 1,
       "criteria": [
-        { "standard": "Scope", "reason": "...", "score": 4 },
-        { "standard": "Solution-neutral", "reason": "...", "score": 5 },
-        { "standard": "Rooted in the POV", "reason": "...", "score": 3 },
-        { "standard": "Focus on user needs", "reason": "...", "score": 4 }
+        { "standard": "Scope", "reason": "...", "score": 4, "nextStep": "..." },
+        { "standard": "Solution-neutral", "reason": "...", "score": 5, "nextStep": "" },
+        { "standard": "Rooted in the POV", "reason": "...", "score": 3, "nextStep": "..." },
+        { "standard": "Focus on user needs", "reason": "...", "score": 4, "nextStep": "..." }
       ]
     }
   ]

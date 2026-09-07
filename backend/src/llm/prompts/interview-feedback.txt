@@ -98,35 +98,73 @@ An interview can be pleasant and still score low: a persona who volunteers a
 good story does not make the question that prompted it a good question. Judge
 the question, not the answer it happened to get.
 
-### Writing the response
+### Writing the feedback
 
-Be specific. Quote the exact words the student used, say which part of the
-standard they fall short of, and explain what it cost them. Refer to messages
-by what was said, not by index.
+Four things are asked of every entry you write. Students are surveyed on these
+afterwards, so they are part of the task, not style advice.
+
+1. **Be accurate.** Judge against the standard as written above and nothing
+   else, and against good needfinding practice rather than against conversation
+   in general. Do not let a strong or weak impression of the interview carry
+   across all five scores — an interview can be full of neutral questions and
+   still never follow up.
+
+2. **Point at their words.** Quote the exact question the student asked that
+   drove the score, at every score including 5. Refer to messages by what was
+   said, not by index. Feedback that would read the same against a different
+   student's transcript is a failure even when it is true. Never write "ask
+   better follow-ups" without naming the moment one was missed.
+   When the flaw is that something is missing, quote the words standing in
+   its place rather than only naming the absence.
+
+   **Open every response with a quoted fragment**, in double asterisks — their
+   words, not a description of them. This holds when the problem is an absence:
+   quote whatever stands where the missing thing should be. So "The student did not follow up on what was said"
+   becomes "After **\"it was a mess that morning\"**, the next question asked about her commute instead, so the mess went undescribed."
+
+3. **Say what to do next.** Put one concrete action in `nextStep`: what to do
+   differently next time, and what it would have surfaced here. Point the
+   direction — do not write the question out for them. Use "" only when the
+   score is 5 and you genuinely have nothing to add.
+
+4. **Be constructive.** Write about the questions, never about the student.
+   Describe what a question does — what it lets the persona say or stops them
+   from saying — rather than ruling on how good the student is. Avoid "poor",
+   "weak", "fails", "excellent", and avoid praise added to cushion a criticism.
+   Someone reading this should know what to do next and want to do it.
+
+   Do not open with a verdict — "The questions do not…", "The student failed
+   to…", "was not specific enough" — even when the judgement is correct. Start from the
+   words on the page and what they do:
+   - instead of "The student did not ask enough follow-ups", write
+     "When Sofia said **\"it was a mess that morning\"**, the next question moved to a new topic, so the mess went undescribed."
+   - instead of "The questions were vague", write
+     "**\"how do you usually feel\"** asks for a summary, so what came back was a verdict rather than an occasion."
 
 Students skim, so wrap the parts that carry the point in double asterisks, like
-**this**. Emphasise the specific phrase the student used and the judgement about
-it — not whole sentences, and not connecting words. Aim for one to three
-emphasised fragments. If nothing stands out, emphasise nothing rather than
-padding.
+**this** — one to three fragments per entry, or none if nothing stands out.
+Emphasise their phrase and the judgement about it, not connecting words.
 
-Example: "You asked **\"do you usually check it\"**, which lets Sofia answer in
-general terms. Asking about **one specific occasion** would have surfaced the
-detail you were after."
+Example of the two fields working together:
+- response: "You asked **\"do you usually check it\"**, which lets Sofia answer
+  in general terms, so what came back was her habit rather than an occasion."
+- nextStep: "Anchor the same question to **one specific time it happened** —
+  the last time she checked — and let her narrate what she actually did."
 
 ### Output
 
-Reply with a JSON object of exactly this shape. Write `response` before `score`
-for each entry, and let the score follow from what you wrote — do not decide a
-number first and justify it afterwards.
+Reply with a JSON object of exactly this shape. Keep the keys in this order:
+`response` first, so the score follows from what you wrote rather than being
+justified afterwards — do not decide a number first; then `score`; then
+`nextStep`, which must match the score you just gave.
 
 {
   "criteria": [
-    { "standard": "Active Asking", "response": "...", "score": 3 },
-    { "standard": "Usage of Neutral Questions", "response": "...", "score": 4 },
-    { "standard": "Vagueness", "response": "...", "score": 2 },
-    { "standard": "Appropriate Usage of Follow-up questions", "response": "...", "score": 4 },
-    { "standard": "Question Relevance", "response": "...", "score": 3 }
+    { "standard": "Active Asking", "response": "...", "score": 3, "nextStep": "..." },
+    { "standard": "Usage of Neutral Questions", "response": "...", "score": 4, "nextStep": "..." },
+    { "standard": "Vagueness", "response": "...", "score": 2, "nextStep": "..." },
+    { "standard": "Appropriate Usage of Follow-up questions", "response": "...", "score": 5, "nextStep": "" },
+    { "standard": "Question Relevance", "response": "...", "score": 3, "nextStep": "..." }
   ]
 }
 

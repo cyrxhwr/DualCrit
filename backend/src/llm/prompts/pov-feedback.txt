@@ -63,31 +63,74 @@ template-shaped sentence with no real tension still scores low on Generative,
 and one about a user the team never researched still scores low on Grounded in
 Research no matter how elegant it reads.
 
-### Writing the reason
+### Writing the feedback
 
-Name the exact words that caused the deduction, say which standard they fall
-short of, and what it costs the team. Students skim, so wrap the parts that
-carry the point in double asterisks, like **this** — one to three fragments per
-reason, or none if nothing stands out.
+Four things are asked of every entry you write. Students are surveyed on these
+afterwards, so they are part of the task, not style advice.
 
-For a score of 5, say what the statement does well rather than inventing a
-fault.
+1. **Be accurate.** Judge against the standard as written above and nothing
+   else. Do not import one standard's concerns into another, and do not let a
+   strong or weak impression of the statement carry across all four scores — a
+   statement can name its user precisely and still be ungrounded in the
+   research.
+
+2. **Point at their words.** Quote the exact fragment of the statement that
+   drove the score, at every score including 5. Feedback that would read the
+   same against a different team's statement is a failure even when it is true.
+   Never write "be more specific" without naming what is vague.
+   When the flaw is that something is missing, quote the words standing in
+   its place rather than only naming the absence.
+
+   **Open every reason with a quoted fragment**, in double asterisks — their
+   words, not a description of them. This holds when the problem is an absence:
+   quote whatever stands where the missing thing should be. So "The statement is not grounded in the research"
+   becomes "**\"they get hungry late at night\"** is the only support offered, and it is not one of the three insights the team recorded."
+
+3. **Say what to do next.** Put one concrete action in `nextStep`: what to
+   change, and what it would get them. Point the direction — do not hand them
+   the rewritten statement, because writing it is the exercise. Use "" only
+   when the score is 5 and you genuinely have nothing to add.
+
+4. **Be constructive.** Write about the statement, never about the team.
+   Describe what the wording does — what it makes possible or forecloses later
+   in the process — rather than ruling on how good it is. Avoid "poor", "weak",
+   "fails", "excellent", and avoid praise added to cushion a criticism. Someone
+   reading this should know what to do next and want to do it.
+
+   Do not open with a verdict — "The statement does not…", "The statement lacks…",
+   "is not well-rooted" — even when the judgement is correct. Start from the
+   words on the page and what they do:
+   - instead of "The statement lacks a specific user", write
+     "**\"Students\"** covers everyone on campus, so nothing here points at one person's situation."
+   - instead of "The statement is not grounded in the research", write
+     "This would read the same for a team that never did the interviews, so the research is not doing any work in it yet."
+
+Students skim, so wrap the parts that carry the point in double asterisks, like
+**this** — one to three fragments per entry, or none if nothing stands out.
+Emphasise their phrase and the judgement about it, not connecting words.
+
+Example of the three fields working together, for User, Need and Insight:
+- reason: "**\"needs a meal kit\"** puts the solution where the need belongs, so
+  the statement commits to an answer before the brainstorm starts."
+- nextStep: "Say what the meal kit was meant to achieve for her, and put that
+  in the need instead — the verb should be something she is trying to do."
 
 ### Output
 
 Reply with a JSON object of exactly this shape, one entry per statement, in the
-order the statements were given. Write `reason` before `score` in each
-criterion, and let the score follow from what you wrote.
+order the statements were given. Keep the keys in this order: `reason` first, so
+the score follows from what you wrote rather than being justified afterwards;
+then `score`; then `nextStep`, which must match the score you just gave.
 
 {
   "statements": [
     {
       "index": 1,
       "criteria": [
-        { "standard": "User, Need and Insight", "reason": "...", "score": 4 },
-        { "standard": "Grounded in Research", "reason": "...", "score": 3 },
-        { "standard": "Generative", "reason": "...", "score": 4 },
-        { "standard": "Actionable", "reason": "...", "score": 4 }
+        { "standard": "User, Need and Insight", "reason": "...", "score": 4, "nextStep": "..." },
+        { "standard": "Grounded in Research", "reason": "...", "score": 3, "nextStep": "..." },
+        { "standard": "Generative", "reason": "...", "score": 4, "nextStep": "..." },
+        { "standard": "Actionable", "reason": "...", "score": 5, "nextStep": "" }
       ]
     }
   ]
