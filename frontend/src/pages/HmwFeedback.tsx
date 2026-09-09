@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Sparkles } from 'lucide-react';
-import { api, type ScoredSet } from '../lib/api';
+import { api, type ScoredItem, type ScoredSet } from '../lib/api';
 import ScoredItemCard from '../components/ScoredItemCard';
 
 interface Props {
@@ -9,9 +9,33 @@ interface Props {
 }
 
 /**
- * Two sets side by side: the student's own three questions and the three the
- * team voted for. The comparison is the lesson, as in the previous system.
+ * The team's chosen questions and the student's own, in one set.
+ *
+ * The server scores these as two evaluations — one over the winners, one over
+ * this student's three — so a question that is both came back twice, scored by
+ * two separate model calls that could disagree about the same words. They are
+ * merged here the same way the summary merges them: the team's evaluation
+ * wins, so a chosen question reads identically for everyone looking at it.
  */
+function merge(
+  team: ScoredSet | null,
+  mine: ScoredSet | null,
+): { item: ScoredItem; isMine: boolean }[] {
+  const mineTexts = new Set((mine?.items ?? []).map((i) => i.text));
+  const seen = new Set<string>();
+  const merged: { item: ScoredItem; isMine: boolean }[] = [];
+
+  // Team first, so the chosen questions lead and their scores are the ones
+  // shown; the student's own that did not win follow.
+  for (const item of [...(team?.items ?? []), ...(mine?.items ?? [])]) {
+    if (seen.has(item.text)) continue;
+    seen.add(item.text);
+    merged.push({ item, isMine: mineTexts.has(item.text) });
+  }
+
+  return merged;
+}
+
 export default function HmwFeedback({ activityId, onContinue }: Props) {
   const [mine, setMine] = useState<ScoredSet | null>(null);
   const [team, setTeam] = useState<ScoredSet | null>(null);
@@ -39,19 +63,7 @@ export default function HmwFeedback({ activityId, onContinue }: Props) {
     };
   }, [activityId]);
 
-  const section = (title: string, blurb: string, set: ScoredSet | null) =>
-    set &&
-    set.items.length > 0 && (
-      <section>
-        <h3 className="text-sm font-semibold text-gray-700">{title}</h3>
-        <p className="text-sm text-gray-500 mb-3">{blurb}</p>
-        <div className="space-y-4">
-          {set.items.map((item, i) => (
-            <ScoredItemCard key={i} item={item} />
-          ))}
-        </div>
-      </section>
-    );
+  const questions = useMemo(() => merge(team, mine), [team, mine]);
 
   return (
     <div>
@@ -59,7 +71,8 @@ export default function HmwFeedback({ activityId, onContinue }: Props) {
         AI feedback on the HMW questions
       </h2>
       <p className="text-sm text-gray-500 mb-5">
-        Your own three and your team's chosen three, scored the same way.
+        The three your team chose, and your own — a question that is both
+        appears once.
       </p>
 
       {loading && (
@@ -71,23 +84,21 @@ export default function HmwFeedback({ activityId, onContinue }: Props) {
 
       {error && <p className="note note-error mb-4">{error}</p>}
 
-      {!loading && !error && !mine && !team && (
+      {!loading && !error && questions.length === 0 && (
         <p className="note mb-4 text-gray-600 bg-transparent border-gray-200">
           Feedback is not available for this activity.
         </p>
       )}
 
-      <div className="space-y-8">
-        {section(
-          'Your questions',
-          'The three you wrote, whether or not the team picked them.',
-          mine,
-        )}
-        {section(
-          "Your team's chosen questions",
-          'The three that won the vote — these are the brainstorm seeds.',
-          team,
-        )}
+      <div className="space-y-4 stagger">
+        {questions.map(({ item, isMine }, i) => (
+          <ScoredItemCard
+            key={i}
+            item={item}
+            isMine={isMine}
+            selectedLabel="Your team chose this"
+          />
+        ))}
       </div>
 
       <div className="flex justify-end mt-8">
