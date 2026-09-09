@@ -116,8 +116,6 @@ export interface Criterion {
   standard: string;
   score: number;
   response: string;
-  /** One concrete action, or "" when the entry is already fully met. */
-  nextStep?: string;
 }
 
 export interface StoredEvaluation {
@@ -128,7 +126,7 @@ export interface StoredEvaluation {
   createdAt: string;
   feedback: {
     /** Question feedback: one entry per rubric violation, or a single "None". */
-    feedback?: { mistake: string; explanation: string; nextStep?: string }[];
+    feedback?: { mistake: string; explanation: string }[];
     /** Interview feedback: the five rubric scores. */
     criteria?: Criterion[];
   };
@@ -147,8 +145,6 @@ export interface RubricCriterion {
   standard: string;
   reason: string;
   score: number;
-  /** One concrete action, or "" when the entry is already fully met. */
-  nextStep?: string;
 }
 
 /** A statement or question with its rubric scores. */
@@ -222,11 +218,7 @@ export interface SessionSummary {
   scenarioTag: string | null;
   myQuestion: string | null;
   teamQuestion: string | null;
-  questionFeedback: {
-    mistake: string;
-    explanation: string;
-    nextStep?: string;
-  }[];
+  questionFeedback: { mistake: string; explanation: string }[];
   transcript: { role: 'student' | 'persona'; text: string }[];
   criteria: Criterion[];
   questionCount: number;

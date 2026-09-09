@@ -5,7 +5,6 @@ import { getSocket } from '../lib/socket';
 import { useActivityRoom } from '../lib/useActivityRoom';
 import { describeMistake, isNoIssue } from '../lib/rubric';
 import { withEmphasis } from '../lib/emphasis';
-import NextStep from '../components/NextStep';
 
 interface Props {
   activityId: string;
@@ -139,7 +138,6 @@ export default function QuestionFeedback({
                     <p className="text-blue-700 text-sm leading-relaxed break-words">
                       {withEmphasis(item.explanation)}
                     </p>
-                    <NextStep text={item.nextStep} />
                   </div>
                 </div>
               </div>
@@ -177,7 +175,6 @@ export default function QuestionFeedback({
                   <p className="text-blue-700 text-sm leading-relaxed break-words">
                     {withEmphasis(items[0].explanation)}
                   </p>
-                  <NextStep text={items[0].nextStep} />
                 </div>
               </div>
             </div>

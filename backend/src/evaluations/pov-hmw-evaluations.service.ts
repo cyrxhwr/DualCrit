@@ -4,13 +4,12 @@ import { ActivitiesService } from '../activities/activities.service';
 import { PovHmwService } from '../pov-hmw/pov-hmw.service';
 import { LlmService } from '../llm/llm.service';
 import type { StoredEvaluation } from './evaluations.service';
+import { withMove } from './with-move';
 
 /** One rubric line. Same shape for POV and HMW, so one renderer serves both. */
 export interface Criterion {
   standard: string;
   reason: string;
-  /** One concrete action, or "" when the entry is already fully met. */
-  nextStep?: string;
   score: number;
 }
 
@@ -26,10 +25,17 @@ export interface ScoredSet {
   items: ScoredItem[];
 }
 
-/** What the model returns, before it is paired back up with the text. */
+/**
+ * What the model returns, before it is paired back up with the text.
+ *
+ * `move` is a separate key on the way out of the model and never on the way
+ * into storage — see with-move.ts for why it is asked for separately at all.
+ */
+type ModelCriterion = Criterion & { move?: string };
+
 interface ModelReply {
-  statements?: { index: number; criteria: Criterion[] }[];
-  questions?: { index: number; criteria: Criterion[] }[];
+  statements?: { index: number; criteria: ModelCriterion[] }[];
+  questions?: { index: number; criteria: ModelCriterion[] }[];
 }
 
 interface ContributionRow {
@@ -249,7 +255,7 @@ export class PovHmwEvaluationsService {
   private pair(
     texts: string[],
     rows: ContributionRow[],
-    replies: { index: number; criteria: Criterion[] }[],
+    replies: { index: number; criteria: ModelCriterion[] }[],
   ): ScoredSet {
     const byIndex = new Map(replies.map((r) => [Number(r.index), r.criteria]));
     const items: ScoredItem[] = [];
@@ -260,7 +266,15 @@ export class PovHmwEvaluationsService {
         this.logger.warn(`No evaluation returned for item ${i + 1}`);
         return;
       }
-      items.push({ text, isSelected: rows[i]?.is_selected ?? false, criteria });
+      items.push({
+        text,
+        isSelected: rows[i]?.is_selected ?? false,
+        criteria: criteria.map((c) => ({
+          standard: c.standard,
+          reason: withMove(c.reason, c.move),
+          score: c.score,
+        })),
+      });
     });
 
     return { items };

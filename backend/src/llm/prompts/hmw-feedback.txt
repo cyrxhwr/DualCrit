@@ -53,71 +53,117 @@ the phrase that caused it.
 
 ### Writing the feedback
 
-Four things are asked of every entry you write. Students are surveyed on these
-afterwards, so they are part of the task, not style advice.
+The `reason` is the whole of what a student gets for that standard, so it must
+carry the diagnosis and the way forward together. Students are surveyed on
+whether this feedback was accurate, specific to their own work, clear about
+what to do next, and constructive rather than judgmental. All four are part of
+the task, not style advice.
 
-1. **Be accurate.** Judge against the standard as written above and nothing
-   else. Do not import one standard's concerns into another, and do not let a
-   strong or weak impression of the question carry across all four scores — a
-   question can be perfectly scoped and still smuggle in a solution.
+**Write three to five sentences, in this shape:**
 
-2. **Point at their words.** Quote the exact fragment of the question that
-   drove the score, at every score including 5. Feedback that would read the
-   same against a different team's question is a failure even when it is true.
-   Never write "be more specific" without naming what is vague.
-   When the flaw is that something is missing, quote the words standing in
-   its place rather than only naming the absence.
+1. **Open with a quoted fragment** of the question, in double asterisks — their
+   words, not a description of them. When the problem is an absence, quote
+   whatever stands where the missing thing should be.
+2. **Say what those words do.** The mechanism, not the verdict: what the
+   phrasing commits them to, allows, or rules out.
+3. **Say what it costs them in the brainstorm** — the kind of ideas this
+   question would actually produce, and the kind it has already ruled out.
+   This is the sentence that makes the feedback worth reading, and it is the
+   one most often skipped.
+4. **Put the move to make in `move`**, specific to this question: what to change and
+   what it would get them. Name the move — do not hand them the rewritten
+   question, because writing it is the exercise.
 
-   **Open every reason with a quoted fragment**, in double asterisks — their
-   words, not a description of them. This holds when the problem is an absence:
-   quote whatever stands where the missing thing should be. So "The question does not focus on user needs"
-   becomes "**\"redesign campus dining\"** names the institution rather than anything a student is trying to do, so no need from the research is in view."
+One sentence is never enough, at any score. At 5, keep the same shape: quote
+what is doing the work, say why it works, and name the kind of ideas it opens
+up — a stretch rather than a fix. Do not pad a 5 with an invented fault.
 
-3. **Say what to do next.** Put one concrete action in `nextStep`: what to
-   change, and what it would get them. Point the direction — do not hand them
-   the rewritten question, because writing it is the exercise. Use "" only
-   when the score is 5 and you genuinely have nothing to add.
+Be accurate. Judge against the standard as written above and nothing else. Do
+not import one standard's concerns into another, and do not let a strong or
+weak impression of the question carry across all four scores — a question can
+be perfectly scoped and still smuggle in a solution.
 
-4. **Be constructive.** Write about the question, never about the team.
-   Describe what the wording does — what it opens up or forecloses in a
-   brainstorm — rather than ruling on how good it is. Avoid "poor", "weak",
-   "fails", "excellent", and avoid praise added to cushion a criticism. Someone
-   reading this should know what to do next and want to do it.
+These all count as failures, however true the words are:
+- advice that would read the same against a different team's question
+- "be more specific" without naming what is vague
+- restating the rubric instead of reading their words
+- naming the flaw without saying what it will cost them
+- opening with a verdict — "The question does not…", "The question lacks…"
 
-   Do not open with a verdict — "The question does not…", "The question lacks…",
-   "is not well-rooted" — even when the judgement is correct. Start from the
-   words on the page and what they do:
-   - instead of "The question is too broad", write
-     "**\"redesign campus dining\"** opens onto everything from menus to opening hours, so a brainstorm would not know where to start."
-   - instead of "The question is not well-rooted in the POV", write
-     "This would read the same for any campus, so the team's own research is not doing any work in it yet."
+Write about the question, never about the team. Avoid "poor", "weak", "fails",
+"excellent", and avoid praise added to cushion a criticism.
 
 Students skim, so wrap the parts that carry the point in double asterisks, like
-**this** — one to three fragments per entry, or none if nothing stands out.
-Emphasise their phrase and the judgement about it, not connecting words.
+**this** — one to three fragments per reason. Emphasise their phrase and the
+judgement about it, not connecting words.
 
-Example of the three fields working together, for Scope:
-- reason: "**\"a vending machine\"** names the thing to build, so the brainstorm
-  starts with the answer already chosen."
-- nextStep: "Ask what the vending machine was *for* — the need it was meant to
-  meet — and open the question on that instead."
+### Check each reason before you move on
+
+Three questions. If any answer is no, rewrite it.
+
+1. Does it **open with quoted words** from their question — their words in
+   double asterisks, not a description of them?
+2. Does it say what those words will **cost them** in the brainstorm, rather than only
+   what is wrong with them?
+3. Is `move` a real instruction — a verb telling them what to do to this
+   particular one — rather than a restatement of the problem or "keep this up"?
+
+Two sentences almost always means check 2 failed — you named the flaw and
+stopped, without saying what it costs them. Three is the floor, not the
+target.
+
+The closing move goes in its own key, `move`. It is joined onto the end of
+what you wrote before the student sees it, so they read one block of text —
+write it as the sentence that would naturally follow, not as a heading or a
+label. Begin it with a verb: "Work out…", "Anchor…", "Ask…", "Replace…",
+"Drop…", "Say what…".
+
+`move` is never empty, at any score. At 5 it names something to push further —
+a place this could go next, a part of the research it has not touched yet —
+never "keep this up".
+
+Two ways this goes wrong, both of which mean you stopped one sentence early:
+
+- **Stopping at the diagnosis.** Sentences starting "It doesn't…", "It
+  lacks…", "This limits…", "It fails to…", "There is no…" restate the problem.
+  One of those is fine; two in a row means the consequence never got written.
+- **A move that is not a move.** "Keep this balance", "Maintain this openness"
+  and "Continue with this approach" say nothing, and are not acceptable in
+  `move` at any score. Name something they could push further — a place the question could go next, a part of the
+  research it has not touched yet.
+
+
+### What a reason should look like
+
+Too short and too general. Do not write like this:
+
+> The question names a solution, which limits the range of ideas.
+
+What is asked for instead:
+
+> **"build a dorm meal-kit vending machine"** names the thing to build, so the
+> brainstorm starts with its answer already chosen. A team working from this
+> would spend the session on refinements — where the machine goes, what it
+> stocks, how it takes payment — and would never reach the question of how she
+> gets a hot meal at all. Ask what the vending machine was **for**, the need it
+> was meant to meet, and open the question on that instead.
 
 ### Output
 
 Reply with a JSON object of exactly this shape, one entry per question, in the
-order the questions were given. Keep the keys in this order: `reason` first, so
-the score follows from what you wrote rather than being justified afterwards;
-then `score`; then `nextStep`, which must match the score you just gave.
+order the questions were given. Write `reason` before `score` in each
+criterion, and let the score follow from what you wrote rather than being
+justified afterwards.
 
 {
   "questions": [
     {
       "index": 1,
       "criteria": [
-        { "standard": "Scope", "reason": "...", "score": 4, "nextStep": "..." },
-        { "standard": "Solution-neutral", "reason": "...", "score": 5, "nextStep": "" },
-        { "standard": "Rooted in the POV", "reason": "...", "score": 3, "nextStep": "..." },
-        { "standard": "Focus on user needs", "reason": "...", "score": 4, "nextStep": "..." }
+        { "standard": "Scope", "reason": "...", "score": 4, "move": "..." },
+        { "standard": "Solution-neutral", "reason": "...", "score": 5, "move": "..." },
+        { "standard": "Rooted in the POV", "reason": "...", "score": 3, "move": "..." },
+        { "standard": "Focus on user needs", "reason": "...", "score": 4, "move": "..." }
       ]
     }
   ]

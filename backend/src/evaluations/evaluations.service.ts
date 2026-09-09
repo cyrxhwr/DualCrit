@@ -3,13 +3,12 @@ import { SupabaseService } from '../supabase/supabase.service';
 import { ActivitiesService } from '../activities/activities.service';
 import { LlmService } from '../llm/llm.service';
 import { consensus, EVAL_SAMPLES } from './consensus';
+import { withMove } from './with-move';
 
 /** One entry per rubric violation, or a single "None" entry when sound. */
 export interface FeedbackItem {
   mistake: string;
   explanation: string;
-  /** One concrete action, or "" when the entry is already fully met. */
-  nextStep?: string;
 }
 
 export interface QuestionFeedback {
@@ -20,9 +19,16 @@ export interface Criterion {
   standard: string;
   score: number;
   response: string;
-  /** One concrete action, or "" when the entry is already fully met. */
-  nextStep?: string;
 }
+
+/**
+ * What the model returns before {@link withMove} folds it down.
+ *
+ * `move` is a separate key on the way out of the model and never on the way
+ * into storage — see with-move.ts for why it is asked for separately at all.
+ */
+type ModelCriterion = Criterion & { move?: string };
+type ModelFeedbackItem = FeedbackItem & { move?: string };
 
 export interface InterviewFeedback {
   criteria: Criterion[];
@@ -134,6 +140,16 @@ export class EvaluationsService {
       ].join('\n'),
     );
 
+    const folded: QuestionFeedback = {
+      feedback: (parsed.feedback ?? []).map((item) => ({
+        mistake: item.mistake,
+        explanation: withMove(
+          item.explanation,
+          (item as ModelFeedbackItem).move,
+        ),
+      })),
+    };
+
     const { error } = await this.supabase.client.from('ai_evaluations').insert({
       activity_id: activityId,
       student_id: null,
@@ -145,8 +161,8 @@ export class EvaluationsService {
         scenarioTag: activity.selected_scenario_tag,
       },
       ai_response: raw,
-      processed_scores: parsed,
-      feedback_summary: parsed.feedback?.[0]?.explanation ?? null,
+      processed_scores: folded,
+      feedback_summary: folded.feedback?.[0]?.explanation ?? null,
     });
 
     if (error) {
@@ -256,7 +272,15 @@ export class EvaluationsService {
         EVAL_SAMPLES,
       );
 
-    const agreed = consensus(parsed);
+    const agreed = consensus(
+      parsed.map((sample) => ({
+        criteria: (sample.criteria ?? []).map((c) => ({
+          standard: c.standard,
+          score: c.score,
+          response: withMove(c.response, (c as ModelCriterion).move),
+        })),
+      })),
+    );
 
     const { error } = await this.supabase.client.from('ai_evaluations').insert({
       activity_id: activityId,

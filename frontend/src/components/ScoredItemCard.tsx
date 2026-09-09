@@ -1,7 +1,6 @@
 import { Star } from 'lucide-react';
 import type { ScoredItem } from '../lib/api';
 import { withEmphasis } from '../lib/emphasis';
-import NextStep from './NextStep';
 
 interface Props {
   item: ScoredItem;
@@ -79,11 +78,8 @@ export default function ScoredItemCard({ item, selectedLabel, isMine }: Props) {
                 </span>
               </span>
             </dt>
-            <dd>
-              <span className="block text-sm text-blue-900 bg-blue-50 rounded-lg p-3 leading-relaxed">
-                {withEmphasis(criterion.reason)}
-              </span>
-              <NextStep text={criterion.nextStep} />
+            <dd className="text-sm text-blue-900 bg-blue-50 rounded-lg p-3 leading-relaxed">
+              {withEmphasis(criterion.reason)}
             </dd>
           </div>
         ))}

@@ -4,7 +4,6 @@ import { api, type SessionSummary } from '../lib/api';
 import { scenarioByTag } from '../lib/scenarios';
 import { describeMistake, isNoIssue } from '../lib/rubric';
 import { withEmphasis } from '../lib/emphasis';
-import NextStep from '../components/NextStep';
 import { initialOf } from '../lib/name';
 import { useAuth } from '../lib/auth';
 import SummaryActions from '../components/SummaryActions';
@@ -118,7 +117,6 @@ export default function Summary({ activityId, onFinish }: Props) {
                     <p className="text-sm mt-2">
                       {withEmphasis(item.explanation)}
                     </p>
-                    <NextStep text={item.nextStep} />
                   </li>
                 ))}
               </ul>
@@ -204,7 +202,6 @@ export default function Summary({ activityId, onFinish }: Props) {
                   <p className="text-sm text-blue-900 bg-blue-50 rounded p-3 leading-relaxed">
                     {withEmphasis(criterion.response)}
                   </p>
-                  <NextStep text={criterion.nextStep} />
                 </article>
               ))}
             </div>

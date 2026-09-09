@@ -30,12 +30,6 @@ export interface SessionSummary {
 }
 
 /**
- * The POV & HMW equivalent.
- *
- * Both halves of each step are here: what this student wrote and what the team
- * settled on, so the summary shows the comparison the workflow is built around.
- */
-/**
  * A scored entry with the reader's own authorship attached.
  *
  * The stored evaluations carry no authorship — that is what keeps voting
@@ -46,6 +40,12 @@ export interface SummaryScoredItem extends ScoredItem {
   isMine: boolean;
 }
 
+/**
+ * The POV & HMW equivalent of SessionSummary.
+ *
+ * Both halves of each step are here: what this student wrote and what the team
+ * settled on, so the summary shows the comparison the workflow is built around.
+ */
 export interface PovHmwSummary {
   activityName: string;
   needs: string[];
@@ -176,9 +176,6 @@ export class SummaryService {
       lines.push('## Feedback on the team question', '');
       for (const item of s.questionFeedback) {
         lines.push(`- **${item.mistake}** — ${item.explanation}`);
-        if (item.nextStep?.trim()) {
-          lines.push(`  - Try next: ${item.nextStep}`);
-        }
       }
       lines.push('');
     }
@@ -202,9 +199,6 @@ export class SummaryService {
           criterion.response,
           '',
         );
-        if (criterion.nextStep?.trim()) {
-          lines.push(`**Try next:** ${criterion.nextStep}`, '');
-        }
       }
     }
 
@@ -466,9 +460,6 @@ export class SummaryService {
         lines.push(
           `- **${criterion.standard} — ${criterion.score}/5** — ${criterion.reason}`,
         );
-        if (criterion.nextStep?.trim()) {
-          lines.push(`  - Try next: ${criterion.nextStep}`);
-        }
       }
       lines.push('');
     }

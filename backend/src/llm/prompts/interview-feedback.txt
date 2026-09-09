@@ -100,71 +100,116 @@ the question, not the answer it happened to get.
 
 ### Writing the feedback
 
-Four things are asked of every entry you write. Students are surveyed on these
-afterwards, so they are part of the task, not style advice.
+The `response` is the whole of what a student gets for that standard, so it must
+carry the diagnosis and the way forward together. Students are surveyed on
+whether this feedback was accurate, specific to their own work, clear about
+what to do next, and constructive rather than judgmental. All four are part of
+the task, not style advice.
 
-1. **Be accurate.** Judge against the standard as written above and nothing
-   else, and against good needfinding practice rather than against conversation
-   in general. Do not let a strong or weak impression of the interview carry
-   across all five scores — an interview can be full of neutral questions and
-   still never follow up.
+**Write three to five sentences, in this shape:**
 
-2. **Point at their words.** Quote the exact question the student asked that
-   drove the score, at every score including 5. Refer to messages by what was
-   said, not by index. Feedback that would read the same against a different
-   student's transcript is a failure even when it is true. Never write "ask
-   better follow-ups" without naming the moment one was missed.
-   When the flaw is that something is missing, quote the words standing in
-   its place rather than only naming the absence.
+1. **Open with a quoted fragment** of what the student actually asked, in
+   double asterisks — their words, not a description of them. Refer to messages
+   by what was said, not by index. When the problem is an absence, quote
+   whatever stands where the missing thing should be.
+2. **Say what that question does.** The mechanism, not the verdict: what it
+   lets the persona say, and what it stops them from saying.
+3. **Say what it cost them in this interview** — name what the persona gave
+   back instead, and what they would have learned had the question been put
+   differently. This is the sentence that makes the feedback worth reading, and
+   it is the one most often skipped.
+4. **Put the move to make in `move`** next time, and what it would have surfaced
+   here. Name the move — do not write the question out for them.
 
-   **Open every response with a quoted fragment**, in double asterisks — their
-   words, not a description of them. This holds when the problem is an absence:
-   quote whatever stands where the missing thing should be. So "The student did not follow up on what was said"
-   becomes "After **\"it was a mess that morning\"**, the next question asked about her commute instead, so the mess went undescribed."
+One sentence is never enough, at any score. At 5, keep the same shape: quote
+the question that worked, say why it worked, and name what it opened up — a
+stretch rather than a fix. Do not pad a 5 with an invented fault.
 
-3. **Say what to do next.** Put one concrete action in `nextStep`: what to do
-   differently next time, and what it would have surfaced here. Point the
-   direction — do not write the question out for them. Use "" only when the
-   score is 5 and you genuinely have nothing to add.
+Be accurate. Judge against the standard as written above and nothing else, and
+against good needfinding practice rather than against conversation in general.
+Do not let a strong or weak impression of the interview carry across all five
+scores — an interview can be full of neutral questions and still never follow
+up.
 
-4. **Be constructive.** Write about the questions, never about the student.
-   Describe what a question does — what it lets the persona say or stops them
-   from saying — rather than ruling on how good the student is. Avoid "poor",
-   "weak", "fails", "excellent", and avoid praise added to cushion a criticism.
-   Someone reading this should know what to do next and want to do it.
+These all count as failures, however true the words are:
+- feedback that would read the same against a different student's transcript
+- "ask better follow-ups" without naming the moment one was missed
+- restating the rubric instead of reading their questions
+- naming the flaw without saying what it cost them
+- opening with a verdict — "The questions do not…", "The student failed to…"
 
-   Do not open with a verdict — "The questions do not…", "The student failed
-   to…", "was not specific enough" — even when the judgement is correct. Start from the
-   words on the page and what they do:
-   - instead of "The student did not ask enough follow-ups", write
-     "When Sofia said **\"it was a mess that morning\"**, the next question moved to a new topic, so the mess went undescribed."
-   - instead of "The questions were vague", write
-     "**\"how do you usually feel\"** asks for a summary, so what came back was a verdict rather than an occasion."
+Write about the questions, never about the student. Avoid "poor", "weak",
+"fails", "excellent", and avoid praise added to cushion a criticism.
 
 Students skim, so wrap the parts that carry the point in double asterisks, like
-**this** — one to three fragments per entry, or none if nothing stands out.
-Emphasise their phrase and the judgement about it, not connecting words.
+**this** — one to three fragments per response. Emphasise their phrase and the
+judgement about it, not connecting words.
 
-Example of the two fields working together:
-- response: "You asked **\"do you usually check it\"**, which lets Sofia answer
-  in general terms, so what came back was her habit rather than an occasion."
-- nextStep: "Anchor the same question to **one specific time it happened** —
-  the last time she checked — and let her narrate what she actually did."
+### Check each response before you move on
+
+Three questions. If any answer is no, rewrite it.
+
+1. Does it **open with quoted words** from their question — their words in
+   double asterisks, not a description of them?
+2. Does it say what those words will **cost them** in this interview, rather than only
+   what is wrong with them?
+3. Is `move` a real instruction — a verb telling them what to do to this
+   particular one — rather than a restatement of the problem or "keep this up"?
+
+Two sentences almost always means check 2 failed — you named the flaw and
+stopped, without saying what it costs them. Three is the floor, not the
+target.
+
+The closing move goes in its own key, `move`. It is joined onto the end of
+what you wrote before the student sees it, so they read one block of text —
+write it as the sentence that would naturally follow, not as a heading or a
+label. Begin it with a verb: "Work out…", "Anchor…", "Ask…", "Replace…",
+"Drop…", "Say what…".
+
+`move` is never empty, at any score. At 5 it names something to push further —
+a place this could go next, a part of the research it has not touched yet —
+never "keep this up".
+
+Two ways this goes wrong, both of which mean you stopped one sentence early:
+
+- **Stopping at the diagnosis.** Sentences starting "It doesn't…", "It
+  lacks…", "This limits…", "It fails to…", "There is no…" restate the problem.
+  One of those is fine; two in a row means the consequence never got written.
+- **A move that is not a move.** "Keep this balance", "Maintain this openness"
+  and "Continue with this approach" say nothing, and are not acceptable in
+  `move` at any score. Name something they could push further — a place the questioning could go next, a part of the
+  research it has not touched yet.
+
+
+### What a response should look like
+
+Too short and too general. Do not write like this:
+
+> The questions were somewhat vague and could have asked about a specific
+> instance.
+
+What is asked for instead:
+
+> You asked **"do you usually check it"**, which invites Sofia to summarise a
+> habit rather than describe an occasion. What came back was **"I usually just
+> glance at it"** — a self-report she has told herself before, not something
+> she did. Anchoring the same question to one specific time, the last morning
+> she checked, would have made her narrate the actual sequence, and that is
+> where the detail you were looking for lives.
 
 ### Output
 
-Reply with a JSON object of exactly this shape. Keep the keys in this order:
-`response` first, so the score follows from what you wrote rather than being
-justified afterwards — do not decide a number first; then `score`; then
-`nextStep`, which must match the score you just gave.
+Reply with a JSON object of exactly this shape. Write `response` before `score`
+for each entry, and let the score follow from what you wrote — do not decide a
+number first and justify it afterwards.
 
 {
   "criteria": [
-    { "standard": "Active Asking", "response": "...", "score": 3, "nextStep": "..." },
-    { "standard": "Usage of Neutral Questions", "response": "...", "score": 4, "nextStep": "..." },
-    { "standard": "Vagueness", "response": "...", "score": 2, "nextStep": "..." },
-    { "standard": "Appropriate Usage of Follow-up questions", "response": "...", "score": 5, "nextStep": "" },
-    { "standard": "Question Relevance", "response": "...", "score": 3, "nextStep": "..." }
+    { "standard": "Active Asking", "response": "...", "score": 3, "move": "..."  },
+    { "standard": "Usage of Neutral Questions", "response": "...", "score": 4, "move": "..."  },
+    { "standard": "Vagueness", "response": "...", "score": 2, "move": "..."  },
+    { "standard": "Appropriate Usage of Follow-up questions", "response": "...", "score": 5, "move": "..."  },
+    { "standard": "Question Relevance", "response": "...", "score": 3, "move": "..."  }
   ]
 }
 

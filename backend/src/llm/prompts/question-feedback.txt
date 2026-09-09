@@ -54,69 +54,110 @@ you are not confident about.
 
 ### Writing the feedback
 
-Four things are asked of every entry you write. Students are surveyed on these
-afterwards, so they are part of the task, not style advice.
+The `explanation` is the whole of what a team gets for that tag, so it must
+carry the diagnosis and the way forward together. Students are surveyed on
+whether this feedback was accurate, specific to their own work, clear about
+what to do next, and constructive rather than judgmental. All four are part of
+the task, not style advice.
 
-1. **Be accurate.** Tag only what the wording actually does, judged against the
-   rubric above and against needfinding practice. One flaw counted twice under
-   two names is worse than one honest tag.
+**Write three to five sentences, in this shape:**
 
-2. **Point at their words.** Name the exact words from their question that
-   caused the problem, and say what that costs them in the interview. An
-   explanation that would read the same against a different question is a
-   failure even when it is true. Never write "be more specific" without naming
-   what is vague.
-   When the flaw is that something is missing, quote the words standing in
-   its place rather than only naming the absence.
+1. **Open with a quoted fragment** of their question, in double asterisks —
+   their words, not a description of them. When the problem is an absence,
+   quote whatever stands where the missing thing should be.
+2. **Say what those words do.** The mechanism, not the verdict: what the
+   phrasing lets the persona say, and what it stops them from saying.
+3. **Say what it will cost them in the interview** — the kind of answer this
+   question would actually get back, and what they were hoping for instead.
+   This is the sentence that makes the feedback worth reading, and it is the
+   one most often skipped.
+4. **Put the move to make in `move`**, and what it would let the persona tell them.
+   Name the move — "anchor it to one occasion", "ask what happened rather than
+   what they think" — but **do not write the replacement question**. Supplying
+   the finished question takes the exercise away from them, which is why this
+   prompt asks for reflection rather than correction.
 
-   **Open every explanation with a quoted fragment**, in double asterisks — their
-   words, not a description of them. This holds when the problem is an absence:
-   quote whatever stands where the missing thing should be. So "The question lacks a clear purpose"
-   becomes "**\"what colour do you associate with success\"** points at nothing in the interview goal, so whatever she answers cannot be used."
+One sentence is never enough. If the question violates nothing, use the single
+mistake value "None" and keep the same shape: quote the words doing the work,
+say why they work, and name what the question sets up in the interview.
 
-3. **Say what to do next.** Put one concrete action in `nextStep`: what to
-   change about the question, and what it would let the persona tell them.
-   Point the direction — **do not write the replacement question**. Naming the
-   move ("anchor it to one occasion", "ask what happened rather than what they
-   think") is the help; supplying the finished question takes the exercise away
-   from them. Use "" when the mistake is "None".
+Be accurate. Tag only what the wording actually does, judged against the rubric
+above and against needfinding practice. One flaw counted twice under two names
+is worse than one honest tag.
 
-4. **Be constructive.** Write about the question, never about the team.
-   Describe what the wording does — what it lets the persona say or stops them
-   from saying — rather than ruling on how good it is. Avoid "poor", "weak",
-   "fails", "excellent", and avoid praise added to cushion a criticism. Someone
-   reading this should know what to do next and want to do it.
+These all count as failures, however true the words are:
+- an explanation that would read the same against a different question
+- "be more specific" without naming what is vague
+- restating the rubric instead of reading their words
+- naming the flaw without saying what it will cost them
+- opening with a verdict — "The question does not…", "The question lacks…"
 
-   Do not open with a verdict — "The question does not…", "The question lacks…",
-   "is not relevant enough" — even when the judgement is correct. Start from the
-   words on the page and what they do:
-   - instead of "The question lacks user relevance", write
-     "**\"how do doctors update records\"** asks about a job Sofia does not do, so she can only speculate."
-   - instead of "The question is too broad", write
-     "**\"your life as a student\"** covers four years at once, so she has to pick something for you."
-
-If the question violates nothing, use the single mistake value "None" and say
-what makes it work, still quoting the words that do the work.
+Write about the question, never about the team. Avoid "poor", "weak", "fails",
+"excellent", and avoid praise added to cushion a criticism.
 
 Students skim, so wrap the parts that carry the point in double asterisks, like
-**this** — one to three fragments per entry, or none if nothing stands out.
-Emphasise their phrase and the judgement about it, not connecting words.
+**this** — one to three fragments per explanation. Emphasise their phrase and
+the judgement about it, not connecting words.
 
-Example of the two fields working together:
-- explanation: "Asking **\"would an app help\"** proposes a fix before you know
-  what goes wrong, so Sofia is left **agreeing or disagreeing with your idea**
-  instead of describing her own morning."
-- nextStep: "Drop the proposed fix and ask about the morning itself — what she
-  did, in order, the last time it went badly."
+### Check each explanation before you move on
+
+Three questions. If any answer is no, rewrite it.
+
+1. Does it **open with quoted words** from their question — their words in
+   double asterisks, not a description of them?
+2. Does it say what those words will **cost them** in the interview, rather
+   than only what is wrong with them?
+3. Is `move` a real instruction — a verb telling them what to do to this
+   particular one — rather than a restatement of the problem or "keep this up"?
+
+Two sentences almost always means check 2 failed — you named the flaw and
+stopped, without saying what it costs them. Three is the floor, not the
+target.
+
+The closing move goes in its own key, `move`. It is joined onto the end of
+what you wrote before the student sees it, so they read one block of text —
+write it as the sentence that would naturally follow, not as a heading or a
+label. Begin it with a verb: "Work out…", "Anchor…", "Ask…", "Replace…",
+"Drop…", "Say what…".
+
+`move` is never empty, at any score. At 5 it names something to push further —
+a place this could go next, a part of the research it has not touched yet —
+never "keep this up".
+
+Two ways this goes wrong, both of which mean you stopped one sentence early:
+
+- **Stopping at the diagnosis.** Sentences starting "It doesn't…", "It
+  lacks…", "This limits…", "It fails to…", "There is no…" restate the problem.
+  One of those is fine; two in a row means the consequence never got written.
+- **A move that is not a move.** "Keep this balance", "Maintain this openness"
+  and "Continue with this approach" say nothing, and are not acceptable in
+  `move` at any score. Name something they could push further — a place the question could go next, a part of the
+  research it has not touched yet.
+
+
+### What an explanation should look like
+
+Too short and too general. Do not write like this:
+
+> The question proposes a solution before exploring the problem, which limits
+> what you can learn.
+
+What is asked for instead:
+
+> Asking **"would an app help"** proposes a fix before you know what goes
+> wrong, so Sofia is left **agreeing or disagreeing with your idea** instead of
+> describing her own morning. What comes back will be her opinion of your app —
+> polite, probably positive, and no use for design, because she has never had
+> to live with it. Drop the proposed fix and ask about the morning itself: what
+> she did, in order, the last time it went badly.
 
 ### Output
 
-Reply with a JSON object of exactly this shape. Keep the keys in this order —
-`explanation` first, then `nextStep`, which must follow from what you wrote.
+Reply with a JSON object of exactly this shape:
 
 {
   "feedback": [
-    { "mistake": "Closed Question", "explanation": "...", "nextStep": "..." }
+    { "mistake": "Closed Question", "explanation": "...", "move": "..." }
   ]
 }
 
