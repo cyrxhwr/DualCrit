@@ -5,6 +5,7 @@ import { getSocket } from '../lib/socket';
 import { useActivityMembers } from '../lib/useActivityMembers';
 import { useVoting } from '../lib/useVoting';
 import ResearchBrief from '../components/ResearchBrief';
+import HmwTypes from '../components/HmwTypes';
 
 interface Props {
   activityId: string;
@@ -222,6 +223,8 @@ export default function HmwCreation({ activityId, pov, onDecided }: Props) {
       {(error ?? voting.error) && (
         <p className="note note-error mb-4">{error ?? voting.error}</p>
       )}
+
+      {!inVoting && <HmwTypes />}
 
       {!inVoting && (
         <div className="mb-6 space-y-3">
