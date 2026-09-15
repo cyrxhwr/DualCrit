@@ -92,6 +92,11 @@ export default function HmwCreation({ activityId, pov, onDecided }: Props) {
     memberCount > 0 && questions.length >= memberCount * PER_STUDENT;
   const inVoting = voting.state?.status === 'active';
   const decided = voting.state?.status === 'completed';
+  // Everyone has voted but more questions reach the cut than there are
+  // places: some are level for the last spot, so the vote stays open.
+  const tied =
+    voting.state?.isComplete === true &&
+    (voting.state?.winners.length ?? 0) > PICK;
 
   const announced = useRef(false);
   useEffect(() => {
@@ -218,6 +223,12 @@ export default function HmwCreation({ activityId, pov, onDecided }: Props) {
           insights={research.insights}
           pov={pov}
         />
+      )}
+
+      {tied && (
+        <p className="note note-attention mb-4">
+          It's a tie for the last place — change a vote to break it.
+        </p>
       )}
 
       {(error ?? voting.error) && (
@@ -370,7 +381,7 @@ export default function HmwCreation({ activityId, pov, onDecided }: Props) {
             </span>
             <button
               type="button"
-              disabled={picked.length !== PICK || sameAsSaved}
+              disabled={voting.busy || picked.length !== PICK || sameAsSaved}
               onClick={() => void voting.castVote(picked)}
               className="btn btn-primary"
             >

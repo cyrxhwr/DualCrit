@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { api, type VotingState } from './api';
 import { getSocket } from './socket';
 import { useActivityRoom } from './useActivityRoom';
@@ -16,6 +16,10 @@ export function useVoting(activityId: string | undefined, type: string) {
   const [myVote, setMyVote] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  // A ref, not just state: two clicks in the same frame both read `busy` as
+  // false before React re-renders, and both requests go out.
+  const inFlight = useRef(false);
 
   // Join the room ourselves rather than assuming another hook did it.
   const connected = useActivityRoom(activityId);
@@ -62,11 +66,18 @@ export function useVoting(activityId: string | undefined, type: string) {
 
   const start = useCallback(
     async (maxSelections = 1) => {
-      if (!activityId) return;
+      if (!activityId || inFlight.current) return;
+      inFlight.current = true;
+      setBusy(true);
       try {
+        // The server decides how many options a vote picks; the count is still
+        // sent so this page also works against a backend from before that.
         setState(await api.startVoting(activityId, type, maxSelections));
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Could not start voting');
+      } finally {
+        inFlight.current = false;
+        setBusy(false);
       }
     },
     [activityId, type],
@@ -74,17 +85,22 @@ export function useVoting(activityId: string | undefined, type: string) {
 
   const castVote = useCallback(
     async (optionIds: string[]) => {
-      if (!activityId) return;
+      if (!activityId || inFlight.current) return;
+      inFlight.current = true;
+      setBusy(true);
       setError(null);
       try {
         setState(await api.castVote(activityId, type, optionIds));
         setMyVote(optionIds);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Could not save vote');
+      } finally {
+        inFlight.current = false;
+        setBusy(false);
       }
     },
     [activityId, type],
   );
 
-  return { state, myVote, loading, error, start, castVote };
+  return { state, myVote, loading, error, busy, start, castVote };
 }

@@ -319,7 +319,7 @@ export default function QuestionCreation({
             )}
             <button
               type="button"
-              disabled={!picked || picked === voting.myVote[0]}
+              disabled={voting.busy || !picked || picked === voting.myVote[0]}
               onClick={() => picked && void voting.castVote([picked])}
               className="btn btn-primary"
             >

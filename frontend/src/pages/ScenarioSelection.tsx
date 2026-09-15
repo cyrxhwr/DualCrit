@@ -15,7 +15,7 @@ interface Props {
  * treats start as "ensure a round exists" rather than "reset the round".
  */
 export default function ScenarioSelection({ activityId, onDecided }: Props) {
-  const { state, myVote, loading, error, start, castVote } = useVoting(
+  const { state, myVote, loading, error, busy, start, castVote } = useVoting(
     activityId,
     'scenario_selection',
   );
@@ -133,7 +133,7 @@ export default function ScenarioSelection({ activityId, onDecided }: Props) {
         )}
         <button
           type="button"
-          disabled={!picked || picked === myVote[0]}
+          disabled={busy || !picked || picked === myVote[0]}
           onClick={() => picked && void castVote([picked])}
           className="btn btn-primary"
         >
