@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
 import { ActivitiesService } from '../activities/activities.service';
+import { ActivityLock } from '../activities/activity-lock';
 
 export const VOTE_TYPES = [
   'scenario_selection',
@@ -9,6 +10,18 @@ export const VOTE_TYPES = [
   'hmw_question',
 ] as const;
 export type VoteType = (typeof VOTE_TYPES)[number];
+
+/**
+ * How many options each vote picks. Decided here rather than taken from the
+ * request: a client that opened a POV vote as "pick 3" left every normal
+ * one-pick ballot rejected, and the team unable to vote at all.
+ */
+export const MAX_SELECTIONS: Record<VoteType, number> = {
+  scenario_selection: 1,
+  interview_question: 1,
+  pov_statement: 1,
+  hmw_question: 3,
+};
 
 /** Valid options for a scenario vote. Display text lives in the frontend. */
 export const SCENARIO_TAGS = ['A', 'B', 'C', 'D'];
@@ -53,11 +66,23 @@ export interface Tally {
  * Count a round. Pure, so it can be tested without a database — this is the
  * calculation that decides what a team ends up working on.
  *
- * A member counts as having voted once they have any row, and `winners` holds
- * everything on the top score, so a tie is visible rather than resolved by
- * whichever option happened to sort first.
+ * A member counts as having voted once they have any row.
+ *
+ * The team picks `maxSelections` options, so `winners` is every option scoring
+ * at least as well as the last of those places. When that is exactly
+ * `maxSelections` options, the choice is settled. When it is more, some are
+ * level for the final place — a tie, visible rather than resolved by whichever
+ * option happened to sort first. With one pick this is simply everything on
+ * the top score.
+ *
+ * Counting only the top score was wrong for a pick of three: votes of 4, 3 and
+ * 2 recorded one question as the team's choice instead of three.
  */
-export function computeTally(rows: VoteRow[], memberCount: number): Tally {
+export function computeTally(
+  rows: VoteRow[],
+  memberCount: number,
+  maxSelections = 1,
+): Tally {
   const tally: Record<string, number> = {};
   const voters = new Set<string>();
 
@@ -67,13 +92,14 @@ export function computeTally(rows: VoteRow[], memberCount: number): Tally {
   }
 
   const ranked = Object.entries(tally).sort((a, b) => b[1] - a[1]);
-  const topScore = ranked[0]?.[1] ?? 0;
+  const places = Math.min(Math.max(1, maxSelections), ranked.length);
+  const cutoff = ranked[places - 1]?.[1] ?? 0;
 
   return {
     tally,
     votedCount: voters.size,
     isComplete: memberCount > 0 && voters.size >= memberCount,
-    winners: ranked.filter(([, n]) => n === topScore).map(([id]) => id),
+    winners: ranked.filter(([, n]) => n > 0 && n >= cutoff).map(([id]) => id),
   };
 }
 
@@ -84,6 +110,7 @@ export class VotingService {
   constructor(
     private readonly supabase: SupabaseService,
     private readonly activities: ActivitiesService,
+    private readonly lock: ActivityLock,
   ) {}
 
   /**
@@ -102,10 +129,18 @@ export class VotingService {
     activityId: string,
     studentUuid: string,
     type: VoteType,
-    maxSelections = 1,
   ): Promise<VotingState> {
     await this.activities.assertMember(activityId, studentUuid);
+    return this.lock.run(activityId, () =>
+      this.startUnlocked(activityId, studentUuid, type),
+    );
+  }
 
+  private async startUnlocked(
+    activityId: string,
+    studentUuid: string,
+    type: VoteType,
+  ): Promise<VotingState> {
     const existing = await this.findLatestRound(activityId, type);
     if (existing && existing.status === 'active') {
       return this.buildState(existing);
@@ -116,7 +151,7 @@ export class VotingService {
       .insert({
         activity_id: activityId,
         type,
-        max_selections: maxSelections,
+        max_selections: MAX_SELECTIONS[type],
         started_by: studentUuid,
       })
       .select('id, activity_id, type, status, max_selections')
@@ -177,7 +212,20 @@ export class VotingService {
     optionIds: string[],
   ): Promise<VotingState> {
     await this.activities.assertMember(activityId, studentUuid);
+    // One vote at a time per activity: the check that the round is open, the
+    // write, and the decision to close it must not interleave with anyone
+    // else's.
+    return this.lock.run(activityId, () =>
+      this.castUnlocked(activityId, studentUuid, type, optionIds),
+    );
+  }
 
+  private async castUnlocked(
+    activityId: string,
+    studentUuid: string,
+    type: VoteType,
+    optionIds: string[],
+  ): Promise<VotingState> {
     const round = await this.findLatestRound(activityId, type);
     if (!round || round.status !== 'active') {
       throw new BadRequestException('Voting is not open');
@@ -192,26 +240,34 @@ export class VotingService {
 
     await this.assertOptionsExist(round, chosen);
 
-    // Replacing this student's own rows only; nobody else's are touched.
-    const { error: clearError } = await this.supabase.client
-      .from('votes')
-      .delete()
-      .eq('round_id', round.id)
-      .eq('student_id', studentUuid);
-
-    if (clearError) throw new BadRequestException(clearError.message);
-
+    // Add the new picks first, then remove this student's other rows; nobody
+    // else's are touched. In this order:
+    //   - resending the same vote is harmless, where a double-clicked button
+    //     used to surface a raw duplicate-key error;
+    //   - the student is never briefly counted as not having voted;
+    //   - two of their requests racing can leave them fewer votes than they
+    //     are allowed, but never more — the lock prevents even that here.
     const { error: insertError } = await this.supabase.client
       .from('votes')
-      .insert(
+      .upsert(
         chosen.map((optionId) => ({
           round_id: round.id,
           student_id: studentUuid,
           option_id: optionId,
         })),
+        { onConflict: 'round_id,student_id,option_id', ignoreDuplicates: true },
       );
 
     if (insertError) throw new BadRequestException(insertError.message);
+
+    const { error: clearError } = await this.supabase.client
+      .from('votes')
+      .delete()
+      .eq('round_id', round.id)
+      .eq('student_id', studentUuid)
+      .not('option_id', 'in', `(${chosen.map((id) => `"${id}"`).join(',')})`);
+
+    if (clearError) throw new BadRequestException(clearError.message);
 
     const state = await this.buildState(round);
     return state.isComplete ? this.complete(round, state) : state;
@@ -269,7 +325,11 @@ export class VotingService {
 
     if (error) throw new BadRequestException(error.message);
 
-    const counted = computeTally((votes ?? []) as VoteRow[], members.length);
+    const counted = computeTally(
+      (votes ?? []) as VoteRow[],
+      members.length,
+      round.max_selections,
+    );
 
     return {
       activityId: round.activity_id,
@@ -297,13 +357,23 @@ export class VotingService {
       return state;
     }
 
-    const { error } = await this.supabase.client
+    const { data: closed, error } = await this.supabase.client
       .from('voting_rounds')
       .update({ status: 'completed', completed_at: new Date().toISOString() })
       .eq('id', round.id)
-      .eq('status', 'active'); // only the first caller closes it
+      .eq('status', 'active')
+      .select('id');
 
     if (error) throw new BadRequestException(error.message);
+
+    // Only the request that actually closed the round records the outcome.
+    // Checking the status in the filter was not enough on its own: both of
+    // two simultaneous final votes went on to record a selection, and two
+    // statements ended up marked as the team's choice.
+    if (!closed?.length) {
+      const latest = await this.findLatestRound(round.activity_id, round.type);
+      return this.buildState(latest ?? { ...round, status: 'completed' });
+    }
 
     await this.recordSelection(round, state.winners);
 
@@ -340,6 +410,14 @@ export class VotingService {
       } else {
         patch.selected_hmw_contents = texts;
       }
+
+      // Clear the type first, so exactly the winners end up selected even if
+      // an earlier bug left another option marked.
+      await this.supabase.client
+        .from('contributions')
+        .update({ is_selected: false })
+        .eq('activity_id', round.activity_id)
+        .eq('type', round.type);
 
       await this.supabase.client
         .from('contributions')

@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 import { VotingService, VOTE_TYPES, type VoteType } from './voting.service';
 import { CastVoteDto } from './dto/cast-vote.dto';
-import { StartRoundDto } from './dto/start-round.dto';
 import {
   AuthedStudent,
   CurrentStudent,
@@ -49,14 +48,10 @@ export class VotingController {
     @CurrentStudent() student: AuthedStudent,
     @Param('id', ParseUUIDPipe) id: string,
     @Param('type') type: string,
-    @Body() dto: StartRoundDto,
   ) {
-    const state = await this.voting.startOrGet(
-      id,
-      student.id,
-      parseType(type),
-      dto.maxSelections ?? 1,
-    );
+    // How many options a vote picks is decided by the server, from the type.
+    // A body sent by an older page is simply ignored.
+    const state = await this.voting.startOrGet(id, student.id, parseType(type));
     this.realtime.publish(id, 'voting:state', state);
     return state;
   }

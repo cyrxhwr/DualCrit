@@ -63,3 +63,69 @@ describe('computeTally', () => {
     expect(result.winners).toEqual([]);
   });
 });
+
+describe('computeTally with several picks', () => {
+  // Four students, each picking three questions.
+  const ballots = (picks: string[][]) =>
+    picks.flatMap((options, i) =>
+      options.map((option_id) => ({ student_id: `s${i + 1}`, option_id })),
+    );
+
+  it('keeps the top three when the ranking is clear', () => {
+    const result = computeTally(
+      ballots([
+        ['Q1', 'Q2', 'Q3'],
+        ['Q1', 'Q2', 'Q3'],
+        ['Q1', 'Q2', 'Q4'],
+        ['Q1', 'Q5', 'Q6'],
+      ]),
+      4,
+      3,
+    );
+
+    // 4, 3, 2 and then 1s: counting only the top score used to keep just Q1.
+    expect(result.winners).toEqual(['Q1', 'Q2', 'Q3']);
+  });
+
+  it('reports a tie for the last place as more winners than places', () => {
+    const result = computeTally(
+      ballots([
+        ['Q1', 'Q2', 'Q3'],
+        ['Q1', 'Q2', 'Q4'],
+        ['Q1', 'Q2', 'Q5'],
+        ['Q3', 'Q4', 'Q6'],
+      ]),
+      4,
+      3,
+    );
+
+    // Q1 and Q2 are settled; Q3 and Q4 are level for the third place.
+    expect(result.winners.sort()).toEqual(['Q1', 'Q2', 'Q3', 'Q4']);
+  });
+
+  it('does not settle on two when three are wanted and the rest are level', () => {
+    const result = computeTally(
+      ballots([
+        ['Q1', 'Q2', 'Q3'],
+        ['Q1', 'Q2', 'Q4'],
+        ['Q5', 'Q6', 'Q7'],
+        ['Q8', 'Q9', 'Q10'],
+      ]),
+      4,
+      3,
+    );
+
+    expect(result.winners.length).toBeGreaterThan(3);
+  });
+
+  it('keeps a single pick exactly as before', () => {
+    const rows = [
+      { student_id: 's1', option_id: 'A' },
+      { student_id: 's2', option_id: 'A' },
+      { student_id: 's3', option_id: 'B' },
+    ];
+
+    expect(computeTally(rows, 3, 1).winners).toEqual(['A']);
+    expect(computeTally(rows, 3).winners).toEqual(['A']);
+  });
+});

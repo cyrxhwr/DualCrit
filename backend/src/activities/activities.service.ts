@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
 import type { ActivityType } from './dto/create-activity.dto';
+import { ActivityLock } from './activity-lock';
 
 export interface ActivitySummary {
   id: string;
@@ -59,7 +60,10 @@ export interface ActivityMember {
 
 @Injectable()
 export class ActivitiesService {
-  constructor(private readonly supabase: SupabaseService) {}
+  constructor(
+    private readonly supabase: SupabaseService,
+    private readonly lock: ActivityLock,
+  ) {}
 
   /** Everything the dashboard needs, in two queries rather than N. */
   async listForStudent(studentUuid: string): Promise<ActivitySummary[]> {
@@ -182,24 +186,43 @@ export class ActivitiesService {
       throw new NotFoundException('No open activity with that code');
     }
 
-    // The roster is fixed once the host starts. A late arrival would change
-    // what "everyone has submitted" and "everyone has voted" mean in the
-    // middle of a round, so joining is refused rather than silently allowed.
-    if (activity.started_at) {
-      throw new ForbiddenException('That activity has already started');
-    }
+    // Checked and written under the activity's lock: counting seats and then
+    // taking one are two steps, and six students joining a four-seat team at
+    // once all counted three and all got in.
+    await this.lock.run(activity.id, async () => {
+      // Re-read under the lock: the host may have started while this request
+      // waited its turn.
+      const { data: fresh, error: freshError } = await this.supabase.client
+        .from('activities')
+        .select('started_at')
+        .eq('id', activity.id)
+        .single<{ started_at: string | null }>();
+      if (freshError) throw new BadRequestException(freshError.message);
 
-    // A returning member is already counted, so only check capacity for
-    // someone genuinely new. This is the bug that stopped students rejoining
-    // a full team in the previous system.
-    const { data: existing } = await this.supabase.client
-      .from('activity_members')
-      .select('student_id')
-      .eq('activity_id', activity.id)
-      .eq('student_id', studentUuid)
-      .maybeSingle();
+      // The roster is fixed once the host starts. A late arrival would change
+      // what "everyone has submitted" and "everyone has voted" mean in the
+      // middle of a round, so joining is refused rather than silently allowed.
+      if (fresh.started_at) {
+        throw new ForbiddenException('That activity has already started');
+      }
 
-    if (!existing) {
+      const { data: existing } = await this.supabase.client
+        .from('activity_members')
+        .select('student_id')
+        .eq('activity_id', activity.id)
+        .eq('student_id', studentUuid)
+        .maybeSingle();
+
+      // A returning member keeps their seat and their role. Writing the row
+      // afresh set is_host to false, so a host who re-entered their own code
+      // stopped being host, and nobody else could become one.
+      if (existing) {
+        await this.reactivateMember(activity.id, studentUuid);
+        return;
+      }
+
+      // Only someone genuinely new needs a seat. This is the bug that stopped
+      // students rejoining a full team in the previous system.
       const { count, error: countError } = await this.supabase.client
         .from('activity_members')
         .select('student_id', { count: 'exact', head: true })
@@ -210,11 +233,52 @@ export class ActivitiesService {
       if ((count ?? 0) >= activity.max_participants) {
         throw new ForbiddenException('That activity is full');
       }
-    }
 
-    await this.addMember(activity.id, studentUuid, false);
+      await this.addMember(activity.id, studentUuid, false);
+      await this.giveUpSeatIfOverCapacity(
+        activity.id,
+        studentUuid,
+        activity.max_participants,
+      );
+    });
+
     const list = await this.listForStudent(studentUuid);
     return list.find((a) => a.id === activity.id)!;
+  }
+
+  /**
+   * The database-level backstop for capacity.
+   *
+   * The lock only serialises requests inside one server process. If joins
+   * ever raced across processes, every new member re-checks after taking a
+   * seat, and whoever arrived after the limit gives it back. Seats are
+   * ordered by arrival, so every request agrees on who is over.
+   */
+  private async giveUpSeatIfOverCapacity(
+    activityId: string,
+    studentUuid: string,
+    capacity: number,
+  ): Promise<void> {
+    const { data, error } = await this.supabase.client
+      .from('activity_members')
+      .select('student_id')
+      .eq('activity_id', activityId)
+      .eq('is_active', true)
+      .order('joined_at', { ascending: true })
+      .order('student_id', { ascending: true });
+
+    if (error) throw new BadRequestException(error.message);
+
+    const seat = (data ?? []).findIndex((m) => m.student_id === studentUuid);
+    if (seat >= capacity) {
+      await this.supabase.client
+        .from('activity_members')
+        .delete()
+        .eq('activity_id', activityId)
+        .eq('student_id', studentUuid)
+        .eq('is_host', false);
+      throw new ForbiddenException('That activity is full');
+    }
   }
 
   /**
@@ -226,6 +290,16 @@ export class ActivitiesService {
    * Idempotent — starting twice keeps the original time rather than resetting.
    */
   async start(activityId: string, studentUuid: string): Promise<void> {
+    // Same queue as joining, so a join and the start cannot cross.
+    await this.lock.run(activityId, () =>
+      this.startUnlocked(activityId, studentUuid),
+    );
+  }
+
+  private async startUnlocked(
+    activityId: string,
+    studentUuid: string,
+  ): Promise<void> {
     const { data: membership, error: membershipError } =
       await this.supabase.client
         .from('activity_members')
@@ -308,6 +382,20 @@ export class ActivitiesService {
 
     if (error) throw new BadRequestException(error.message);
     if (!data) throw new ForbiddenException('You are not in this activity');
+  }
+
+  /** A returning member: mark them active without touching their role. */
+  private async reactivateMember(
+    activityId: string,
+    studentUuid: string,
+  ): Promise<void> {
+    const { error } = await this.supabase.client
+      .from('activity_members')
+      .update({ is_active: true, last_seen_at: new Date().toISOString() })
+      .eq('activity_id', activityId)
+      .eq('student_id', studentUuid);
+
+    if (error) throw new BadRequestException(error.message);
   }
 
   private async addMember(

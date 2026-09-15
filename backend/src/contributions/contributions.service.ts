@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
 import { ActivitiesService } from '../activities/activities.service';
+import { ActivityLock } from '../activities/activity-lock';
 
 export const CONTRIBUTION_TYPES = [
   'interview_question',
@@ -37,6 +38,7 @@ export class ContributionsService {
   constructor(
     private readonly supabase: SupabaseService,
     private readonly activities: ActivitiesService,
+    private readonly lock: ActivityLock,
   ) {}
 
   async list(
@@ -85,7 +87,24 @@ export class ContributionsService {
     orderIndex = 1,
   ): Promise<Contribution[]> {
     await this.activities.assertMember(activityId, studentUuid);
-    await this.assertNotDecided(activityId, type);
+
+    // In the same queue as starting a vote, so a submission cannot slip in
+    // between the check below and the vote opening.
+    await this.lock.run(activityId, () =>
+      this.write(activityId, studentUuid, type, content, orderIndex),
+    );
+
+    return this.list(activityId, studentUuid, type);
+  }
+
+  private async write(
+    activityId: string,
+    studentUuid: string,
+    type: ContributionType,
+    content: Record<string, unknown>,
+    orderIndex: number,
+  ): Promise<void> {
+    await this.assertOpenForSubmissions(activityId, type);
 
     const { error } = await this.supabase.client.from('contributions').upsert(
       {
@@ -99,15 +118,16 @@ export class ContributionsService {
     );
 
     if (error) throw new BadRequestException(error.message);
-
-    return this.list(activityId, studentUuid, type);
   }
 
   /**
-   * Once the team has voted, the options are settled. Editing a question
-   * after it won would change what everyone agreed to.
+   * Submissions close as soon as voting opens, not only once it finishes.
+   *
+   * Editing a statement mid-vote changed the words under an option that
+   * teammates had already read and voted for, and whatever the edit said was
+   * what got recorded if it won.
    */
-  private async assertNotDecided(
+  private async assertOpenForSubmissions(
     activityId: string,
     type: ContributionType,
   ): Promise<void> {
@@ -116,12 +136,18 @@ export class ContributionsService {
       .select('status')
       .eq('activity_id', activityId)
       .eq('type', type)
-      .eq('status', 'completed')
+      .in('status', ['active', 'completed'])
       .limit(1);
 
     if (error) throw new BadRequestException(error.message);
-    if ((data?.length ?? 0) > 0) {
+    const status = data?.[0]?.status as string | undefined;
+    if (status === 'completed') {
       throw new BadRequestException('Your team has already voted on these');
+    }
+    if (status === 'active') {
+      throw new BadRequestException(
+        'Voting has started, so these can no longer be changed',
+      );
     }
   }
 }
